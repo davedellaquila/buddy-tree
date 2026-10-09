@@ -143,6 +143,10 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 .dumps-head{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px;margin:12px 0 0}
 .dumps-head h4{margin:0;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#8b949e}
 .dumps-head .darrow{font-size:25px;color:#8b949e;transition:transform .15s;display:inline-block;line-height:1;position:relative;top:-2px}
+.bp-sec > h3{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}
+.bp-sec > h3 .secarrow{font-size:14px;color:#8b949e;transition:transform .15s;display:inline-block;line-height:1}
+.bp-sec.collapsed > *:not(h3){display:none}
+.bp-sec.collapsed .secarrow{transform:rotate(-90deg)}
 .dumps.collapsed .darrow{transform:rotate(-90deg)}
 .dumps.collapsed .dumps-body{display:none}
 #sb-gear{position:absolute;top:10px;right:10px;z-index:10;width:36px;height:36px;background:none;border:none;
@@ -478,6 +482,28 @@ function getFieldOrder(){
   if (!S.fieldOrder || !Array.isArray(S.fieldOrder)) S.fieldOrder = FIELD_DEFS.map(f => f.id);
   return S.fieldOrder;
 }
+function applySectionCollapse(bid){
+  const home = document.getElementById('buddy-home');
+  if (!home) return;
+  if (!S.secCollapsed || typeof S.secCollapsed !== 'object') S.secCollapsed = {};
+  if (!S.secCollapsed[bid] || typeof S.secCollapsed[bid] !== 'object') S.secCollapsed[bid] = {};
+  home.querySelectorAll('.bp-sec[data-field] > h3').forEach(h3 => {
+    if (h3.querySelector('.secarrow')) return;
+    const sec = h3.parentElement;
+    const fid = sec.dataset.field;
+    const arrow = document.createElement('span');
+    arrow.className = 'secarrow';
+    arrow.textContent = '\u25be';
+    h3.insertBefore(arrow, h3.firstChild);
+    if (S.secCollapsed[bid][fid]) sec.classList.add('collapsed');
+    h3.addEventListener('click', e => {
+      if (e.target.closest('.info-tip')) return;
+      sec.classList.toggle('collapsed');
+      S.secCollapsed[bid][fid] = sec.classList.contains('collapsed');
+      save();
+    });
+  });
+}
 function applyFieldOrder(){
   const home = document.getElementById('buddy-home');
   if (!home) return;
@@ -704,6 +730,7 @@ function renderBuddy(id){
   initPanelResize(); applyPanelWidth();
   refreshTokenUI(id);
   applyFieldOrder();
+  applySectionCollapse(id);
   renderJournal();
   if (id === 'project-buddy') {
     const tw = document.querySelector('#buddy-home .bp-tree-wrap');
