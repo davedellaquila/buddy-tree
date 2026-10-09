@@ -229,6 +229,11 @@ body.standalone .sa-bar{display:flex}
 
 .pstrip img{height:150px;border-radius:10px;border:1px solid #30363d;display:block}
 .pstrip img:hover{border-color:#1f6feb}
+.pwrap{position:relative;flex:0 0 auto}
+.pdel{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.7);
+  color:#fff;border:none;font-size:14px;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1}
+.pwrap:hover .pdel{display:flex}
+.pdel:hover{background:rgba(200,0,0,.85)}
 .node.drop-target{outline:2px solid #1f6feb;outline-offset:3px}
 .proj-row.drop-target{background:#1c2330;box-shadow:inset 0 0 0 2px #1f6feb}
 /* ---- buddy homepage ---- */
@@ -1235,6 +1240,21 @@ async function ghPutFile(repo, path, b64, msg){
   const body = {message: msg, content: b64}; if (sha) body.sha = sha;
   await ghApi('/repos/davedellaquila/' + repo + '/contents/' + path, 'PUT', body);
 }
+async function ghDeleteFile(repo, path, msg){
+  const t = ghToken(); if (!t) throw new Error('Add a GitHub token first.');
+  // Get SHA first
+  const r = await fetch('https://api.github.com/repos/davedellaquila/' + repo + '/contents/' + path, {
+    headers: {Authorization: 'token ' + t, Accept: 'application/vnd.github.v3+json'}
+  });
+  if (!r.ok) throw new Error('File not found');
+  const j = await r.json();
+  const d = await fetch('https://api.github.com/repos/davedellaquila/' + repo + '/contents/' + path, {
+    method: 'DELETE',
+    headers: {Authorization: 'token ' + t, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json'},
+    body: JSON.stringify({message: msg || 'Delete ' + path, sha: j.sha})
+  });
+  if (!d.ok) throw new Error('Delete failed: ' + d.status);
+}
 async function ghGetFile(repo, path){
   try {
     const j = await ghApi('/repos/davedellaquila/' + repo + '/contents/' + path);
@@ -1261,10 +1281,13 @@ async function loadPhotos(id){
   let repo = [];
   try {
     const r = await fetch('https://api.github.com/repos/davedellaquila/buddy-tree/contents/photos/' + id);
-    if (r.ok) { const j = await r.json(); repo = (Array.isArray(j) ? j : []).filter(f => f.type === 'file').map(f => ({src: f.download_url, href: f.download_url})); }
+    if (r.ok) { const j = await r.json(); repo = (Array.isArray(j) ? j : []).filter(f => f.type === 'file').map(f => ({src: f.download_url, href: f.download_url, path: f.path})); }
   } catch (e) {}
   const all = seeds.concat(repo.filter(x => !seeds.some(s => s.src === x.src)));
-  strip.innerHTML = all.map(p => '<a href="' + escHtml(p.href) + '" target="_blank" rel="noopener"><img src="' + escHtml(p.src) + '" loading="lazy" alt=""></a>').join('');
+  strip.innerHTML = all.map(p => {
+    const del = p.path ? '<button class="pdel" data-del="' + escHtml(p.path) + '" title="Delete photo">\u2715</button>' : '';
+    return '<div class="pwrap"><a href="' + escHtml(p.href) + '" target="_blank" rel="noopener"><img src="' + escHtml(p.src) + '" loading="lazy" alt=""></a>' + del + '</div>';
+  }).join('');
   const st = document.getElementById('pstat');
   if (st) st.textContent = all.length
     ? all.length + ' photo' + (all.length === 1 ? '' : 's') + ' \u2014 stored in the buddy-tree repo under photos/' + id + '/'
@@ -1495,6 +1518,18 @@ document.addEventListener('click', e => {
   if (e.target.closest && e.target.closest('#bp-desktop')) { const m = S.sel.match(/^buddy:(.+)$/); if (m) saveToDesktop(m[1]); return; }
   if (e.target.closest && e.target.closest('#sa-full')) { try { location.hash = '#/' + S.sel; } catch (e) {} document.body.classList.remove('standalone'); return; }
   if (e.target.closest && e.target.closest('.grip')) { e.preventDefault(); return; }
+  const pd = e.target.closest('[data-del]');
+  if (pd) {
+    e.preventDefault(); e.stopPropagation();
+    const path = pd.dataset.del;
+    const mm = S.sel.match(/^buddy:(.+)$/);
+    const bid = mm ? mm[1] : null;
+    if (!confirm('Delete this photo?')) return;
+    ghDeleteFile('buddy-tree', path, 'Delete photo for ' + (bid || 'buddy'))
+      .then(() => { toast('Photo deleted.'); if (bid) loadPhotos(bid); })
+      .catch(err => toast('Delete failed: ' + (err.message || err)));
+    return;
+  }
   const vb = e.target.closest('[data-view]');
   if (vb) { show('view:' + vb.dataset.view); return; }
   const pb = e.target.closest('[data-plan]');
