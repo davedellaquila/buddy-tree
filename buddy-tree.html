@@ -54,10 +54,18 @@
   .root-stub { width: 0; height: 26px; border-left: 2px solid #3a4a63; margin: 0 auto; }
 
   .node {
-    display: inline-block; width: 196px; vertical-align: top;
+    display: inline-block; width: 196px; vertical-align: top; position: relative;
     background: #161b22; border: 1px solid #30363d; border-top: 3px solid #8b949e;
     border-radius: 10px; padding: 12px 12px 13px;
   }
+  .grip {
+    position: absolute; top: 7px; left: 7px; z-index: 2;
+    cursor: grab; opacity: 0; color: #8b949e; font-size: 13px; line-height: 1;
+    padding: 4px; user-select: none; -webkit-user-select: none;
+  }
+  .node:hover .grip { opacity: .65; }
+  .grip:hover { opacity: 1 !important; }
+  .grip:active { cursor: grabbing; }
   .node .name { font-weight: 700; font-size: 15px; margin-bottom: 5px; }
   .node .desc { font-size: 12px; line-height: 1.45; color: #8b949e; }
   .node .tag {

@@ -445,9 +445,13 @@ function gridKids(b){
     + '<div class="desc">' + escHtml(c.tagline || '') + '</div><div class="tag">' + nodeTag(c, 2) + '</div>'
     + gridKids(c) + '</div></li>').join('') + '</ul>';
 }
+function gripHtml(b){
+  if (b.id === 'project-buddy') return '';
+  return '<span class="grip" draggable="true" data-buddy="' + b.id + '" title="Drag to move under a different parent">\u28ff</span>';
+}
 function orgNode(b, depth){
   const kids = kidsOf[b.id] || [];
-  let s = '<li><div class="node ' + b.kind + '" data-buddy="' + b.id + '"><div class="name">' + iconName(b) + '</div>'
+  let s = '<li><div class="node ' + b.kind + '" data-buddy="' + b.id + '">' + gripHtml(b) + '<div class="name">' + iconName(b) + '</div>'
     + '<div class="desc">' + escHtml(b.tagline || '') + '</div>'
     + '<div class="tag">' + nodeTag(b, depth) + '</div></div>';
   if (kids.length) s += '<ul>' + kids.map(c => orgNode(c, depth + 1)).join('') + '</ul>';
@@ -467,9 +471,18 @@ function renderOrgTree(){
     s += '<section class="standalones"><h2>Direct children of ' + escHtml(dispName(root)) + '</h2>'
       + '<p class="sub">Standalone buddies &mdash; parent is ' + escHtml(dispName(root)) + ' itself. Two meta-projects are tagged.</p>'
       + '<div class="grid">'
-      + rest.map(b => '<div class="node ' + b.kind + '" data-buddy="' + b.id + '"><div class="name">' + iconName(b) + '</div>'
+      + rest.map(b => '<div class="node ' + b.kind + '" data-buddy="' + b.id + '">' + gripHtml(b) + '<div class="name">' + iconName(b) + '</div>'
         + '<div class="desc">' + escHtml(b.tagline || '') + '</div><div class="tag">' + nodeTag(b, 1) + '</div>'
         + gridKids(b) + '</div>').join('')
+      + '</div></section>';
+  }
+  const orphans = (kidsOf['__root'] || []).filter(b => b.id !== 'project-buddy');
+  if (orphans.length) {
+    s += '<section class="standalones"><h2>Orphaned buddies</h2>'
+      + '<p class="sub">No parent yet &mdash; drag one onto a buddy in the tree to give it a home.</p>'
+      + '<div class="grid">'
+      + orphans.map(b => '<div class="node ' + b.kind + '" data-buddy="' + b.id + '">' + gripHtml(b) + '<div class="name">' + iconName(b) + '</div>'
+        + '<div class="desc">' + escHtml(b.tagline || '') + '</div></div>').join('')
       + '</div></section>';
   }
   document.getElementById('treezoom').innerHTML = s;
@@ -539,6 +552,7 @@ function applyZoom(){
   let pan = null, swallow = false;
   tz.addEventListener('pointerdown', e => {
     if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    if (e.target.closest && e.target.closest('.grip')) return;
     pan = { x: e.clientX, y: e.clientY, sl: tz.scrollLeft, st: tz.scrollTop, moved: false, id: e.pointerId };
   });
   tz.addEventListener('pointermove', e => {
@@ -564,6 +578,22 @@ function applyZoom(){
   tz.addEventListener('click', e => {
     if (swallow) { e.preventDefault(); e.stopPropagation(); }
   }, true);
+})();
+(function initGripDrag(){
+  const tz = document.getElementById('treezoom');
+  tz.addEventListener('dragstart', e => {
+    const g = e.target.closest ? e.target.closest('.grip') : null;
+    if (!g) return;
+    const id = g.dataset.buddy;
+    if (!id || id === 'project-buddy') { e.preventDefault(); return; }
+    dragId = id;
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', id); } catch (_e) {}
+  });
+  tz.addEventListener('dragend', () => {
+    dragId = null;
+    document.querySelectorAll('#treezoom .node.drop-target').forEach(x => x.classList.remove('drop-target'));
+  });
 })();
 (function initTreeDrop(){
   function target(e){
@@ -902,6 +932,7 @@ async function loadSharedNotes(id){
   });
 }
 document.addEventListener('click', e => {
+  if (e.target.closest && e.target.closest('.grip')) { e.preventDefault(); return; }
   const vb = e.target.closest('[data-view]');
   if (vb) { show('view:' + vb.dataset.view); return; }
   const pb = e.target.closest('[data-plan]');
