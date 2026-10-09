@@ -140,6 +140,10 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 #bp-resize::after{content:'';width:7px;height:56px;border-radius:3px;background:#6e7681}
 #bp-resize:hover::after{background:#58a6ff}
 #bp-resize:hover{background:rgba(31,111,235,.1)}
+.pupload{height:150px;min-width:120px;border-radius:10px;border:1px dashed #30363d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:#0d1117;flex:0 0 auto}
+.pupload .pbar{width:80px;height:6px;background:#21262d;border-radius:3px;overflow:hidden}
+.pupload .pbar > div{height:100%;background:#1f6feb;border-radius:3px;transition:width .2s}
+.pupload .plabel{font-size:11px;color:#8b949e}
 .dumps-head{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px;margin:12px 0 0}
 .dumps-head h4{margin:0;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#8b949e}
 .dumps-head .darrow{font-size:25px;color:#8b949e;transition:transform .15s;display:inline-block;line-height:1;position:relative;top:-2px}
@@ -1390,7 +1394,8 @@ async function handlePhotoFiles(id, files){
   }
   if (progTile) progTile.remove();
   const dz = document.getElementById('pdrop'); if (dz) dz.style.background = '';
-  loadPhotos(id);
+  if (st) st.textContent = 'Uploaded ' + n + ' photo' + (n === 1 ? '' : 's') + '. Refreshing\u2026';
+  setTimeout(() => loadPhotos(id), 2000);
 }
 function renderTokenRow(id){
   const st = document.getElementById('pstat'); if (!st || document.getElementById('ghtok')) return;
