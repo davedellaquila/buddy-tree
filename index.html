@@ -212,10 +212,6 @@ body.light #zoombar{background:#ffffff;border-color:#d0d7de}
 .ghtoken input{flex:1;min-width:180px;background:#0d1117;border:1px solid #30363d;color:#e6edf3;border-radius:8px;padding:7px 10px;font-size:13px}
 .linkbtn{background:none;border:none;color:#1f6feb;cursor:pointer;font-size:13px;padding:2px 4px}
 .linkbtn:hover{text-decoration:underline}
-.tokenwarn{background:#3a2a00;border:2px solid #d29922;color:#f0b429;border-radius:10px;padding:14px 16px;font-size:14px;margin-top:8px;line-height:1.6}
-.tokenwarn a{color:#ffd866;font-weight:bold}
-.tokenwarn b{color:#ffe9a8}
-#bp-shared-notes:disabled{opacity:.45;cursor:not-allowed}
 .bp-topnav{margin-bottom:6px}
 .bp-build{margin:26px 0 6px;font-size:11px;color:#6e7681;text-align:center}
 .pstrip{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 6px}
@@ -678,7 +674,7 @@ function renderBuddy(id){
     + '<textarea class="notes" id="bp-ingest" placeholder="Dump what’s in your head about '+escHtml(dispName(b))+'…"></textarea>'
     + '<div style="margin-top:8px"><button class="linkbtn" id="ingest-dump">Dump it →</button> <span class="fineprint" id="ingest-status"></span></div>'
     + '<div id="ingest-feed" style="margin-top:8px"></div></div>'
-    + '<div class="bp-build">Build 20261009.1442</div>'
+    + '<div class="bp-build">Build 20261009.1445</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -972,7 +968,7 @@ function renderPlan(id){
     + '<div class="bp-sec"><h3>Related buddies</h3>'+buds+'</div>'
     + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this plan…">'+escHtml(S.notes[id]||'')+'</textarea>'
     + '<p class="fineprint">Saved on this device only.</p></div>'
-    + '<div class="bp-build">Build 20261009.1442</div>'
+    + '<div class="bp-build">Build 20261009.1445</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
@@ -1060,11 +1056,7 @@ async function dumpIngest(id){
   if (!text) return;
   const b = byId[id];
   const stamp = new Date().toLocaleString();
-  const entry = '## ' + stamp + '
-
-' + text + '
-
-';
+  const entry = '## ' + stamp + String.fromCharCode(10,10) + text + String.fromCharCode(10,10);
   if (!ghToken() || !b.repo) {
     const key = 'ingest:' + id;
     let arr = [];
@@ -1078,9 +1070,7 @@ async function dumpIngest(id){
   }
   if (st) st.textContent = 'Dumping…';
   try {
-    const cur = await ghGetFile(b.repo, 'docs/ingest.md') || '# Ingest log — ' + b.name + '
-
-';
+    const cur = await ghGetFile(b.repo, 'docs/ingest.md') || '# Ingest log — ' + b.name + String.fromCharCode(10,10);
     await ghPutFile(b.repo, 'docs/ingest.md', b64encode(cur + entry), 'Ingest dump for ' + id);
     ta.value = '';
     if (st) st.textContent = 'Dumped to ' + b.repo + '/docs/ingest.md';
@@ -1089,8 +1079,7 @@ async function dumpIngest(id){
 }
 function parseIngest(md){
   return md.split(/^## /m).slice(1).map(p => {
-    const nl = p.indexOf('
-');
+    const nl = p.indexOf(String.fromCharCode(10));
     return {stamp: p.slice(0, nl).trim(), body: p.slice(nl).trim()};
   }).reverse();
 }
@@ -1215,19 +1204,7 @@ async function loadSharedNotes(id){
   const ta = document.getElementById('bp-shared-notes'), st = document.getElementById('shared-status');
   if (!ta) return;
   const b = byId[id];
-  const oldW = document.getElementById('shared-token-warn'); if (oldW) oldW.remove();
-  ta.disabled = false;
-  if (!ghToken() || !b.repo) {
-    ta.disabled = true; ta.value = '';
-    if (st) st.textContent = '';
-    const w = document.createElement('div');
-    w.id = 'shared-token-warn'; w.className = 'tokenwarn';
-    w.innerHTML = ghToken()
-      ? '⚠️ <b>No repo linked for these shared notes.</b> Nothing you type here will save.'
-      : '⚠️ <b>Shared notes are off — you gotta go get the token, bro.</b><br>Nothing you type here will save until then. <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener">Get a GitHub token</a> (classic token, <b>repo</b> scope), then paste it in the Photos section below — it never leaves this device.';
-    ta.after(w);
-    return;
-  }
+  if (!ghToken() || !b.repo) { if (st) st.textContent = ghToken() ? 'No repo linked for shared notes.' : 'Add a GitHub token (in the Photos section) to sync shared notes.'; return; }
   if (st) st.textContent = 'Loading…';
   const txt = await ghGetFile(b.repo, 'docs/notes.md');
   ta.value = txt || '';

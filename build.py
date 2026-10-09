@@ -345,6 +345,11 @@ function renderBuddy(id){
     + '<div class="bp-sec"><h3>Shared notes</h3><p class="fineprint">Saved to the buddy\u2019s repo (docs/notes.md) \u2014 visible to everyone with repo access.</p>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Shared notes\u2026"></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
+    + '<div class="bp-sec"><h3>Ingest</h3><p class="fineprint">Brain-dump anything about this buddy \u2014 raw and unfiltered. '
+    + 'Each dump lands in the buddy\u2019s repo (docs/ingest.md) as a timestamped entry, ready to be worked into the dossier later.</p>'
+    + '<textarea class="notes" id="bp-ingest" placeholder="Dump what\u2019s in your head about '+escHtml(dispName(b))+'\u2026"></textarea>'
+    + '<div style="margin-top:8px"><button class="linkbtn" id="ingest-dump">Dump it \u2192</button> <span class="fineprint" id="ingest-status"></span></div>'
+    + '<div id="ingest-feed" style="margin-top:8px"></div></div>'
     + '<div class="bp-build">Build __BUILD__</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
@@ -369,6 +374,7 @@ function renderBuddy(id){
   loadPhotos(id);
   initPhotoDrop(id);
   loadSharedNotes(id);
+  renderIngestFeed(id);
   renderJournal();
   if (id === 'project-buddy') {
     const tw = document.querySelector('#buddy-home .bp-tree-wrap');
@@ -719,6 +725,55 @@ function revertJournal(){
   renderJournal();
   toast('Reverted ' + n + ' change' + (n === 1 ? '' : 's') + '.');
 }
+/* ---------- ingest ---------- */
+async function dumpIngest(id){
+  const ta = document.getElementById('bp-ingest'), st = document.getElementById('ingest-status');
+  const text = ta.value.trim();
+  if (!text) return;
+  const b = byId[id];
+  const stamp = new Date().toLocaleString();
+  const entry = '## ' + stamp + String.fromCharCode(10,10) + text + String.fromCharCode(10,10);
+  if (!ghToken() || !b.repo) {
+    const key = 'ingest:' + id;
+    let arr = [];
+    try { arr = JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) {}
+    arr.push({t: Date.now(), text});
+    try { localStorage.setItem(key, JSON.stringify(arr)); } catch (e) {}
+    ta.value = '';
+    if (st) st.textContent = 'Saved on this device (add a GitHub token to sync it to the repo).';
+    renderIngestFeed(id);
+    return;
+  }
+  if (st) st.textContent = 'Dumping\u2026';
+  try {
+    const cur = await ghGetFile(b.repo, 'docs/ingest.md') || '# Ingest log \u2014 ' + b.name + String.fromCharCode(10,10);
+    await ghPutFile(b.repo, 'docs/ingest.md', b64encode(cur + entry), 'Ingest dump for ' + id);
+    ta.value = '';
+    if (st) st.textContent = 'Dumped to ' + b.repo + '/docs/ingest.md';
+  } catch (err) { if (st) st.textContent = 'Save failed: ' + (err.message || err); }
+  renderIngestFeed(id);
+}
+function parseIngest(md){
+  return md.split(/^## /m).slice(1).map(p => {
+    const nl = p.indexOf(String.fromCharCode(10));
+    return {stamp: p.slice(0, nl).trim(), body: p.slice(nl).trim()};
+  }).reverse();
+}
+async function renderIngestFeed(id){
+  const feed = document.getElementById('ingest-feed'); if (!feed) return;
+  const b = byId[id];
+  let entries = [];
+  if (ghToken() && b.repo) {
+    const md = await ghGetFile(b.repo, 'docs/ingest.md');
+    if (md) entries = parseIngest(md);
+  } else {
+    try { entries = (JSON.parse(localStorage.getItem('ingest:' + id) || '[]')).map(e => ({stamp: new Date(e.t).toLocaleString(), body: e.text})).reverse(); } catch (e) {}
+  }
+  if (!entries.length) { feed.innerHTML = '<p class="fineprint">No dumps yet.</p>'; return; }
+  feed.innerHTML = '<p class="fineprint">' + entries.length + ' dump' + (entries.length === 1 ? '' : 's') + ' \u2014 most recent:</p>'
+    + '<div class="attn"><div class="attn-body"><div class="attn-text">' + escHtml(entries[0].body.slice(0, 300)) + (entries[0].body.length > 300 ? '\u2026' : '') + '</div>'
+    + '<div class="attn-date">' + escHtml(entries[0].stamp) + '</div></div></div>';
+}
 /* ---------- GitHub repo write-back (photos + shared notes) ---------- */
 function ghToken(){ return S.ghToken || ''; }
 async function ghApi(path, method, body){
@@ -857,6 +912,7 @@ document.addEventListener('click', e => {
   if (nb) { const k = nb.dataset.navbtn; if (k === 'back') goBack(); else stepBuddy(k === 'next' ? 1 : -1); return; }
   if (e.target.closest('#j-revert')) { revertJournal(); return; }
   if (e.target.closest('#j-toggle')) { document.getElementById('journal-bar').classList.toggle('open'); return; }
+  if (e.target.closest('#ingest-dump')) { const m = S.sel.match(/^buddy:(.+)$/); if (m) dumpIngest(m[1]); return; }
   const rp = e.target.closest('#reset-parents');
   if (rp) { S.parents = {}; save(); buildKids(); renderNav(); refreshViews();
     if (S.sel.startsWith('buddy:')) renderBuddy(S.sel.slice(6));
