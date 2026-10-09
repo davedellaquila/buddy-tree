@@ -285,14 +285,17 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 .bp-sec > h3{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}
 .bp-sec > h3 .secarrow{font-size:25px;color:#8b949e;transition:transform .15s;display:inline-block;line-height:1}
 .bp-sec.collapsed > *:not(h3){display:none}
-.bp-sec.collapsed .secarrow{transform:rotate(-90deg)}
-.dumps.collapsed .darrow{transform:rotate(-90deg)}
+.bp-sec .secarrow{transform:rotate(90deg)}
+.bp-sec.collapsed .secarrow{transform:rotate(0deg)}
+.dumps .darrow{transform:rotate(90deg)}
+.dumps.collapsed .darrow{transform:rotate(0deg)}
 .dumps.collapsed .dumps-body{display:none}
 #sb-gear{position:absolute;top:10px;right:10px;z-index:10;width:36px;height:36px;background:none;border:none;
   border-radius:8px;color:#8b949e;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 #sb-gear:hover{color:#e6edf3}
 #plans-sec.collapsed #plan-nav{display:none}
-#plans-sec.collapsed #plans-arrow{transform:rotate(-90deg);display:inline-block}
+#plans-sec #plans-arrow{transform:rotate(90deg);display:inline-block}
+#plans-sec.collapsed #plans-arrow{transform:rotate(0deg)}
 
 #avatar-picker{position:fixed;z-index:2000;background:#161b22;border:1px solid #30363d;border-radius:12px;
   padding:16px;width:280px;display:none;box-shadow:0 12px 40px rgba(0,0,0,.6)}
@@ -487,7 +490,7 @@ body.standalone .sa-bar{display:flex}
   <div style="padding:0 10px 8px"><input type="search" id="buddy-search" placeholder="Search buddies…" aria-label="Search buddies"
     style="width:100%;box-sizing:border-box;background:#0d1117;border:1px solid #30363d;color:#e6edf3;border-radius:8px;padding:7px 10px;font-size:13px"></div>
   <h3>Buddies <span id="attn-pill" class="zero">0</span></h3><div id="buddy-nav"></div></div>
-  <div class="nav-sec" id="plans-sec"><h3 style="cursor:pointer" id="plans-toggle"><span id="plans-arrow">▾</span> Business Plans</h3><div id="plan-nav"></div></div>
+  <div class="nav-sec" id="plans-sec"><h3 style="cursor:pointer" id="plans-toggle"><span id="plans-arrow">›</span> Business Plans</h3><div id="plan-nav"></div></div>
 </aside>
 <main id="main">
 <div id="journal-bar"></div>
@@ -834,7 +837,7 @@ function applySectionCollapse(bid){
     const fid = sec.dataset.field;
     const arrow = document.createElement('span');
     arrow.className = 'secarrow';
-    arrow.textContent = '▾';
+    arrow.textContent = '›';
     h3.insertBefore(arrow, h3.firstChild);
     if (S.secCollapsed[bid][fid]) sec.classList.add('collapsed');
     h3.addEventListener('click', e => {
@@ -1013,7 +1016,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Saved to the buddy’s repo (docs/notes.md) — visible to everyone with repo access.">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Shared notes…"></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261009.1624</div>'
+    + '<div class="bp-build">Build 20261009.1626</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -1426,7 +1429,7 @@ function renderPlan(id){
     + '<div class="bp-sec"><h3>Related buddies</h3>'+buds+'</div>'
     + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this plan…">'+escHtml(S.notes[id]||'')+'</textarea>'
     + '<p class="fineprint">Saved on this device only.</p></div>'
-    + '<div class="bp-build">Build 20261009.1624</div>'
+    + '<div class="bp-build">Build 20261009.1626</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
@@ -1608,7 +1611,7 @@ async function renderIngestFeed(id){
   if (!S.dumpsCollapsed || typeof S.dumpsCollapsed !== 'object') S.dumpsCollapsed = {};
   const dCollapsed = S.dumpsCollapsed[id] !== false;
   feed.innerHTML = '<div class="dumps' + (dCollapsed ? ' collapsed' : '') + '">'
-    + '<div class="dumps-head" id="dumps-toggle"><span class="darrow">▾</span><h4>Dumps (' + entries.length + ')</h4></div>'
+    + '<div class="dumps-head" id="dumps-toggle"><span class="darrow">›</span><h4>Dumps (' + entries.length + ')</h4></div>'
     + '<div class="dumps-body"><div style="height:8px"></div>'
     + entries.map(function(e){ return '<div class="attn"><div class="attn-body"><div class="attn-text">' + escHtml(e.body.slice(0, 300)) + (e.body.length > 300 ? '…' : '') + '</div><div class="attn-date">' + escHtml(e.stamp) + '</div></div></div>'; }).join('')
     + '</div></div>';
