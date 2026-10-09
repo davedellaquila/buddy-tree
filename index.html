@@ -68,12 +68,12 @@
     border-radius: 10px; padding: 12px 12px 13px;
   }
   .grip {
-    position: absolute; top: 7px; left: 7px; z-index: 2;
-    cursor: grab; opacity: 0; color: #8b949e; font-size: 13px; line-height: 1;
-    padding: 4px; user-select: none; -webkit-user-select: none;
+    position: absolute; top: 4px; left: 4px; z-index: 2;
+    cursor: grab; opacity: .45; color: #8b949e; font-size: 16px; line-height: 1;
+    padding: 8px; user-select: none; -webkit-user-select: none;
   }
-  .node:hover .grip { opacity: .65; }
-  .grip:hover { opacity: 1 !important; }
+  .node:hover .grip { opacity: .9; }
+  .grip:hover { opacity: 1 !important; color: #e6edf3; }
   .grip:active { cursor: grabbing; }
   .node .name { font-weight: 700; font-size: 15px; margin-bottom: 5px; }
   .node .desc { font-size: 12px; line-height: 1.45; color: #8b949e; }
@@ -752,7 +752,7 @@ function renderBuddy(id){
     + '<textarea class="notes" id="bp-ingest" placeholder="Dump what’s in your head about '+escHtml(dispName(b))+'…"></textarea>'
     + '<div style="margin-top:8px"><button class="linkbtn" id="ingest-dump">Dump it →</button> <span class="fineprint" id="ingest-status"></span></div>'
     + '<div id="ingest-feed" style="margin-top:8px"></div></div>'
-    + '<div class="bp-build">Build 20261009.1459</div>'
+    + '<div class="bp-build">Build 20261009.1500</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -1094,7 +1094,7 @@ function renderPlan(id){
     + '<div class="bp-sec"><h3>Related buddies</h3>'+buds+'</div>'
     + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this plan…">'+escHtml(S.notes[id]||'')+'</textarea>'
     + '<p class="fineprint">Saved on this device only.</p></div>'
-    + '<div class="bp-build">Build 20261009.1459</div>'
+    + '<div class="bp-build">Build 20261009.1500</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
