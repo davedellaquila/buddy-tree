@@ -63,7 +63,9 @@ body{padding:0}
   font-size:14px;z-index:99;box-shadow:0 4px 24px rgba(0,0,0,.5);white-space:nowrap;
   max-width:92vw;overflow:hidden;text-overflow:ellipsis}
 .treewrap{position:relative;display:flex;gap:10px;align-items:flex-start}
-#treezoom{flex:1;min-width:0;overflow:auto;height:calc(100vh - 170px);border:1px solid #30363d;cursor:grab;border-radius:12px;background:#0d1117}
+#view-tree{margin:-36px -32px -80px;display:flex;flex-direction:column;min-height:calc(100vh - 0px)}
+#view-tree #zoomwrap{flex:1;min-height:0}
+#treezoom{flex:1;min-width:0;min-height:0;overflow:auto;border:1px solid #30363d;border-left:none;border-right:none;cursor:grab;border-radius:0;background:#0d1117}
 #treezoom.panning{cursor:grabbing}
 #treezoom.panning,#treezoom.panning *{user-select:none!important;-webkit-user-select:none!important}
 #treezoom,#treezoom *{user-select:none;-webkit-user-select:none}
