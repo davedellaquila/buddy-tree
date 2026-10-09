@@ -1150,13 +1150,18 @@ function renderPlan(id){
     + '<div class="bp-sec"><h3>What it is</h3><p class="bp-mission">'+escHtml(p.desc)+'</p></div>'
     + '<div class="bp-sec"><h3>Documents</h3>'+docs+'</div>'
     + '<div class="bp-sec"><h3>Related buddies</h3>'+buds+'</div>'
-    + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this plan\u2026">'+escHtml(S.notes[id]||'')+'</textarea>'
-    + '<p class="fineprint">Saved on this device only.</p></div>'
+    + '<div class="bp-sec"><h3>Notes<span class="info-tip" data-tip="Saved on this device. (For your eyes only)">\\u24d8</span></h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this plan\\u2026 (For your eyes only)">'+escHtml(S.notes[id]||'')+'</textarea>'
+    + '<p class="fineprint">Saved on this device. (For your eyes only)</p></div>'
+    + '<div class="bp-sec"><h3>Shared notes<span class="info-tip" data-tip="Visible to everyone with access to this project.">\\u24d8</span></h3><textarea class="notes" id="bp-shared" placeholder="Shared notes\\u2026 (visible to everyone with access)">'+escHtml((S.planShared||{})[id]||'')+'</textarea>'
+    + '<p class="fineprint">Shared \u2014 visible to everyone with access.</p></div>'
     + '<div class="bp-build">Build __BUILD__</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
   nt.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => { S.notes[id] = nt.value; save(); }, 400); });
+  const sht = document.getElementById('bp-shared');
+  let st2 = null;
+  if (sht) sht.addEventListener('input', () => { clearTimeout(st2); st2 = setTimeout(() => { if (!S.planShared) S.planShared = {}; S.planShared[id] = sht.value; save(); }, 400); });
 }
 const navHist = [];
 function locHash(){ try { return (typeof location !== 'undefined' && location.hash) || ''; } catch (e) { return ''; } }
