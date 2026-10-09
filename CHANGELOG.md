@@ -6,6 +6,8 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
 ## 2026-10-09
 
 ### Added
+- **Zoom slider floats over the chart** — moved from the margin into the
+  chart area itself, map-control style. (`94948af`)
 - **Chart viewport polish** — visible border around the chart viewport so its
   edges are clear; the viewport now fills the available page height instead
   of clipping. (`f6aa25c`)
