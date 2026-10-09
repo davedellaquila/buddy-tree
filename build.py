@@ -98,6 +98,9 @@ body.light #zoombar{background:#ffffff;border-color:#d0d7de}
 #token-banner .ghtoken{margin-top:0}
 .locked{opacity:.45;pointer-events:none}
 textarea[disabled]{opacity:.5;cursor:not-allowed}
+.tokenwarn{background:#3a2a00;border:2px solid #d29922;color:#f0b429;border-radius:10px;padding:14px 16px;font-size:14px;margin-top:8px;line-height:1.6}
+.tokenwarn a{color:#ffd866;font-weight:bold}
+.tokenwarn b{color:#ffe9a8}
 .ghtoken input{flex:1;min-width:180px;background:#0d1117;border:1px solid #30363d;color:#e6edf3;border-radius:8px;padding:7px 10px;font-size:13px}
 .linkbtn{background:none;border:none;color:#1f6feb;cursor:pointer;font-size:13px;padding:2px 4px}
 .linkbtn:hover{text-decoration:underline}
@@ -1061,7 +1064,18 @@ function updateTokenGating(id){
   const banner = document.getElementById('token-banner');
   if (banner) banner.classList.toggle('show', !has);
   const sn = document.getElementById('bp-shared-notes');
-  if (sn) { sn.disabled = !has; sn.placeholder = has ? 'Shared notes\u2026' : 'Add a GitHub token above to unlock shared notes.'; }
+  if (sn) {
+    sn.disabled = !has;
+    sn.placeholder = has ? 'Shared notes\u2026' : 'Add a GitHub token above to unlock shared notes.';
+    const oldW = document.getElementById('shared-token-warn'); if (oldW) oldW.remove();
+    if (!has) {
+      sn.value = '';
+      const w = document.createElement('div');
+      w.id = 'shared-token-warn'; w.className = 'tokenwarn';
+      w.innerHTML = '⚠️ <b>Shared notes are off — you gotta go get the token, bro.</b><br>Nothing you type here will save until then. <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener">Get a GitHub token</a> (classic token, <b>repo</b> scope), then paste it above — it never leaves this device.';
+      if (sn.parentNode) sn.parentNode.insertBefore(w, sn.nextSibling);
+    }
+  }
   const ig = document.getElementById('bp-ingest');
   if (ig) { ig.disabled = !has; ig.placeholder = has ? ig.placeholder : 'Add a GitHub token above to unlock ingest.'; }
   const db = document.getElementById('ingest-dump');
