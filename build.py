@@ -1194,8 +1194,7 @@ document.addEventListener('keydown', e => {
   if (e.key === '/' && !e.target.matches('input, textarea, [contenteditable="true"]')) { e.preventDefault(); const bs = document.getElementById('buddy-search'); if (bs) bs.focus(); return; }
   if (e.key === '+' || e.key === '=') { S.zoom = Math.min(160, (S.zoom || 100) + 5); save(); applyZoom(); return; }
   if (e.key === '-' || e.key === '_') { S.zoom = Math.max(50, (S.zoom || 100) - 5); save(); applyZoom(); return; }
-  if (e.key === '0') { S.zoom = 100; save(); applyZoom(); return; }
-  if (/^[1-9]$/.test(e.key)) { S.zoom = parseInt(e.key, 10) * 10; save(); applyZoom(); return; }
+  if (e.key === '0') { zoomToFit(); return; }
   if (!['ArrowDown','ArrowUp','ArrowLeft','ArrowRight'].includes(e.key)) return;
   const items = Array.from(document.querySelectorAll('#buddy-nav [data-buddy]'));
   if (!items.length) return;
