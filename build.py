@@ -302,6 +302,16 @@ body.standalone .sa-bar{display:flex}
   .bp-name:focus{background:#ddf4ff}
   .proj-row[data-plan]:hover{background:#f6f8fa}
 }
+
+  .grip {
+    position: absolute; top: 4px; left: 4px; z-index: 2;
+    cursor: grab; opacity: .45; color: #8b949e; font-size: 16px; line-height: 1;
+    padding: 8px; user-select: none; -webkit-user-select: none;
+  }
+  .node:hover .grip { opacity: .9; }
+  .grip:hover { opacity: 1 !important; color: #e6edf3; }
+  .grip:active { cursor: grabbing; }
+  .node{position:relative;}
 """
 
 ICON_DOC = ('<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor"'
@@ -358,7 +368,7 @@ const byId = Object.fromEntries(BUDDIES.map(b => [b.id, b]));
 const PLANS = PLANS_JSON;
 const planById = Object.fromEntries(PLANS.map(p => [p.id, p]));
 const kidsOf = {};
-function effParent(b){ return (S.parents && S.parents[b.id]) || b.parent; }
+function effParent(b){ if (S.parents && b.id in S.parents) return S.parents[b.id]; return b.parent; }
 function buildKids(){
   for (const k in kidsOf) delete kidsOf[k];
   BUDDIES.forEach(b => { const p = effParent(b) || '__root'; (kidsOf[p] = kidsOf[p] || []).push(b); });
@@ -748,8 +758,8 @@ function renderOrgTree(){
     + '<div class="root-stub"></div><div class="tree"><ul>'
     + fam.map(b => orgNode(b, 1)).join('') + '</ul></div></div>';
   if (rest.length) {
-    s += '<section class="standalones"><h2>Direct children of ' + escHtml(dispName(root)) + '</h2>'
-      + '<p class="sub">Standalone buddies &mdash; parent is ' + escHtml(dispName(root)) + ' itself. Two meta-projects are tagged.</p>'
+    s += '<section class="standalones"><h2>Orphaned buddies</h2>'
+      + '<p class="sub">No meaningful parent yet &mdash; drag one onto a buddy in the tree to give it a home, or drop it here to detach.</p>'
       + '<div class="grid">'
       + rest.map(b => '<div class="node ' + b.kind + '" data-buddy="' + b.id + '">' + gripHtml(b) + '<div class="name">' + iconName(b) + '</div>'
         + '<div class="desc">' + escHtml(b.tagline || '') + '</div><div class="tag">' + nodeTag(b, 1) + '</div>'
@@ -904,7 +914,8 @@ initPan();
   function clearHl(){ document.querySelectorAll('.node.drop-target,.proj-row.drop-target').forEach(x => x.classList.remove('drop-target')); }
   document.addEventListener('dragover', e => {
     const n = target(e);
-    if (!n || !dragId || n.dataset.buddy === dragId) return;
+    if (!dragId) return;
+    if (n && n.dataset.buddy === dragId) return;
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     document.querySelectorAll('.node.drop-target,.proj-row.drop-target').forEach(x => { if (x !== n) x.classList.remove('drop-target'); });
@@ -912,11 +923,26 @@ initPan();
   });
   document.addEventListener('drop', e => {
     const n = target(e);
-    if (!n || !dragId) return;
+    if (!dragId) return;
     e.preventDefault();
-    const src = dragId, dst = n.dataset.buddy;
+    const src = dragId;
     dragId = null; clearHl();
-    moveBuddy(src, dst);
+    if (n) {
+      moveBuddy(src, n.dataset.buddy);
+    } else {
+      // Dropped on blank background: detach (no parent)
+      const b = byId[src];
+      if (b) {
+        const beforeParent = effParent(b);
+        if (b.parent) { /* has real parent in data */ }
+        delete S.parents[src];
+        // Set explicit orphan: parent = null override
+        S.parents[src] = null;
+        logChange('move', src, 'Detached \u201c' + dispName(b) + '\u201d (now orphaned)', beforeParent, null);
+        save(); buildKids(); renderNav(); refreshViews();
+        toast(dispName(b) + ' detached \u2014 now an orphan.');
+      }
+    }
   });
   document.addEventListener('dragend', () => { dragId = null; clearHl(); });
 })();
