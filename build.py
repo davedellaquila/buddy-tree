@@ -1237,7 +1237,8 @@ async function renderIngestFeed(id){
     try { entries = (JSON.parse(localStorage.getItem('ingest:' + id) || '[]')).map(e => ({stamp: new Date(e.t).toLocaleString(), body: e.text})).reverse(); } catch (e) {}
   }
   if (!entries.length) { feed.innerHTML = '<p class="fineprint">No dumps yet.</p>'; return; }
-  const dCollapsed = S.dumpsCollapsed !== false;
+  if (!S.dumpsCollapsed || typeof S.dumpsCollapsed !== 'object') S.dumpsCollapsed = {};
+  const dCollapsed = S.dumpsCollapsed[id] !== false;
   feed.innerHTML = '<div class="dumps' + (dCollapsed ? ' collapsed' : '') + '">'
     + '<div class="dumps-head" id="dumps-toggle"><span class="darrow">\u25be</span><h4>Dumps (' + entries.length + ')</h4></div>'
     + '<div class="dumps-body"><div style="height:8px"></div>'
@@ -1247,7 +1248,8 @@ async function renderIngestFeed(id){
   if (dt) dt.addEventListener('click', function(){
     var d = feed.querySelector('.dumps');
     d.classList.toggle('collapsed');
-    S.dumpsCollapsed = d.classList.contains('collapsed');
+    if (!S.dumpsCollapsed || typeof S.dumpsCollapsed !== 'object') S.dumpsCollapsed = {};
+    S.dumpsCollapsed[id] = d.classList.contains('collapsed');
     save();
   });
 }
