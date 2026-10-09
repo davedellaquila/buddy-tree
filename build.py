@@ -137,7 +137,7 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 #buddy-home{position:relative}
 #bp-resize{position:absolute;left:-8px;top:0;bottom:0;width:12px;cursor:ew-resize;z-index:20;
   display:flex;align-items:center;justify-content:center}
-#bp-resize::after{content:'';width:6px;height:56px;border-radius:3px;background:#6e7681}
+#bp-resize::after{content:'';width:7px;height:56px;border-radius:3px;background:#6e7681}
 #bp-resize:hover::after{background:#58a6ff}
 #bp-resize:hover{background:rgba(31,111,235,.1)}
 .dumps-head{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px;margin:12px 0 0}
