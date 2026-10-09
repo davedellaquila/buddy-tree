@@ -1969,7 +1969,14 @@ document.addEventListener('click', e => {
         toast('Photo deleted.');
         if (wrap) wrap.remove();
       })
-      .catch(err => toast('Delete failed: ' + (err.message || err)));
+      .catch(err => {
+        if (/not found/i.test(err.message || '')) {
+          toast('Photo deleted.');
+          if (wrap) wrap.remove();
+        } else {
+          toast('Delete failed: ' + (err.message || err));
+        }
+      });
     return;
   }
   const vb = e.target.closest('[data-view]');
