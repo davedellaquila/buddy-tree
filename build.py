@@ -891,19 +891,35 @@ function renderOrgTree(){
   document.getElementById('treezoom').innerHTML = s;
 }
 function renderProjects(){
+  if (!S.projCollapsed || typeof S.projCollapsed !== 'object') S.projCollapsed = {};
   let s = '<section class="projects-view" style="margin-top:24px"><h2>Projects by Buddy</h2>'
     + '<p class="sub">Every buddy, in hierarchy order, with its current status.</p><div class="proj-list">';
   (function walk(id, depth){
     const b = byId[id]; if (!b) return;
+    const kids = kidsOf[id] || [];
+    const hasKids = kids.length > 0;
+    const collapsed = !!S.projCollapsed[id];
+    const arrowCls = hasKids ? (collapsed ? '' : 'expanded') : 'leaf';
     s += '<div class="proj-row d' + Math.min(depth, 3) + '" data-buddy="' + b.id + '">'
+      + '<span class="parrow ' + arrowCls + '" data-proj-toggle="' + b.id + '">\u203a</span>'
       + (depth ? '<span class="dot">\u2514</span>' : '')
       + '<span class="pname">' + iconName(b) + '</span>'
       + '<span class="pdesc">' + escHtml(b.tagline || '') + '</span>'
       + '<span class="status ' + b.statusClass + '">' + escHtml(b.status) + '</span></div>';
-    (kidsOf[id] || []).forEach(c => walk(c.id, depth + 1));
+    if (!collapsed) kids.forEach(c => walk(c.id, depth + 1));
   })('project-buddy', 0);
   s += '</div></section>';
-  document.getElementById('view-projects').innerHTML = s;
+  const vp = document.getElementById('view-projects');
+  vp.innerHTML = s;
+  vp.querySelectorAll('[data-proj-toggle]').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      const bid = el.dataset.projToggle;
+      S.projCollapsed[bid] = !S.projCollapsed[bid];
+      save();
+      renderProjects();
+    });
+  });
 }
 let treeHTML0 = null, projHTML0 = null;
 function refreshViews(){
