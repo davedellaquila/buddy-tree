@@ -1,0 +1,94 @@
+# Buddies Dashboard — Feature Registry
+
+Living list of every feature in the dashboard. Update this file when a feature
+ships or changes — it's the source of truth for future documentation.
+
+Repo: https://github.com/davedellaquila/buddy-tree
+Live: https://davedellaquila.github.io/buddy-tree/
+Build: `build.py` generates `index.html` from `buddies.json` + `plans.json`.
+
+---
+
+## Tree chart
+
+- **Classic tree layout** — the canonical design. (A card-based redesign was
+  tried and reverted; preserved on branch `card-tree-redesign` for reference.)
+- **Zoom slider** — vertical slider beside the chart, 50–160%.
+- **Shift+scroll zoom** — hold Shift and scroll over the tree to zoom.
+- **Grab-to-pan** — click-drag the chart to slide it around; grab/grabbing
+  cursors; small movements still count as clicks; the stray click after a
+  drag is swallowed so you don't navigate by accident.
+- **Gripper handles (⠿)** — every tree tile has a drag handle (top-left,
+  appears on hover). Drag a tile onto another buddy to reparent it.
+  Loop protection: can't drop a parent onto its own descendant.
+- **Orphaned buddies section** — buddies with no parent render in their own
+  tree section with grippers, instead of being invisible.
+- **Drop targets** — tree nodes and Projects rows accept drops from the
+  sidebar and from tile grippers to assign/change parents.
+
+## Sidebar
+
+- **Horizontally resizable** — drag the edge, 220–560 px, width remembered
+  per device.
+- **Drag-to-reparent** — drag any sidebar buddy onto a tree node or
+  Projects row to change its parent.
+- **App name** — the top-left "Buddies" label is inline-editable,
+  device-persisted, and updates the browser title.
+
+## Buddy detail pages
+
+- **Navigation** — Back, Prev, Next, and All buddies.
+- **Build numbers** — every buddy and business-plan page shows a timestamp
+  build number.
+- **Click-to-rename** — buddy names are inline editable.
+- **Scratch notes** — device-local freeform notes (localStorage).
+- **Shared notes** — sync to the buddy's repo at `docs/notes.md` via the
+  GitHub Contents API (needs a token; falls back to device-local).
+- **Ingest box** — brain-dump raw thoughts about the buddy; each dump is
+  appended as a timestamped entry to the buddy's repo `docs/ingest.md`
+  (device-local fallback). Raw material for later dossier work.
+- **Photo strip** — photos from `photos/<buddy-id>/` in the dashboard repo;
+  drag/drop upload area; HEIC files are converted to JPEG in-browser
+  (`heic2any`); uploads push to the repo via the GitHub API.
+- **💾 Save to desktop** — downloads a launcher file (`.webloc` on Mac,
+  `.url` on Windows) that opens the buddy in standalone mode.
+
+## Standalone mode
+
+- **Hash deep-links** — `#/buddy:<id>`, `#/view:tree`, `#/plan:<id>`;
+  back/forward buttons work.
+- **Chromeless standalone view** — `#/buddy:<id>/standalone` hides the
+  sidebar and shows just the buddy page, with a small "open full
+  dashboard" bar. Feels like its own little app.
+
+## Change journal
+
+- Tracks buddy renames, note edits, hierarchy moves, and app-name changes.
+- Shows `Revert (N)` and "What changed?"; persists across reloads via
+  localStorage; reverts all logged changes at once.
+
+## GitHub integration
+
+- Token stored in localStorage (`S.ghToken`); used for photo uploads,
+  shared notes, and ingest sync.
+- Photo uploads target the public `buddy-tree` repo; shared notes and
+  ingest target each buddy's own (usually private) repo.
+
+## Repo automation (project-buddy drill)
+
+- Every new buddy repo is stamped with `README.md` (name, mission,
+  brief links) and `docs/brief.md` (full brief text), plus an empty
+  `docs/ingest.md` log — committed and pushed automatically.
+
+---
+
+## Known limitations / follow-ups
+
+- Photo "all image types" claim is aspirational: HEIC is converted and
+  JPEG/PNG/GIF/WebP work, but other formats are merely renamed to `.jpg`.
+- Shared-note edits, photo uploads, and ingest dumps are not in the
+  change journal.
+- Back-history is session memory, not persisted across reloads.
+- The localStorage GitHub token is convenient but risky; a fine-grained
+  token (or backend) is the safer long-term design.
+- The dashboard is public and currently contains family dossiers.
