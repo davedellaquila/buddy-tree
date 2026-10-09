@@ -62,11 +62,11 @@ body{padding:0}
   border:1px solid #1f6feb;color:#e6edf3;padding:10px 20px;border-radius:999px;
   font-size:14px;z-index:99;box-shadow:0 4px 24px rgba(0,0,0,.5);white-space:nowrap;
   max-width:92vw;overflow:hidden;text-overflow:ellipsis}
-.treewrap{display:flex;gap:10px;align-items:flex-start}
+.treewrap{position:relative;display:flex;gap:10px;align-items:flex-start}
 #treezoom{flex:1;min-width:0;overflow:auto;height:calc(100vh - 170px);border:1px solid #30363d;cursor:grab;border-radius:12px;background:#0d1117}
 #treezoom.panning{cursor:grabbing}
 #treezoom.panning,#treezoom.panning *{user-select:none!important;-webkit-user-select:none!important}
-#zoombar{position:sticky;top:12px;flex:0 0 54px;height:248px;background:#161b22;border:1px solid #30363d;border-radius:12px;z-index:5}
+#zoombar{position:absolute;top:14px;left:14px;width:54px;height:248px;background:rgba(22,27,34,.94);border:1px solid #30363d;border-radius:12px;z-index:5;box-shadow:0 4px 16px rgba(0,0,0,.4)}
 #zoombar .zt{position:absolute;top:8px;left:0;right:0;text-align:center;font-size:11px;color:#8b949e;cursor:help}
 #zoomrange{position:absolute;left:50%;top:50%;width:188px;margin:0;padding:0;transform:translate(-50%,-50%) rotate(-90deg);accent-color:#1f6feb;cursor:pointer}
 #zoombar .zv{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:12px;color:#8b949e;font-variant-numeric:tabular-nums}
