@@ -1281,10 +1281,22 @@ async function loadPhotos(id){
   const b = byId[id];
   const seeds = (b.photos || []).map(u => ({src: u, href: u}));
   let repo = [];
-  try {
-    const r = await fetch('https://api.github.com/repos/davedellaquila/buddy-tree/contents/photos/' + id);
-    if (r.ok) { const j = await r.json(); repo = (Array.isArray(j) ? j : []).filter(f => f.type === 'file').map(f => ({src: f.download_url, href: f.download_url, path: f.path})); }
-  } catch (e) {}
+  const headers = {};
+  if (ghToken()) headers['Authorization'] = 'token ' + ghToken();
+  const reposToCheck = [];
+  if (b.repo) reposToCheck.push({repo: b.repo, path: 'photos'});
+  reposToCheck.push({repo: 'buddy-tree', path: 'photos/' + id});
+  for (const rc of reposToCheck) {
+    try {
+      const r = await fetch('https://api.github.com/repos/davedellaquila/' + rc.repo + '/contents/' + rc.path, {headers});
+      if (r.ok) {
+        const j = await r.json();
+        const files = (Array.isArray(j) ? j : []).filter(f => f.type === 'file')
+          .map(f => ({src: f.download_url, href: f.download_url, path: f.path, repo: rc.repo}));
+        for (const f of files) { if (!repo.some(x => x.src === f.src)) repo.push(f); }
+      }
+    } catch (e) {}
+  }
   const all = seeds.concat(repo.filter(x => !seeds.some(s => s.src === x.src)));
   strip.innerHTML = all.map(p => {
     const del = p.path ? '<button class="pdel" data-del="' + escHtml(p.path) + '" data-repo="' + escHtml(p.repo || 'buddy-tree') + '" title="Delete photo">\u2715</button>' : '';
