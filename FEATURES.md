@@ -46,7 +46,10 @@ Build: `build.py` generates `index.html` from `buddies.json` + `plans.json`.
   GitHub Contents API (needs a token; falls back to device-local).
 - **Ingest box** — brain-dump raw thoughts about the buddy; each dump is
   appended as a timestamped entry to the buddy's repo `docs/ingest.md`.
-  Raw material for later dossier work.
+  Raw material for later dossier work. Dumps live in a collapsible
+  "Dumps (n)" section (collapsed by default, state remembered per buddy);
+  each dump tile has edit (✏️) and delete (🗑️) buttons in its upper-right
+  corner.
 - **Token gating** — photos, shared notes, and ingest are locked until a
   GitHub token is saved; an amber banner at the top of every buddy page
   prompts for it.

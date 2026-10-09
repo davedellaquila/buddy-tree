@@ -294,6 +294,10 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 .bp-sec.collapsed .secarrow{transform:rotate(0deg)}
 .dumps .darrow{transform:rotate(90deg)}
 .dumps.collapsed .darrow{transform:rotate(0deg)}
+.dump-actions{position:absolute;top:10px;right:12px;display:flex;gap:8px;align-items:center}
+.dump-act{background:none;border:none;cursor:pointer;font-size:15px;opacity:.5;padding:2px;line-height:1}
+.dump-act:hover{opacity:1}
+.dumps-body .attn-body{padding-right:64px}
 .dumps.collapsed .dumps-body{display:none}
 #sb-gear{position:absolute;top:10px;right:10px;z-index:10;width:36px;height:36px;background:none;border:none;
   border-radius:8px;color:#8b949e;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center}
@@ -415,7 +419,7 @@ body.standalone .sa-bar{display:flex}
 .art-label{font-weight:650;font-size:14.5px}
 .art-sub{font-size:12.5px;color:#8b949e;margin-top:2px}
 .art-go{margin-left:auto;color:#6e7681;font-size:18px}
-.attn{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:13px 15px;
+.attn{position:relative;background:#161b22;border:1px solid #30363d;border-radius:12px;padding:13px 15px;
   margin-bottom:10px;display:flex;gap:12px;align-items:flex-start}
 .attn.unseen{border-color:#1f6feb;background:#0d1a30}
 .attn .adot{width:9px;height:9px;border-radius:50%;background:#1f6feb;margin-top:6px;flex:0 0 9px;visibility:hidden}
@@ -1048,7 +1052,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Saved to the buddy’s repo (docs/notes.md) — visible to everyone with repo access.">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Shared notes…"></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261009.1649</div>'
+    + '<div class="bp-build">Build 20261009.2356</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -1494,7 +1498,7 @@ function renderPlan(id){
     + '<p class="fineprint">Saved on this device. (For your eyes only)</p></div>'
     + '<div class="bp-sec"><h3>Shared notes<span class="info-tip" data-tip="Visible to everyone with access to this project.">\u24d8</span></h3><textarea class="notes" id="bp-shared" placeholder="Shared notes\u2026 (visible to everyone with access)">'+escHtml((S.planShared||{})[id]||'')+'</textarea>'
     + '<p class="fineprint">Shared — visible to everyone with access.</p></div>'
-    + '<div class="bp-build">Build 20261009.1649</div>'
+    + '<div class="bp-build">Build 20261009.2356</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
@@ -1694,8 +1698,9 @@ async function renderIngestFeed(id){
   feed.innerHTML = '<div class="dumps' + (dCollapsed ? ' collapsed' : '') + '">'
     + '<div class="dumps-head" id="dumps-toggle"><span class="darrow">›</span><h4>Dumps (' + entries.length + ')</h4></div>'
     + '<div class="dumps-body"><div style="height:8px"></div>'
-    + entries.map(function(e){ return '<div class="attn"><div class="attn-body"><div class="attn-text">' + escHtml(e.body.slice(0, 300)) + (e.body.length > 300 ? '…' : '') + '</div><div class="attn-date">' + escHtml(e.stamp) + '</div></div></div>'; }).join('')
+    + entries.map(function(e, i){ return '<div class="attn"><div class="dump-actions"><button class="dump-act" data-dump-edit="' + i + '" title="Edit this dump">✏️</button><button class="dump-act" data-dump-del="' + i + '" title="Delete this dump">🗑️</button></div><div class="attn-body"><div class="attn-text">' + escHtml(e.body.slice(0, 300)) + (e.body.length > 300 ? '…' : '') + '</div><div class="attn-date">' + escHtml(e.stamp) + '</div></div></div>'; }).join('')
     + '</div></div>';
+  feed._entries = entries;
   var dt = document.getElementById('dumps-toggle');
   if (dt) dt.addEventListener('click', function(){
     var d = feed.querySelector('.dumps');
@@ -1703,6 +1708,99 @@ async function renderIngestFeed(id){
     if (!S.dumpsCollapsed || typeof S.dumpsCollapsed !== 'object') S.dumpsCollapsed = {};
     S.dumpsCollapsed[id] = d.classList.contains('collapsed');
     save();
+  });
+  feed.querySelectorAll('[data-dump-del]').forEach(function(btn){
+    btn.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      if (!confirm('Delete this dump?')) return;
+      deleteDump(id, parseInt(btn.getAttribute('data-dump-del'), 10));
+    });
+  });
+  feed.querySelectorAll('[data-dump-edit]').forEach(function(btn){
+    btn.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      editDump(id, parseInt(btn.getAttribute('data-dump-edit'), 10), btn);
+    });
+  });
+}
+
+async function deleteDump(id, idx){
+  const b = byId[id];
+  try {
+    if (ghToken() && b.repo) {
+      const md = await ghGetFile(b.repo, 'docs/ingest.md');
+      if (!md) throw new Error('No ingest file.');
+      const parts = md.split(/^## /m);
+      const head = parts[0];
+      const secs = parts.slice(1);
+      const target = secs.length - 1 - idx;
+      if (target < 0 || target >= secs.length) throw new Error('Dump not found.');
+      secs.splice(target, 1);
+      await ghPutFile(b.repo, 'docs/ingest.md', b64encode(head + secs.map(function(s){ return '## ' + s; }).join('')), 'Delete ingest dump for ' + id);
+    } else {
+      const key = 'ingest:' + id;
+      let arr = [];
+      try { arr = JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) {}
+      const target = arr.length - 1 - idx;
+      if (target < 0 || target >= arr.length) throw new Error('Dump not found.');
+      arr.splice(target, 1);
+      localStorage.setItem(key, JSON.stringify(arr));
+    }
+    toast('Dump deleted.');
+  } catch (err) { toast('Delete failed: ' + (err.message || err)); return; }
+  renderIngestFeed(id);
+}
+
+async function saveDumpBody(id, idx, newBody){
+  const b = byId[id];
+  if (ghToken() && b.repo) {
+    const md = await ghGetFile(b.repo, 'docs/ingest.md');
+    if (!md) throw new Error('No ingest file.');
+    const parts = md.split(/^## /m);
+    const head = parts[0];
+    const secs = parts.slice(1);
+    const target = secs.length - 1 - idx;
+    if (target < 0 || target >= secs.length) throw new Error('Dump not found.');
+    const s = secs[target];
+    var LF = String.fromCharCode(10);
+    const nl = s.indexOf(LF);
+    const stamp = (nl >= 0 ? s.slice(0, nl) : s).trim();
+    secs[target] = stamp + LF + LF + newBody + LF + LF;
+    await ghPutFile(b.repo, 'docs/ingest.md', b64encode(head + secs.map(function(x){ return '## ' + x; }).join('')), 'Edit ingest dump for ' + id);
+  } else {
+    const key = 'ingest:' + id;
+    let arr = [];
+    try { arr = JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) {}
+    const target = arr.length - 1 - idx;
+    if (target < 0 || target >= arr.length) throw new Error('Dump not found.');
+    arr[target].text = newBody;
+    localStorage.setItem(key, JSON.stringify(arr));
+  }
+}
+
+function editDump(id, idx, btn){
+  const feed = document.getElementById('ingest-feed');
+  const entries = (feed && feed._entries) || [];
+  const e = entries[idx];
+  if (!e) return;
+  const tile = btn.closest('.attn');
+  if (!tile) return;
+  const textDiv = tile.querySelector('.attn-text');
+  const acts = tile.querySelector('.dump-actions');
+  if (acts) acts.style.display = 'none';
+  textDiv.innerHTML = '<textarea class="notes" style="min-height:90px">' + escHtml(e.body) + '</textarea>'
+    + '<div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-end">'
+    + '<button class="linkbtn" data-ecancel>Cancel</button>'
+    + '<button class="linkbtn" data-esave>Save</button></div>';
+  const ta = textDiv.querySelector('textarea');
+  ta.focus();
+  textDiv.querySelector('[data-ecancel]').addEventListener('click', function(){ renderIngestFeed(id); });
+  textDiv.querySelector('[data-esave]').addEventListener('click', async function(){
+    const v = ta.value.trim();
+    if (!v) { toast('Dump text is empty.'); return; }
+    try { await saveDumpBody(id, idx, v); toast('Dump updated.'); }
+    catch (err) { toast('Save failed: ' + (err.message || err)); return; }
+    renderIngestFeed(id);
   });
 }
 /* ---------- GitHub repo write-back (photos + shared notes) ---------- */
