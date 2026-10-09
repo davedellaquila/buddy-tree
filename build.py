@@ -135,6 +135,16 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
   cursor:pointer;display:flex;align-items:center;justify-content:center}
 .bp-close-x:hover{color:#e6edf3;border-color:#1f6feb;background:#1c2128}
 #buddy-home{position:relative}
+#bp-resize{position:absolute;left:0;top:0;bottom:0;width:8px;cursor:ew-resize;z-index:20;
+  display:flex;align-items:center;justify-content:center}
+#bp-resize::after{content:'';width:4px;height:40px;border-radius:2px;background:#30363d}
+#bp-resize:hover::after{background:#1f6feb}
+.info-tip{position:relative;display:inline-block;margin-left:6px;cursor:help;color:#8b949e;font-size:12px}
+.info-tip:hover{color:#e6edf3}
+.info-tip::after{content:attr(data-tip);position:absolute;bottom:125%;left:50%;transform:translateX(-50%);
+  background:#161b22;border:1px solid #30363d;color:#e6edf3;padding:8px 12px;border-radius:8px;font-size:12px;
+  line-height:1.5;width:220px;white-space:normal;z-index:100;opacity:0;pointer-events:none;transition:opacity .15s}
+.info-tip:hover::after{opacity:1}
 .ghtoken input{flex:1;min-width:180px;background:#0d1117;border:1px solid #30363d;color:#e6edf3;border-radius:8px;padding:7px 10px;font-size:13px}
 .linkbtn{background:none;border:none;color:#1f6feb;cursor:pointer;font-size:13px;padding:2px 4px}
 .linkbtn:hover{text-decoration:underline}
@@ -477,6 +487,32 @@ function openFieldSettings(){
   });
   m.classList.add('show');
 }
+function applyPanelWidth(){
+  const vb = document.getElementById('view-buddy');
+  if (vb && S.panelWidth) vb.style.width = S.panelWidth + 'px';
+}
+function initPanelResize(){
+  const vb = document.getElementById('view-buddy');
+  if (!vb || vb.dataset.rsz) return;
+  vb.dataset.rsz = '1';
+  const h = document.getElementById('bp-resize');
+  if (!h) return;
+  let sx = null, sw = 0;
+  h.addEventListener('pointerdown', e => {
+    sx = e.clientX; sw = vb.getBoundingClientRect().width;
+    h.setPointerCapture(e.pointerId); e.preventDefault();
+  });
+  h.addEventListener('pointermove', e => {
+    if (sx === null) return;
+    const w = Math.min(window.innerWidth * 0.9, Math.max(320, sw + (sx - e.clientX)));
+    vb.style.width = w + 'px';
+  });
+  h.addEventListener('pointerup', e => {
+    if (sx === null) return;
+    S.panelWidth = Math.round(vb.getBoundingClientRect().width);
+    save(); sx = null;
+  });
+}
 function renderBuddy(id){
   const b = byId[id]; if(!b) return;
   const items = (b.attention || []).slice().sort((x,y) => (S.seen[x.id]?1:0) - (S.seen[y.id]?1:0));
@@ -519,6 +555,7 @@ function renderBuddy(id){
     + '<div class="ghtoken"><input type="password" id="ghtok2" placeholder="GitHub token (repo scope)" aria-label="GitHub token">'
     + '<button class="linkbtn" id="ghtok2-save">Save token</button></div></div>'
     + '<div class="sa-bar"><span>\U0001f516 Standalone view</span><button class="linkbtn" id="sa-full">Open full dashboard \u2192</button></div>'
+    + '<div id="bp-resize" title="Drag to resize panel"></div>'
     + '<button class="bp-close-x" id="bp-close-x" title="Close">\u2715</button>'
     + '<div class="bp-topnav"><button class="linkbtn" data-navbtn="back">\u2190 Back</button>'
     + '<button class="linkbtn" data-navbtn="prev">\u2039 Prev</button><button class="linkbtn" data-navbtn="next">Next \u203a</button>'
@@ -591,6 +628,7 @@ function renderBuddy(id){
   })(id);
   loadPhotos(id);
   initPhotoDrop(id);
+  initPanelResize(); applyPanelWidth();
   refreshTokenUI(id);
   renderJournal();
   if (id === 'project-buddy') {
