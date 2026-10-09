@@ -1,0 +1,346 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>The Buddy Tree — Project Buddy Dashboard</title></head><body>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 24px 64px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 1280px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 8px; }
+  header .eyebrow {
+    display: inline-block; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    color: #d29922; border: 1px solid #3d2e12; background: #231a08;
+    padding: 6px 14px; border-radius: 999px; margin-bottom: 16px;
+  }
+  header h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; }
+  header p.sub { color: #8b949e; margin-top: 10px; font-size: 15px; }
+  header p.stamp { color: #6e7681; margin-top: 6px; font-size: 12px; }
+
+  .tabs { display: flex; justify-content: center; gap: 8px; margin: 24px 0 8px; }
+  .tabs button {
+    font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+    color: #8b949e; background: #161b22; border: 1px solid #30363d;
+    padding: 9px 22px; border-radius: 999px;
+  }
+  .tabs button.active { color: #0d1117; background: #d29922; border-color: #d29922; }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  .chart { overflow-x: auto; padding: 24px 0 8px; }
+
+  /* ---- classic CSS org tree ---- */
+  .tree, .tree ul { display: flex; justify-content: center; margin: 0; padding: 0; }
+  .tree ul { padding-top: 26px; position: relative; }
+  .tree li { list-style: none; position: relative; padding: 26px 7px 0; text-align: center; }
+  .tree li::before, .tree li::after {
+    content: ''; position: absolute; top: 0; right: 50%;
+    width: 50%; height: 26px; border-top: 2px solid #3a4a63;
+  }
+  .tree li::after { right: auto; left: 50%; border-left: 2px solid #3a4a63; }
+  .tree li:only-child::before, .tree li:only-child::after { display: none; }
+  .tree li:only-child { padding-top: 0; }
+  .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+  .tree li:last-child::before { border-right: 2px solid #3a4a63; border-radius: 0 8px 0 0; }
+  .tree li:first-child::after { border-radius: 8px 0 0 0; }
+  .tree ul ul::before {
+    content: ''; position: absolute; top: 0; left: 50%;
+    width: 0; height: 26px; border-left: 2px solid #3a4a63;
+  }
+  .root-stub { width: 0; height: 26px; border-left: 2px solid #3a4a63; margin: 0 auto; }
+
+  .node {
+    display: inline-block; width: 196px; vertical-align: top;
+    background: #161b22; border: 1px solid #30363d; border-top: 3px solid #8b949e;
+    border-radius: 10px; padding: 12px 12px 13px;
+  }
+  .node .name { font-weight: 700; font-size: 15px; margin-bottom: 5px; }
+  .node .desc { font-size: 12px; line-height: 1.45; color: #8b949e; }
+  .node .tag {
+    display: inline-block; margin-top: 8px; font-size: 10px; font-weight: 600;
+    letter-spacing: 0.6px; text-transform: uppercase; padding: 3px 8px; border-radius: 999px;
+  }
+  .node.root { width: 320px; border-top-color: #d29922; background: #1c1a12; border-color: #4a3c18; }
+  .node.root .name { font-size: 20px; }
+  .node.root .desc { font-size: 13px; color: #c9b98a; }
+  .node.personal { border-top-color: #a371f7; }
+  .node.personal .tag { background: #2a1f45; color: #c9a7f5; }
+  .node.property { border-top-color: #3fb950; }
+  .node.property .tag { background: #122b18; color: #7ee787; }
+  .node.finance { border-top-color: #39c5cf; }
+  .node.finance .tag { background: #0f2a2d; color: #76e3ea; }
+  .node.work { border-top-color: #58a6ff; }
+  .node.work .tag { background: #10243f; color: #79c0ff; }
+  .node.family { border-top-color: #f778ba; }
+  .node.family .tag { background: #33182a; color: #ff9bce; }
+  .node.meta .tag { background: #33182a; color: #ff9bce; }
+  .node.standalone .tag { background: #21262d; color: #8b949e; }
+
+  .standalones { margin-top: 56px; }
+  .standalones h2, .projects-view h2 { text-align: center; font-size: 20px; margin-bottom: 6px; }
+  .standalones p.sub, .projects-view p.sub { text-align: center; color: #8b949e; font-size: 14px; margin-bottom: 24px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(196px, 1fr)); gap: 12px; }
+  .grid .node { width: 100%; }
+
+  /* ---- projects list view ---- */
+  .proj-list { max-width: 860px; margin: 0 auto; }
+  .proj-row {
+    display: flex; align-items: baseline; gap: 12px;
+    padding: 10px 14px; border-bottom: 1px solid #21262d;
+  }
+  .proj-row .pname { font-weight: 700; font-size: 14px; white-space: nowrap; }
+  .proj-row .pdesc { font-size: 13px; color: #8b949e; flex: 1; }
+  .proj-row .dot { color: #3a4a63; font-size: 12px; }
+  .status {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 999px; white-space: nowrap;
+  }
+  .st-live { background: #122b18; color: #7ee787; }
+  .st-pilot { background: #0f2a2d; color: #76e3ea; }
+  .st-prd { background: #10243f; color: #79c0ff; }
+  .st-brief { background: #2a1f45; color: #c9a7f5; }
+  .st-active { background: #122b18; color: #7ee787; }
+  .st-idea { background: #21262d; color: #8b949e; }
+  .st-new { background: #33182a; color: #ff9bce; }
+  .st-spec { background: #231a08; color: #e3b341; }
+  .d0 { padding-left: 14px; background: #161b22; border-radius: 8px; margin-top: 18px; }
+  .d0 .pname { font-size: 16px; }
+  .d1 { padding-left: 34px; }
+  .d2 { padding-left: 58px; }
+  .d3 { padding-left: 82px; }
+
+  footer.legend {
+    margin-top: 48px; border-top: 1px solid #21262d; padding-top: 20px;
+    color: #8b949e; font-size: 13px; line-height: 1.7; text-align: center;
+  }
+  footer.legend b { color: #e6edf3; }
+  .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin: 0 4px 0 12px; vertical-align: baseline; }
+
+  /* light app theme */
+  html[data-theme="light"] body { background: #f6f8fa; color: #1f2328; }
+  html[data-theme="light"] .node { background: #ffffff; border-color: #d0d7de; }
+  html[data-theme="light"] .node .desc { color: #57606a; }
+  html[data-theme="light"] header p.sub, html[data-theme="light"] .standalones p.sub,
+  html[data-theme="light"] .projects-view p.sub, html[data-theme="light"] footer.legend { color: #57606a; }
+  html[data-theme="light"] header p.stamp { color: #8b949e; }
+  html[data-theme="light"] .node.root { background: #fff8e6; border-color: #e3b341; }
+  html[data-theme="light"] .node.root .desc { color: #7a5c1e; }
+  html[data-theme="light"] footer.legend { border-top-color: #d0d7de; }
+  html[data-theme="light"] footer.legend b { color: #1f2328; }
+  html[data-theme="light"] .tabs button { background: #ffffff; border-color: #d0d7de; color: #57606a; }
+  html[data-theme="light"] .proj-row { border-bottom-color: #e5e9ee; }
+  html[data-theme="light"] .proj-row .pdesc { color: #57606a; }
+  html[data-theme="light"] .d0 { background: #ffffff; border: 1px solid #e5e9ee; }
+</style>
+<div class="page">
+
+  <header>
+    <div class="eyebrow">Project Buddy &middot; macro view</div>
+    <h1>The Buddy Tree</h1>
+    <p class="sub">29 buddies &middot; one family &middot; Project Buddy is the parent of them all</p>
+    <p class="stamp">Dashboard basis &middot; drawn 2026-10-09</p>
+  </header>
+
+  <div class="tabs">
+    <button id="tab-tree" class="active" onclick="showView('tree')">Tree</button>
+    <button id="tab-projects" onclick="showView('projects')">Projects</button>
+  </div>
+  <script>
+    function showView(which) {
+      document.getElementById('view-tree').classList.toggle('active', which === 'tree');
+      document.getElementById('view-projects').classList.toggle('active', which === 'projects');
+      document.getElementById('tab-tree').classList.toggle('active', which === 'tree');
+      document.getElementById('tab-projects').classList.toggle('active', which === 'projects');
+    }
+  </script>
+
+  <!-- ============ TREE VIEW ============ -->
+  <div id="view-tree" class="view active">
+    <div class="chart">
+      <div style="text-align:center">
+        <div class="node root">
+          <div class="name">Project Buddy</div>
+          <div class="desc">The macro view &mdash; status &amp; next action items for every buddy.<br>Every buddy inherits its tools, knowledge base &amp; dashboard behavior from here.</div>
+        </div>
+      </div>
+      <div class="root-stub"></div>
+
+      <div class="tree">
+        <ul>
+          <li>
+            <div class="node personal">
+              <div class="name">Personal Buddy</div>
+              <div class="desc">Personal-ops &mdash; the &ldquo;figure it out later&rdquo; list with teeth.</div>
+              <div class="tag">family</div>
+            </div>
+            <ul>
+              <li><div class="node personal">
+                <div class="name">Travel Buddy</div>
+                <div class="desc">Trip planning, itineraries, logistics.</div>
+                <div class="tag">child</div>
+              </div></li>
+              <li><div class="node personal">
+                <div class="name">Relationship Buddy</div>
+                <div class="desc">Stay-in-touch nudges, notes, milestones.</div>
+                <div class="tag">child</div>
+              </div></li>
+              <li><div class="node personal">
+                <div class="name">Career Buddy</div>
+                <div class="desc">Career goals, skill growth, job-search readiness.</div>
+                <div class="tag">child</div>
+              </div></li>
+            </ul>
+          </li>
+
+          <li>
+            <div class="node family">
+              <div class="name">Family Buddy</div>
+              <div class="desc">Family projects &mdash; shared with the household, not just Dave.</div>
+              <div class="tag">family &middot; new</div>
+            </div>
+            <ul>
+              <li><div class="node family">
+                <div class="name">Pet Buddy</div>
+                <div class="desc">Per-pet profiles, meds, vet visits, vaccinations.</div>
+                <div class="tag">child</div>
+              </div></li>
+            </ul>
+          </li>
+
+          <li>
+            <div class="node property">
+              <div class="name">Property Buddy</div>
+              <div class="desc">One shape for every property &mdash; deeds, repairs, maintenance, history.</div>
+              <div class="tag">family</div>
+            </div>
+            <ul>
+              <li>
+                <div class="node property">
+                  <div class="name">Cabin Buddy</div>
+                  <div class="desc">Fiddletown cabin ops.</div>
+                  <div class="tag">child</div>
+                </div>
+                <ul>
+                  <li><div class="node property">
+                    <div class="name">Hot Tub Buddy</div>
+                    <div class="desc">Sundance Optima 880 &mdash; treatment schedule, log, chemistry KB.</div>
+                    <div class="tag">grandchild</div>
+                  </div></li>
+                </ul>
+              </li>
+              <li><div class="node property">
+                <div class="name">Lenwood Buddy</div>
+                <div class="desc">Ideas for the future of 6929 Lenwood Way, San Jose.</div>
+                <div class="tag">child</div>
+              </div></li>
+            </ul>
+          </li>
+
+          <li>
+            <div class="node finance">
+              <div class="name">Finance Buddy</div>
+              <div class="desc">Parent container for all money projects.</div>
+              <div class="tag">family</div>
+            </div>
+            <ul>
+              <li><div class="node finance">
+                <div class="name">Money Buddy</div>
+                <div class="desc">The expense tracker app &mdash; craftsmanship as the moat.</div>
+                <div class="tag">child</div>
+              </div></li>
+              <li><div class="node finance">
+                <div class="name">Investment Buddy</div>
+                <div class="desc">Investment ideas, research, signals podcast, dog detection.</div>
+                <div class="tag">child</div>
+              </div></li>
+            </ul>
+          </li>
+
+          <li>
+            <div class="node work">
+              <div class="name">Work Buddy</div>
+              <div class="desc">Succeed at the job &mdash; dossiers, meeting briefs, estimate calibration.</div>
+              <div class="tag">direct child</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <section class="standalones">
+      <h2>Direct children of Project Buddy</h2>
+      <p class="sub">Standalone buddies &mdash; parent is Project Buddy itself. Two meta-projects are tagged.</p>
+      <div class="grid">
+        <div class="node standalone"><div class="name">Car Buddy</div><div class="desc">Per-car service tracking &mdash; MGA coupe + ML500.</div><div class="tag">direct</div></div>
+        <div class="node standalone"><div class="name">TV Buddy</div><div class="desc">Mood-matched pick playing in under 2 minutes.</div><div class="tag">direct</div></div>
+        <div class="node standalone"><div class="name">News Buddy</div><div class="desc">Personalized news companion, listen mode.</div><div class="tag">direct</div></div>
+        <div class="node standalone"><div class="name">Wisdom Buddy</div><div class="desc">Daily wisdom nuggets to Quentin and Sawyer.</div><div class="tag">direct</div></div>
+        <div class="node standalone"><div class="name">Birthday Buddy</div><div class="desc">Witty birthday sayings with a little wisdom.</div><div class="tag">direct</div></div>
+        <div class="node standalone"><div class="name">Job Buddy</div><div class="desc">Job search &mdash; discovery, master profile, recruiter triage.</div><div class="tag">direct</div></div>
+        <div class="node standalone"><div class="name">Reminder Buddy</div><div class="desc">Fire-and-forget nudges.</div><div class="tag">direct</div></div>
+        <div class="node standalone"><div class="name">Housing Buddy</div><div class="desc">Know-your-market real estate &mdash; valuation + search.</div><div class="tag">direct</div></div>
+        <div class="node standalone"><div class="name">Zen Buddy</div><div class="desc">Meditation, breathwork, practice.</div><div class="tag">direct</div></div>
+        <div class="node standalone"><div class="name">School Buddy</div><div class="desc">Learning companion &mdash; &ldquo;what do you want to learn?&rdquo;</div><div class="tag">direct</div></div>
+        <div class="node standalone"><div class="name">Document Buddy</div><div class="desc">Google Docs layer &mdash; folders, meta, what-are-we-working-on.</div><div class="tag">direct</div></div>
+        <div class="node standalone"><div class="name">Tech Buddy</div><div class="desc">Tech inventory + gadget tutor.</div><div class="tag">direct</div></div>
+        <div class="node meta"><div class="name">Scaffold Buddy</div><div class="desc">The skeleton every buddy project is born with.</div><div class="tag">meta</div></div>
+        <div class="node meta"><div class="name">Buddy Suite</div><div class="desc">Shared brand, monetization, marketing across buddies.</div><div class="tag">meta</div></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ PROJECTS VIEW ============ -->
+  <div id="view-projects" class="view">
+    <section class="projects-view" style="margin-top:24px">
+      <h2>Projects by Buddy</h2>
+      <p class="sub">Every buddy, in hierarchy order, with its current status.</p>
+      <div class="proj-list">
+        <div class="proj-row d0"><span class="pname">Project Buddy</span><span class="pdesc">The macro view — status &amp; next actions for every buddy</span><span class="status st-spec">Spec review</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Personal Buddy</span><span class="pdesc">Personal-ops, the "figure it out later" list with teeth</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Travel Buddy</span><span class="pdesc">Trip planning, itineraries, logistics</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Relationship Buddy</span><span class="pdesc">Stay-in-touch nudges, notes, milestones</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Career Buddy</span><span class="pdesc">Career goals, skill growth, job-search readiness</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Family Buddy</span><span class="pdesc">Family projects — shared with the household, not just Dave</span><span class="status st-new">New</span></div>
+        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Pet Buddy</span><span class="pdesc">Per-pet profiles, meds, vet visits, vaccinations</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Property Buddy</span><span class="pdesc">One shape for every property — deeds, repairs, maintenance</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Cabin Buddy</span><span class="pdesc">Fiddletown cabin ops</span><span class="status st-active">Active</span></div>
+        <div class="proj-row d3"><span class="dot">└</span><span class="pname">Hot Tub Buddy</span><span class="pdesc">Sundance Optima 880 — treatment schedule, log, chemistry KB</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Lenwood Buddy</span><span class="pdesc">Ideas for the future of 6929 Lenwood Way, San Jose</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Finance Buddy</span><span class="pdesc">Parent container for all money projects</span><span class="status st-new">New</span></div>
+        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Money Buddy</span><span class="pdesc">The expense tracker app — craftsmanship as the moat</span><span class="status st-live">Live · pre-alpha</span></div>
+        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Investment Buddy</span><span class="pdesc">Investment ideas, research, signals podcast, dog detection</span><span class="status st-live">Live · M2 shipped</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Work Buddy</span><span class="pdesc">Succeed at the job — dossiers, briefs, estimate calibration</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Car Buddy</span><span class="pdesc">Per-car service tracking — MGA coupe + ML500</span><span class="status st-prd">PRD review</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">TV Buddy</span><span class="pdesc">Mood-matched pick playing in under 2 minutes</span><span class="status st-prd">PRD review</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">News Buddy</span><span class="pdesc">Personalized news companion, listen mode</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Wisdom Buddy</span><span class="pdesc">Daily wisdom nuggets to Quentin and Sawyer</span><span class="status st-pilot">Pilot</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Birthday Buddy</span><span class="pdesc">Witty birthday sayings with a little wisdom</span><span class="status st-prd">PRD review</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Job Buddy</span><span class="pdesc">Job search — discovery, master profile, recruiter triage</span><span class="status st-prd">PRD review</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Reminder Buddy</span><span class="pdesc">Fire-and-forget nudges</span><span class="status st-idea">Idea</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Housing Buddy</span><span class="pdesc">Know-your-market real estate — valuation + search</span><span class="status st-prd">PRD review</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Zen Buddy</span><span class="pdesc">Meditation, breathwork, practice</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">School Buddy</span><span class="pdesc">Learning companion — "what do you want to learn?"</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Document Buddy</span><span class="pdesc">Google Docs layer — folders, meta, what-are-we-working-on</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Tech Buddy</span><span class="pdesc">Tech inventory + gadget tutor</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Scaffold Buddy</span><span class="pdesc">The skeleton every buddy project is born with</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Buddy Suite</span><span class="pdesc">Shared brand, monetization, marketing across buddies</span><span class="status st-brief">Brief review</span></div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="legend">
+    <b>How to read this:</b>
+    <span class="swatch" style="background:#d29922"></span>Project Buddy (root &middot; macro view)
+    <span class="swatch" style="background:#a371f7"></span>Personal family
+    <span class="swatch" style="background:#f778ba"></span>Family
+    <span class="swatch" style="background:#3fb950"></span>Property family
+    <span class="swatch" style="background:#39c5cf"></span>Finance family
+    <span class="swatch" style="background:#58a6ff"></span>Work
+    <br>Every buddy inherits from Project Buddy: shared tools &middot; knowledge-base inheritance &middot; dashboard rollup.
+    Children roll their knowledge up; parents push their knowledge down.
+  </footer>
+
+</div>
+</body></html>
