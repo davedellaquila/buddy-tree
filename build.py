@@ -542,13 +542,33 @@ function openFieldSettings(){
   if (!m) {
     m = document.createElement('div'); m.id = 'field-settings';
     m.innerHTML = '<h3>Buddy fields</h3><p class="fineprint" style="margin-bottom:12px">Drag to reorder. Uncheck to hide.</p><div id="fset-list"></div>'
-      + '<label style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;cursor:pointer"><input type="checkbox" id="fset-hidebuddy"> Hide \u201cBuddy\u201d from names</label>'
-      + '<div style="margin-top:12px;text-align:right"><button class="linkbtn" id="fset-close">Done</button></div>';
-    document.body.appendChild(m);
+      + '<div id="fset-settings" style="margin-top:12px"></div>'
+      + '<div style="margin-top:12px;display:flex;gap:8px;justify-content:space-between;align-items:center">'
+      + '<div style="display:flex;gap:8px"><button class="linkbtn" id="fset-reset" title="Restore all settings to factory defaults">Reset to Factory Defaults</button>'
+      + '<button class="linkbtn" id="fset-update" title="Save current settings as the new factory defaults">Update Factory Defaults</button></div>'
+      + '<button class="linkbtn" id="fset-close">Done</button></div>';
     document.getElementById('fset-close').addEventListener('click', () => m.classList.remove('show'));
-    const hb = document.getElementById('fset-hidebuddy');
-    hb.checked = !!S.hideBuddyWord;
-    hb.addEventListener('change', () => { S.hideBuddyWord = hb.checked; save(); renderNav(); const mm = S.sel.match(/^buddy:(.+)$/); if (mm) renderBuddy(mm[1]); if (S.sel === 'view:tree') renderTree(); });
+    const sdiv = document.getElementById('fset-settings');
+    sdiv.innerHTML = SETTING_DEFS.map(s => {
+      const val = getSetting(s.id);
+      if (s.type === 'bool') return '<label style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13px;cursor:pointer"><input type="checkbox" data-setting="' + s.id + '"' + (val ? ' checked' : '') + '> ' + s.label + '</label>';
+      return '';
+    }).join('');
+    sdiv.querySelectorAll('[data-setting]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        S[cb.dataset.setting] = cb.checked; save();
+        renderNav(); const mm2 = S.sel.match(/^buddy:(.+)$/); if (mm2) renderBuddy(mm2[1]); if (S.sel === 'view:tree') renderTree();
+      });
+    });
+    document.getElementById('fset-reset').addEventListener('click', () => {
+      if (!confirm('Reset all settings to factory defaults?')) return;
+      resetToFactory(); openFieldSettings();
+      renderNav(); const mm3 = S.sel.match(/^buddy:(.+)$/); if (mm3) renderBuddy(mm3[1]); if (S.sel === 'view:tree') renderTree();
+    });
+    document.getElementById('fset-update').addEventListener('click', () => {
+      if (!confirm('Save current settings as the new factory defaults?')) return;
+      updateFactory(); toast('Factory defaults updated.');
+    });
   }
   document.addEventListener('keydown', function escClose(e){
     if (e.key === 'Escape') { const fm = document.getElementById('field-settings'); if (fm) fm.classList.remove('show'); }
