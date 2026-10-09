@@ -140,6 +140,11 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 #bp-resize::after{content:'';width:6px;height:56px;border-radius:3px;background:#6e7681}
 #bp-resize:hover::after{background:#58a6ff}
 #bp-resize:hover{background:rgba(31,111,235,.1)}
+.dumps-head{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px;margin:12px 0 0}
+.dumps-head h4{margin:0;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#8b949e}
+.dumps-head .darrow{font-size:10px;color:#8b949e;transition:transform .15s;display:inline-block}
+.dumps.collapsed .darrow{transform:rotate(-90deg)}
+.dumps.collapsed .dumps-body{display:none}
 #sb-gear{position:absolute;top:10px;right:10px;z-index:10;width:36px;height:36px;background:none;border:none;
   border-radius:8px;color:#8b949e;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 #sb-gear:hover{color:#e6edf3}
@@ -1232,9 +1237,19 @@ async function renderIngestFeed(id){
     try { entries = (JSON.parse(localStorage.getItem('ingest:' + id) || '[]')).map(e => ({stamp: new Date(e.t).toLocaleString(), body: e.text})).reverse(); } catch (e) {}
   }
   if (!entries.length) { feed.innerHTML = '<p class="fineprint">No dumps yet.</p>'; return; }
-  feed.innerHTML = '<p class="fineprint">' + entries.length + ' dump' + (entries.length === 1 ? '' : 's') + ' \u2014 most recent:</p>'
-    + '<div class="attn"><div class="attn-body"><div class="attn-text">' + escHtml(entries[0].body.slice(0, 300)) + (entries[0].body.length > 300 ? '\u2026' : '') + '</div>'
-    + '<div class="attn-date">' + escHtml(entries[0].stamp) + '</div></div></div>';
+  const dCollapsed = S.dumpsCollapsed !== false;
+  feed.innerHTML = '<div class="dumps' + (dCollapsed ? ' collapsed' : '') + '">'
+    + '<div class="dumps-head" id="dumps-toggle"><span class="darrow">\u25be</span><h4>Dumps (' + entries.length + ')</h4></div>'
+    + '<div class="dumps-body"><div style="height:8px"></div>'
+    + entries.map(function(e){ return '<div class="attn"><div class="attn-body"><div class="attn-text">' + escHtml(e.body.slice(0, 300)) + (e.body.length > 300 ? '\u2026' : '') + '</div><div class="attn-date">' + escHtml(e.stamp) + '</div></div></div>'; }).join('')
+    + '</div></div>';
+  var dt = document.getElementById('dumps-toggle');
+  if (dt) dt.addEventListener('click', function(){
+    var d = feed.querySelector('.dumps');
+    d.classList.toggle('collapsed');
+    S.dumpsCollapsed = d.classList.contains('collapsed');
+    save();
+  });
 }
 /* ---------- GitHub repo write-back (photos + shared notes) ---------- */
 function ghToken(){ return S.ghToken || ''; }
