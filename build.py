@@ -1293,6 +1293,7 @@ async function handlePhotoFiles(id, files){
       if (st) st.textContent = 'Uploaded ' + n + '/' + list.length + '\u2026';
     } catch (err) { toast('Photo failed: ' + (err.message || err)); }
   }
+  if (progTile) progTile.remove();
   loadPhotos(id);
 }
 function renderTokenRow(id){
