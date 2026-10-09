@@ -68,6 +68,24 @@ body{padding:0}
 #zoomrange{position:absolute;left:50%;top:50%;width:188px;margin:0;padding:0;transform:translate(-50%,-50%) rotate(-90deg);accent-color:#1f6feb;cursor:pointer}
 #zoombar .zv{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:12px;color:#8b949e;font-variant-numeric:tabular-nums}
 body.light #zoombar{background:#ffffff;border-color:#d0d7de}
+#sb-resize{position:absolute;top:0;right:-5px;width:11px;height:100%;cursor:ew-resize;z-index:20}
+#sb-resize:hover{background:rgba(31,111,235,.28)}
+@media (max-width:900px){#sb-resize{display:none}}
+.bp-topnav{display:flex;gap:4px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
+.bp-topnav .sep{color:#6e7681;margin:0 2px}
+#journal-bar{display:none;margin:0 0 12px;background:#0d1a30;border:1px solid #1f6feb;border-radius:10px;padding:9px 13px;font-size:13px}
+#journal-bar.show{display:block}
+#journal-bar ul{margin:8px 0 4px;padding-left:18px;display:none}
+#journal-bar.open ul{display:block}
+#journal-bar li{margin:3px 0;color:#c9d1d9}
+#journal-bar .jtime{color:#6e7681;font-size:11px;margin-left:6px}
+.pdrop{border:2px dashed #30363d;border-radius:12px;padding:20px;text-align:center;color:#8b949e;font-size:13px;margin-top:10px;cursor:pointer}
+.pdrop.over{border-color:#1f6feb;background:#0d1a30;color:#e6edf3}
+.pstrip:empty{display:none}
+.ghtoken{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center}
+.ghtoken input{flex:1;min-width:180px;background:#0d1117;border:1px solid #30363d;color:#e6edf3;border-radius:8px;padding:7px 10px;font-size:13px}
+.linkbtn{background:none;border:none;color:#1f6feb;cursor:pointer;font-size:13px;padding:2px 4px}
+.linkbtn:hover{text-decoration:underline}
 .bp-topnav{margin-bottom:6px}
 .bp-build{margin:26px 0 6px;font-size:11px;color:#6e7681;text-align:center}
 .pstrip{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 6px}
@@ -277,11 +295,10 @@ function renderBuddy(id){
   (b.docs || []).forEach(d => { arts += artRow(ICON_LINK, d.label, 'Related document — Google Doc', d.url); });
   if (!arts) arts = '<p class="bp-empty">No artifacts yet — the drill adds the brief and repo here when they exist.</p>';
   let photos = '';
-  if ((b.photos || []).length) {
-    photos = '<div class="bp-sec"><h3>Photos</h3><div class="pstrip">'
-      + b.photos.map(u => '<a href="'+escHtml(u)+'" target="_blank" rel="noopener"><img src="'+escHtml(u)+'" loading="lazy" alt=""></a>').join('')
-      + '</div></div>';
-  }
+  const seedStrip = (b.photos || []).map(u => '<a href="'+escHtml(u)+'" target="_blank" rel="noopener"><img src="'+escHtml(u)+'" loading="lazy" alt=""></a>').join('');
+  photos = '<div class="bp-sec"><h3>Photos</h3><div class="pstrip" id="pstrip">' + seedStrip + '</div>'
+    + '<div class="pdrop" id="pdrop">Drop photos here or click to choose<br><span style="font-size:12px">JPEG, PNG, GIF, WebP, HEIC \u2014 all supported</span></div>'
+    + '<p class="fineprint" id="pstat"></p></div>';
   const linkedPlans = PLANS.filter(p => (p.buddies || []).includes(id));
   let planSec = '';
   if (linkedPlans.length) {
@@ -306,7 +323,9 @@ function renderBuddy(id){
   }
   document.getElementById('buddy-home').innerHTML =
     '<div class="bp-wrap">'
-    + '<div class="bp-topnav"><button class="linkbtn" data-view="tree">\u2190 All buddies</button></div>'
+    + '<div class="bp-topnav"><button class="linkbtn" data-navbtn="back">\u2190 Back</button>'
+    + '<button class="linkbtn" data-navbtn="prev">\u2039 Prev</button><button class="linkbtn" data-navbtn="next">Next \u203a</button>'
+    + '<span class="sep">\u00b7</span><button class="linkbtn" data-view="tree">All buddies</button></div>'
     + '<div class="bp-crumb">'+crumb(id)+'</div>'
     + '<div class="bp-top"><span class="bp-icon">'+escHtml(b.icon||'')+'</span><h2 class="bp-name" id="bp-name" contenteditable="true" spellcheck="false" data-buddy="'+id+'">'+escHtml(dispName(b))+'</h2>'
     + '<span class="status '+b.statusClass+'">'+escHtml(b.status)+'</span></div>'
@@ -323,19 +342,34 @@ function renderBuddy(id){
     + '<div class="bp-sec"><h3>Needs your attention</h3>'+attn+'</div>'
     + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this buddy\u2026">'+escHtml(S.notes[id]||'')+'</textarea>'
     + '<p class="fineprint">Saved on this device only.</p></div>'
+    + '<div class="bp-sec"><h3>Shared notes</h3><p class="fineprint">Saved to the buddy\u2019s repo (docs/notes.md) \u2014 visible to everyone with repo access.</p>'
+    + '<textarea class="notes" id="bp-shared-notes" placeholder="Shared notes\u2026"></textarea>'
+    + '<p class="fineprint" id="shared-status"></p></div>'
     + '<div class="bp-build">Build __BUILD__</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
   nm.addEventListener('blur', () => {
     const v = nm.textContent.trim();
-    if (v && v !== dispName(b)) { S.names[id] = v; }
-    else { delete S.names[id]; }
+    const before = S.names[id] != null ? S.names[id] : null;
+    const beforeLabel = dispName(b);
+    if (v && v !== beforeLabel) S.names[id] = v; else delete S.names[id];
+    const after = S.names[id] != null ? S.names[id] : null;
+    if (before !== after) logChange('rename', id, 'Renamed \u201c' + beforeLabel + '\u201d \u2192 \u201c' + dispName(byId[id]) + '\u201d', before, after);
     save(); renderNav();
   });
   const nt = document.getElementById('bp-notes');
-  let t = null;
+  let t = null, notesBefore = null;
+  nt.addEventListener('focus', () => { notesBefore = nt.value; });
   nt.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => { S.notes[id] = nt.value; save(); }, 400); });
+  nt.addEventListener('blur', () => {
+    if (notesBefore !== null && notesBefore !== nt.value) logChange('notes', id, 'Edited notes for \u201c' + dispName(byId[id]) + '\u201d', notesBefore, nt.value);
+    notesBefore = null;
+  });
+  loadPhotos(id);
+  initPhotoDrop(id);
+  loadSharedNotes(id);
+  renderJournal();
   if (id === 'project-buddy') {
     const tw = document.querySelector('#buddy-home .bp-tree-wrap');
     const src = document.getElementById('view-tree');
@@ -376,7 +410,9 @@ function moveBuddy(src, target){
   if (!src || !target || src === target) return;
   const b = byId[src]; if (!b || !byId[target]) return;
   if (isDesc(target, src)) { toast('Can\u2019t move ' + dispName(b) + ' under ' + dispName(byId[target]) + ' \u2014 that would create a loop.'); return; }
+  const beforeParent = effParent(b);
   if (target === b.parent) delete S.parents[src]; else S.parents[src] = target;
+  logChange('move', src, 'Moved \u201c' + dispName(byId[src]) + '\u201d under \u201c' + dispName(byId[target]) + '\u201d', beforeParent, target);
   save(); buildKids(); renderNav(); refreshViews();
   if (S.sel === 'buddy:' + src || S.sel === 'buddy:' + target || S.sel === 'buddy:project-buddy') renderBuddy(S.sel.slice(6));
   toast(dispName(b) + ' moved under ' + dispName(byId[target]) + '.');
@@ -481,10 +517,11 @@ function applyZoom(){
   bn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); bn.blur(); } });
   bn.addEventListener('blur', () => {
     const v = bn.textContent.trim();
+    const before = S.appName || null;
     if (v && v !== 'Buddies') S.appName = v; else delete S.appName;
-    const n = S.appName || 'Buddies';
-    bn.textContent = n;
-    document.title = n;
+    const after = S.appName || null;
+    if (before !== after) logChange('brand', null, 'Renamed app \u201c' + (before || 'Buddies') + '\u201d \u2192 \u201c' + (after || 'Buddies') + '\u201d', before, after);
+    applyBrand();
     save();
   });
 })();
@@ -607,7 +644,9 @@ function renderPlan(id){
   let t = null;
   nt.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => { S.notes[id] = nt.value; save(); }, 400); });
 }
-function show(sel){
+const navHist = [];
+function show(sel, push){
+  if (push !== false && S.sel && sel !== S.sel) { navHist.push(S.sel); if (navHist.length > 60) navHist.shift(); }
   S.sel = sel; save();
   document.querySelectorAll('#main .view').forEach(v => v.classList.remove('active'));
   if (sel.startsWith('view:')) {
@@ -625,6 +664,182 @@ function show(sel){
   setIcon(sel.startsWith('plan:') ? ((planById[sel.slice(5)] || {}).icon)
     : sel.startsWith('buddy:') ? ((byId[sel.slice(6)] || {}).icon) : byId['project-buddy'].icon);
 }
+/* ---------- sidebar resize ---------- */
+(function initSbResize(){
+  const sb = document.getElementById('sidebar');
+  function apply(){ const w = S.sbWidth || 308; sb.style.width = w + 'px'; sb.style.flex = '0 0 ' + w + 'px'; }
+  apply();
+  const h = document.getElementById('sb-resize');
+  let sx = null, sw = 0;
+  h.addEventListener('pointerdown', e => { sx = e.clientX; sw = sb.getBoundingClientRect().width; h.setPointerCapture(e.pointerId); e.preventDefault(); });
+  h.addEventListener('pointermove', e => { if (sx === null) return; const w = Math.min(560, Math.max(220, sw + e.clientX - sx)); sb.style.width = w + 'px'; sb.style.flex = '0 0 ' + w + 'px'; });
+  const done = () => { if (sx === null) return; sx = null; S.sbWidth = Math.round(sb.getBoundingClientRect().width); save(); };
+  h.addEventListener('pointerup', done);
+  h.addEventListener('pointercancel', done);
+})();
+/* ---------- prev/next/back ---------- */
+function goBack(){ const p = navHist.pop(); show(p || 'view:tree', false); }
+function stepBuddy(d){
+  const ids = BUDDIES.map(b => b.id);
+  let i = S.sel.startsWith('buddy:') ? ids.indexOf(S.sel.slice(6)) : (d > 0 ? -1 : 0);
+  i = (i + d + ids.length) % ids.length;
+  show('buddy:' + ids[i]);
+}
+/* ---------- change journal ---------- */
+if (!Array.isArray(S.journal)) S.journal = [];
+function logChange(type, buddyId, desc, before, after){
+  S.journal.push({t: Date.now(), type, buddy: buddyId, desc, before: before == null ? null : before, after: after == null ? null : after});
+  save(); renderJournal();
+}
+function renderJournal(){
+  const bar = document.getElementById('journal-bar'); if (!bar) return;
+  const n = S.journal.length;
+  if (!n) { bar.classList.remove('show'); bar.innerHTML = ''; return; }
+  const items = S.journal.map(c => '<li>' + escHtml(c.desc) + '<span class="jtime">' + new Date(c.t).toLocaleString() + '</span></li>').join('');
+  bar.innerHTML = '<button class="linkbtn" id="j-revert">Revert (' + n + ')</button>'
+    + '<button class="linkbtn" id="j-toggle">What changed?</button>'
+    + '<ul>' + items + '</ul>';
+  bar.classList.add('show');
+}
+function applyBrand(){
+  const bn = document.getElementById('brand-name'); const name = S.appName || 'Buddies';
+  if (bn && document.activeElement !== bn) bn.textContent = name;
+  document.title = name;
+}
+function revertJournal(){
+  const js = S.journal.slice().reverse(), n = js.length;
+  js.forEach(c => {
+    if (c.type === 'rename') { if (c.before == null) delete S.names[c.buddy]; else S.names[c.buddy] = c.before; }
+    else if (c.type === 'brand') { if (c.before == null) delete S.appName; else S.appName = c.before; applyBrand(); }
+    else if (c.type === 'notes') { S.notes[c.buddy] = c.before || ''; }
+    else if (c.type === 'move') { const reg = (byId[c.buddy] || {}).parent; if (c.before === reg) delete S.parents[c.buddy]; else S.parents[c.buddy] = c.before; }
+  });
+  S.journal = []; save(); buildKids(); renderNav(); refreshViews();
+  if (S.sel.startsWith('buddy:')) renderBuddy(S.sel.slice(6));
+  renderJournal();
+  toast('Reverted ' + n + ' change' + (n === 1 ? '' : 's') + '.');
+}
+/* ---------- GitHub repo write-back (photos + shared notes) ---------- */
+function ghToken(){ return S.ghToken || ''; }
+async function ghApi(path, method, body){
+  const t = ghToken(); if (!t) throw new Error('Add a GitHub token first.');
+  const r = await fetch('https://api.github.com' + path, {
+    method: method || 'GET',
+    headers: {'Authorization': 'Bearer ' + t, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json'},
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if (!r.ok) throw new Error('GitHub ' + r.status);
+  return r.status === 204 ? null : await r.json();
+}
+async function ghPutFile(repo, path, b64, msg){
+  let sha;
+  try { const ex = await ghApi('/repos/davedellaquila/' + repo + '/contents/' + path); sha = ex.sha; } catch (e) {}
+  const body = {message: msg, content: b64}; if (sha) body.sha = sha;
+  await ghApi('/repos/davedellaquila/' + repo + '/contents/' + path, 'PUT', body);
+}
+async function ghGetFile(repo, path){
+  try {
+    const j = await ghApi('/repos/davedellaquila/' + repo + '/contents/' + path);
+    if (j && j.content) return new TextDecoder().decode(Uint8Array.from(atob(j.content.replace(/\\n/g, '')), c => c.charCodeAt(0)));
+  } catch (e) {}
+  return null;
+}
+function b64encode(str){ const bytes = new TextEncoder().encode(str); let bin = ''; bytes.forEach(b => { bin += String.fromCharCode(b); }); return btoa(bin); }
+function blobToB64(blob){ return new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(',')[1]); fr.onerror = rej; fr.readAsDataURL(blob); }); }
+function loadHeicLib(){
+  return new Promise((res, rej) => {
+    if (window.heic2any) return res();
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';
+    s.onload = res; s.onerror = () => rej(new Error('HEIC converter failed to load'));
+    document.head.appendChild(s);
+  });
+}
+/* ---------- photos ---------- */
+async function loadPhotos(id){
+  const strip = document.getElementById('pstrip'); if (!strip) return;
+  const b = byId[id];
+  const seeds = (b.photos || []).map(u => ({src: u, href: u}));
+  let repo = [];
+  try {
+    const r = await fetch('https://api.github.com/repos/davedellaquila/buddy-tree/contents/photos/' + id);
+    if (r.ok) { const j = await r.json(); repo = (Array.isArray(j) ? j : []).filter(f => f.type === 'file').map(f => ({src: f.download_url, href: f.download_url})); }
+  } catch (e) {}
+  const all = seeds.concat(repo.filter(x => !seeds.some(s => s.src === x.src)));
+  strip.innerHTML = all.map(p => '<a href="' + escHtml(p.href) + '" target="_blank" rel="noopener"><img src="' + escHtml(p.src) + '" loading="lazy" alt=""></a>').join('');
+  const st = document.getElementById('pstat');
+  if (st) st.textContent = all.length
+    ? all.length + ' photo' + (all.length === 1 ? '' : 's') + ' \u2014 stored in the buddy-tree repo under photos/' + id + '/'
+    : 'No photos yet \u2014 drop some below. They land in the buddy-tree repo under photos/' + id + '/';
+}
+async function handlePhotoFiles(id, files){
+  const st = document.getElementById('pstat');
+  const list = Array.from(files || []).filter(f => /^image\//.test(f.type) || /\.hei[cf]$/i.test(f.name));
+  if (!list.length) { toast('No image files in that drop.'); return; }
+  if (!ghToken()) { toast('Add a GitHub token below to publish photos to the repo.'); renderTokenRow(id); return; }
+  let n = 0;
+  for (const f of list) {
+    try {
+      let blob = f, ext = (f.name.split('.').pop() || 'jpg').toLowerCase();
+      if (/\.hei[cf]$/i.test(f.name) || f.type === 'image/heic' || f.type === 'image/heif') {
+        if (st) st.textContent = 'Converting HEIC\u2026';
+        await loadHeicLib();
+        blob = await window.heic2any({blob: f, toType: 'image/jpeg', quality: 0.92});
+        ext = 'jpg';
+      }
+      if (!/^(jpg|jpeg|png|gif|webp)$/.test(ext)) ext = 'jpg';
+      const b64 = await blobToB64(blob);
+      const safe = (f.name.replace(/\.[^.]+$/, '').replace(/[^\w\-]+/g, '_').slice(0, 40) || 'photo');
+      await ghPutFile('buddy-tree', 'photos/' + id + '/' + Date.now() + '-' + safe + '.' + ext, b64, 'Add photo for ' + id);
+      n++;
+      if (st) st.textContent = 'Uploaded ' + n + '/' + list.length + '\u2026';
+    } catch (err) { toast('Photo failed: ' + (err.message || err)); }
+  }
+  loadPhotos(id);
+}
+function renderTokenRow(id){
+  const st = document.getElementById('pstat'); if (!st || document.getElementById('ghtok')) return;
+  const d = document.createElement('div'); d.className = 'ghtoken';
+  d.innerHTML = '<input type="password" id="ghtok" placeholder="GitHub token (repo scope) \u2014 stored on this device only" aria-label="GitHub token">'
+    + '<button class="linkbtn" id="ghtok-save">Save token</button>';
+  st.after(d);
+  document.getElementById('ghtok-save').addEventListener('click', () => {
+    const v = document.getElementById('ghtok').value.trim();
+    if (v) { S.ghToken = v; save(); d.remove(); toast('Token saved on this device.'); loadSharedNotes(id); }
+  });
+}
+function initPhotoDrop(id){
+  const z = document.getElementById('pdrop'); if (!z) return;
+  ['dragenter', 'dragover'].forEach(ev => z.addEventListener(ev, e => { e.preventDefault(); z.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(ev => z.addEventListener(ev, e => { e.preventDefault(); z.classList.remove('over'); }));
+  z.addEventListener('drop', e => handlePhotoFiles(id, e.dataTransfer.files));
+  z.addEventListener('click', () => {
+    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*,.heic,.heif'; inp.multiple = true;
+    inp.addEventListener('change', () => handlePhotoFiles(id, inp.files));
+    inp.click();
+  });
+  if (!ghToken()) renderTokenRow(id);
+}
+/* ---------- shared notes ---------- */
+async function loadSharedNotes(id){
+  const ta = document.getElementById('bp-shared-notes'), st = document.getElementById('shared-status');
+  if (!ta) return;
+  const b = byId[id];
+  if (!ghToken() || !b.repo) { if (st) st.textContent = ghToken() ? 'No repo linked for shared notes.' : 'Add a GitHub token (in the Photos section) to sync shared notes.'; return; }
+  if (st) st.textContent = 'Loading\u2026';
+  const txt = await ghGetFile(b.repo, 'docs/notes.md');
+  ta.value = txt || '';
+  if (st) st.textContent = txt == null ? 'No shared notes yet.' : 'Synced from ' + b.repo + '/docs/notes.md';
+  let t = null;
+  ta.addEventListener('input', () => {
+    clearTimeout(t);
+    if (st) st.textContent = 'Saving\u2026';
+    t = setTimeout(async () => {
+      try { await ghPutFile(b.repo, 'docs/notes.md', b64encode(ta.value), 'Update shared notes'); if (st) st.textContent = 'Saved to ' + b.repo + '/docs/notes.md'; }
+      catch (err) { if (st) st.textContent = 'Save failed: ' + (err.message || err); }
+    }, 900);
+  });
+}
 document.addEventListener('click', e => {
   const vb = e.target.closest('[data-view]');
   if (vb) { show('view:' + vb.dataset.view); return; }
@@ -638,6 +853,10 @@ document.addEventListener('click', e => {
   if (sa) { (byId[sa.dataset.seenAll].attention || []).forEach(a => S.seen[a.id] = Date.now()); save(); renderBuddy(S.sel.slice(6)); renderNav(); return; }
   const gt = e.target.closest('[data-goto]');
   if (gt) { e.preventDefault(); show('buddy:' + gt.dataset.goto); return; }
+  const nb = e.target.closest('[data-navbtn]');
+  if (nb) { const k = nb.dataset.navbtn; if (k === 'back') goBack(); else stepBuddy(k === 'next' ? 1 : -1); return; }
+  if (e.target.closest('#j-revert')) { revertJournal(); return; }
+  if (e.target.closest('#j-toggle')) { document.getElementById('journal-bar').classList.toggle('open'); return; }
   const rp = e.target.closest('#reset-parents');
   if (rp) { S.parents = {}; save(); buildKids(); renderNav(); refreshViews();
     if (S.sel.startsWith('buddy:')) renderBuddy(S.sel.slice(6));
@@ -645,6 +864,7 @@ document.addEventListener('click', e => {
 });
 refreshViews();
 show(S.sel || 'view:tree');
+renderJournal();
 """
     js = js.replace("BUDDIES_JSON", buddies_js).replace("ORDER_JSON", order_js).replace("PLANS_JSON", plans_js)
     js = js.replace("ICON_DOC", "'" + ICON_DOC.replace("'", "\\'") + "'")
@@ -666,12 +886,14 @@ show(S.sel || 'view:tree');
 <body>
 <div class="app">
 <aside id="sidebar">
+<div id="sb-resize" title="Drag to resize sidebar"></div>
   <div class="brand"><div class="eyebrow">Project Buddy &middot; macro view</div><h1 id="brand-name" title="Click to rename">Buddies</h1><div class="bcount">NBUD buddies &middot; one family</div></div>
   <div class="nav-sec"><h3>Views</h3><div id="view-nav"></div></div>
   <div class="nav-sec"><h3>Buddies <span id="attn-pill" class="zero">0</span></h3><div id="buddy-nav"></div></div>
   <div class="nav-sec"><h3>Business Plans</h3><div id="plan-nav"></div></div>
 </aside>
 <main id="main">
+<div id="journal-bar"></div>
 """ + vt + vp + vpl + vm + """
 <section id="view-buddy" class="view"><div id="buddy-home"></div></section>
 </main>
