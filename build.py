@@ -120,6 +120,21 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
   background:none;border:none;color:#8b949e;cursor:pointer;font-size:10px;padding:0;margin-right:2px}
 .brow:hover .ctog.has-kids{display:inline-flex}
 .ctog.has-kids.collapsed{transform:rotate(-90deg)}
+#field-settings{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2000;
+  background:#161b22;border:1px solid #30363d;border-radius:12px;padding:20px;width:320px;max-height:80vh;overflow:auto;
+  box-shadow:0 12px 40px rgba(0,0,0,.6);display:none}
+#field-settings.show{display:block}
+#field-settings h3{margin:0 0 12px;font-size:14px}
+.fset-row{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid #21262d;border-radius:8px;margin-bottom:6px;background:#0d1117;cursor:grab}
+.fset-row.dragging{opacity:.5}
+.fset-row .fh{color:#8b949e;cursor:grab;font-size:14px}
+.fset-row .fl{flex:1;font-size:13px}
+.fset-row input[type=checkbox]{width:16px;height:16px}
+.bp-close-x{position:absolute;top:12px;right:12px;z-index:10;width:32px;height:32px;
+  background:#161b22;border:1px solid #30363d;border-radius:8px;color:#8b949e;font-size:16px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center}
+.bp-close-x:hover{color:#e6edf3;border-color:#1f6feb;background:#1c2128}
+#buddy-home{position:relative}
 .ghtoken input{flex:1;min-width:180px;background:#0d1117;border:1px solid #30363d;color:#e6edf3;border-radius:8px;padding:7px 10px;font-size:13px}
 .linkbtn{background:none;border:none;color:#1f6feb;cursor:pointer;font-size:13px;padding:2px 4px}
 .linkbtn:hover{text-decoration:underline}
@@ -396,6 +411,72 @@ function artRow(icon, label, sub, url){
 function closeDetail(){
   document.getElementById('view-buddy').classList.remove('active', 'panel', 'sheet');
 }
+const FIELD_DEFS = [
+  {id:'ingest', label:'Ingest'},
+  {id:'attention', label:'Needs your attention'},
+  {id:'mission', label:'What it does'},
+  {id:'photos', label:'Photos'},
+  {id:'tree', label:'The Buddy Tree'},
+  {id:'artifacts', label:'Artifacts'},
+  {id:'plans', label:'Business plans'},
+  {id:'notes', label:'Notes'},
+  {id:'shared', label:'Shared notes'},
+];
+function getFieldOrder(){
+  if (!S.fieldOrder || !Array.isArray(S.fieldOrder)) S.fieldOrder = FIELD_DEFS.map(f => f.id);
+  return S.fieldOrder;
+}
+function isFieldVisible(fid){
+  if (!S.fieldHidden) S.fieldHidden = {};
+  return !S.fieldHidden[fid];
+}
+function openFieldSettings(){
+  let m = document.getElementById('field-settings');
+  if (!m) {
+    m = document.createElement('div'); m.id = 'field-settings';
+    m.innerHTML = '<h3>Buddy fields</h3><p class="fineprint" style="margin-bottom:12px">Drag to reorder. Uncheck to hide.</p><div id="fset-list"></div>'
+      + '<div style="margin-top:12px;text-align:right"><button class="linkbtn" id="fset-close">Done</button></div>';
+    document.body.appendChild(m);
+    document.getElementById('fset-close').addEventListener('click', () => m.classList.remove('show'));
+  }
+  const list = document.getElementById('fset-list');
+  list.innerHTML = getFieldOrder().map(fid => {
+    const def = FIELD_DEFS.find(f => f.id === fid);
+    if (!def) return '';
+    const vis = isFieldVisible(fid);
+    return '<div class="fset-row" draggable="true" data-fid="' + fid + '">'
+      + '<span class="fh">\u2630</span><span class="fl">' + def.label + '</span>'
+      + '<input type="checkbox" ' + (vis ? 'checked' : '') + ' data-vis="' + fid + '" title="Show/hide"></div>';
+  }).join('');
+  // Drag reorder
+  let dragEl = null;
+  list.querySelectorAll('.fset-row').forEach(row => {
+    row.addEventListener('dragstart', e => { dragEl = row; row.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
+    row.addEventListener('dragend', () => row.classList.remove('dragging'));
+    row.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+    row.addEventListener('drop', e => {
+      e.preventDefault();
+      if (!dragEl || dragEl === row) return;
+      const ids = Array.from(list.querySelectorAll('.fset-row')).map(r => r.dataset.fid);
+      const from = ids.indexOf(dragEl.dataset.fid), to = ids.indexOf(row.dataset.fid);
+      const order = getFieldOrder();
+      const [moved] = order.splice(from, 1);
+      order.splice(to, 0, moved);
+      S.fieldOrder = order; save();
+      openFieldSettings();
+      const mm = S.sel.match(/^buddy:(.+)$/); if (mm) renderBuddy(mm[1]);
+    });
+  });
+  list.querySelectorAll('[data-vis]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (!S.fieldHidden) S.fieldHidden = {};
+      S.fieldHidden[cb.dataset.vis] = !cb.checked;
+      save();
+      const mm = S.sel.match(/^buddy:(.+)$/); if (mm) renderBuddy(mm[1]);
+    });
+  });
+  m.classList.add('show');
+}
 function renderBuddy(id){
   const b = byId[id]; if(!b) return;
   const items = (b.attention || []).slice().sort((x,y) => (S.seen[x.id]?1:0) - (S.seen[y.id]?1:0));
@@ -438,6 +519,7 @@ function renderBuddy(id){
     + '<div class="ghtoken"><input type="password" id="ghtok2" placeholder="GitHub token (repo scope)" aria-label="GitHub token">'
     + '<button class="linkbtn" id="ghtok2-save">Save token</button></div></div>'
     + '<div class="sa-bar"><span>\U0001f516 Standalone view</span><button class="linkbtn" id="sa-full">Open full dashboard \u2192</button></div>'
+    + '<button class="bp-close-x" id="bp-close-x" title="Close">\u2715</button>'
     + '<div class="bp-topnav"><button class="linkbtn" data-navbtn="back">\u2190 Back</button>'
     + '<button class="linkbtn" data-navbtn="prev">\u2039 Prev</button><button class="linkbtn" data-navbtn="next">Next \u203a</button>'
     + '<span class="sep">\u00b7</span><button class="linkbtn" data-view="tree">All buddies</button>'
@@ -449,8 +531,9 @@ function renderBuddy(id){
     + '<div class="bp-sec"><h3>Ingest</h3><p class="fineprint">Brain-dump anything about this buddy \u2014 raw and unfiltered. '
     + 'Each dump lands in the buddy\u2019s repo (docs/ingest.md) as a timestamped entry, ready to be worked into the dossier later.</p>'
     + '<textarea class="notes" id="bp-ingest" placeholder="Dump what\u2019s in your head about '+escHtml(dispName(b))+'\u2026"></textarea>'
-    + '<div style="margin-top:8px"><button class="linkbtn" id="ingest-dump">Dump it \u2192</button> <span class="fineprint" id="ingest-status"></span></div>'
+    + '<div style="margin-top:8px"><span class="fineprint" id="ingest-status"></span></div>'
     + '<div id="ingest-feed" style="margin-top:8px"></div></div>'
+    + '<div class="bp-sec"><h3>Needs your attention</h3>'+attn+'</div>'
     + '<div class="bp-sec"><h3>What it does</h3><p class="bp-mission">'+escHtml(b.mission)+'</p>'
     + '<p class="fineprint">The mission is the brief\u2019s executive summary — tweak it through the buddy\u2019s chat thread and it updates everywhere.</p></div>'
     + photos
@@ -460,7 +543,6 @@ function renderBuddy(id){
         : '')
     + '<div class="bp-sec"><h3>Artifacts</h3>'+arts+'</div>'
     + planSec
-    + '<div class="bp-sec"><h3>Needs your attention</h3>'+attn+'</div>'
     + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this buddy\u2026">'+escHtml(S.notes[id]||'')+'</textarea>'
     + '<p class="fineprint">Saved on this device only.</p></div>'
     + '<div class="bp-sec"><h3>Shared notes</h3><p class="fineprint">Saved to the buddy\u2019s repo (docs/notes.md) \u2014 visible to everyone with repo access.</p>'
@@ -487,6 +569,26 @@ function renderBuddy(id){
     if (notesBefore !== null && notesBefore !== nt.value) logChange('notes', id, 'Edited notes for \u201c' + dispName(byId[id]) + '\u201d', notesBefore, nt.value);
     notesBefore = null;
   });
+  (function initIngestAuto(bid){
+    const ta = document.getElementById('bp-ingest'), st = document.getElementById('ingest-status');
+    if (!ta || ta.dataset.auto) return;
+    ta.dataset.auto = '1';
+    let t = null, lastDumped = '';
+    ta.addEventListener('input', () => {
+      clearTimeout(t);
+      const txt = ta.value.trim();
+      if (!txt || txt === lastDumped) { if (st && !txt) st.textContent = ''; return; }
+      if (st) st.textContent = 'waiting\u2026';
+      t = setTimeout(async () => {
+        const cur = ta.value.trim();
+        if (!cur || cur === lastDumped) return;
+        if (st) st.textContent = 'dumping\u2026';
+        await dumpIngest(bid, true);
+        lastDumped = ta.value.trim();
+        if (st && lastDumped) st.textContent = 'dumped \u2713';
+      }, 2000);
+    });
+  })(id);
   loadPhotos(id);
   initPhotoDrop(id);
   refreshTokenUI(id);
@@ -501,7 +603,7 @@ function renderBuddy(id){
       const zb = mc.querySelector('#zoombar'); if (zb) zb.remove();
       const zw = mc.querySelector('#zoomwrap'); if (zw) { zw.style.display = 'block'; }
       const tz = mc.querySelector('#treezoom'); if (tz) { tz.style.overflow = 'visible'; tz.style.height = 'auto'; tz.removeAttribute('id'); }
-      let mz = 50;
+      let mz = 80;
       const applyMz = () => { const ch = mc.querySelector('.chart'); if (ch) ch.style.zoom = mz + '%'; };
       applyMz();
       document.getElementById('bp-mz-in').addEventListener('click', e => { e.stopPropagation(); mz = Math.min(150, mz + 10); applyMz(); });
@@ -973,7 +1075,7 @@ function saveToDesktop(id){
   toast('Saved ' + filename + ' ' + String.fromCharCode(8212) + ' move it to your desktop.');
 }
 /* ---------- ingest ---------- */
-async function dumpIngest(id){
+async function dumpIngest(id, keepText){
   const ta = document.getElementById('bp-ingest'), st = document.getElementById('ingest-status');
   const text = ta.value.trim();
   if (!text) return;
@@ -985,7 +1087,7 @@ async function dumpIngest(id){
   try {
     const cur = await ghGetFile(b.repo, 'docs/ingest.md') || '# Ingest log \u2014 ' + b.name + String.fromCharCode(10,10);
     await ghPutFile(b.repo, 'docs/ingest.md', b64encode(cur + entry), 'Ingest dump for ' + id);
-    ta.value = '';
+    if (!keepText) ta.value = '';
     if (st) st.textContent = 'Dumped to ' + b.repo + '/docs/ingest.md';
   } catch (err) { if (st) st.textContent = 'Save failed: ' + (err.message || err); }
   renderIngestFeed(id);
@@ -1200,8 +1302,7 @@ function updateTokenGating(id){
   }
   const ig = document.getElementById('bp-ingest');
   if (ig) { ig.disabled = !has; ig.placeholder = has ? ig.placeholder : 'Add a GitHub token above to unlock ingest.'; }
-  const db = document.getElementById('ingest-dump');
-  if (db) db.classList.toggle('locked', !has);
+
   const pz = document.getElementById('pdrop');
   if (pz) pz.classList.toggle('locked', !has);
 }
@@ -1225,7 +1326,7 @@ async function loadSharedNotes(id){
   });
 }
 document.addEventListener('click', e => {
-  if (e.target.closest && e.target.closest('#bp-close')) { closeDetail(); return; }
+  if (e.target.closest && (e.target.closest('#bp-close') || e.target.closest('#bp-close-x'))) { closeDetail(); return; }
   if (e.target.closest && e.target.closest('#menu-btn')) { document.getElementById('sidebar').classList.toggle('open'); return; }
   if (e.target.closest && e.target.closest('#ghtok2-save')) {
     const v = document.getElementById('ghtok2').value.trim();
@@ -1256,7 +1357,6 @@ document.addEventListener('click', e => {
   if (nb) { const k = nb.dataset.navbtn; if (k === 'back') goBack(); else stepBuddy(k === 'next' ? 1 : -1); return; }
   if (e.target.closest('#j-revert')) { revertJournal(); return; }
   if (e.target.closest('#j-toggle')) { document.getElementById('journal-bar').classList.toggle('open'); return; }
-  if (e.target.closest('#ingest-dump')) { const m = S.sel.match(/^buddy:(.+)$/); if (m) dumpIngest(m[1]); return; }
   const rp = e.target.closest('#reset-parents');
   if (rp) { S.parents = {}; save(); buildKids(); renderNav(); refreshViews();
     if (S.sel.startsWith('buddy:')) renderBuddy(S.sel.slice(6));
