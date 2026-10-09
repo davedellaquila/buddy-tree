@@ -270,7 +270,7 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
   cursor:pointer;display:flex;align-items:center;justify-content:center}
 .bp-close-x:hover{color:#e6edf3}
 #buddy-home{position:relative}
-#bp-resize{position:absolute;left:-9px;top:0;bottom:0;width:12px;cursor:ew-resize;z-index:20;
+#bp-resize{position:absolute;left:-8px;top:0;bottom:0;width:12px;cursor:ew-resize;z-index:20;
   display:flex;align-items:center;justify-content:center}
 #bp-resize::after{content:'';width:4px;height:40px;border-radius:2px;background:#30363d}
 #bp-resize:hover::after{background:#1f6feb}
@@ -978,7 +978,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Saved to the buddy’s repo (docs/notes.md) — visible to everyone with repo access.">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Shared notes…"></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261009.1612</div>'
+    + '<div class="bp-build">Build 20261009.1613</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -1390,7 +1390,7 @@ function renderPlan(id){
     + '<div class="bp-sec"><h3>Related buddies</h3>'+buds+'</div>'
     + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this plan…">'+escHtml(S.notes[id]||'')+'</textarea>'
     + '<p class="fineprint">Saved on this device only.</p></div>'
-    + '<div class="bp-build">Build 20261009.1612</div>'
+    + '<div class="bp-build">Build 20261009.1613</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
