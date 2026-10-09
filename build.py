@@ -116,6 +116,10 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
   border-radius:8px;padding:8px 10px;font-size:13px;margin-bottom:10px}
 #token-pop .saved-check{display:none;color:#7ee787;font-size:14px;font-weight:600;margin-top:8px}
 #token-pop .saved-check.show{display:block}
+.ctog{display:none;width:18px;height:18px;flex:0 0 18px;align-items:center;justify-content:center;
+  background:none;border:none;color:#8b949e;cursor:pointer;font-size:10px;padding:0;margin-right:2px}
+.brow:hover .ctog.has-kids{display:inline-flex}
+.ctog.has-kids.collapsed{transform:rotate(-90deg)}
 .ghtoken input{flex:1;min-width:180px;background:#0d1117;border:1px solid #30363d;color:#e6edf3;border-radius:8px;padding:7px 10px;font-size:13px}
 .linkbtn{background:none;border:none;color:#1f6feb;cursor:pointer;font-size:13px;padding:2px 4px}
 .linkbtn:hover{text-decoration:underline}
@@ -442,6 +446,11 @@ function renderBuddy(id){
     + '<div class="bp-top"><span class="bp-icon">'+escHtml(b.icon||'')+'</span><h2 class="bp-name" id="bp-name" contenteditable="true" spellcheck="false" data-buddy="'+id+'">'+escHtml(dispName(b))+'</h2>'
     + '<span class="status '+b.statusClass+'">'+escHtml(b.status)+'</span></div>'
     + '<p class="bp-tagline">'+escHtml(b.tagline||'')+'</p>'
+    + '<div class="bp-sec"><h3>Ingest</h3><p class="fineprint">Brain-dump anything about this buddy \u2014 raw and unfiltered. '
+    + 'Each dump lands in the buddy\u2019s repo (docs/ingest.md) as a timestamped entry, ready to be worked into the dossier later.</p>'
+    + '<textarea class="notes" id="bp-ingest" placeholder="Dump what\u2019s in your head about '+escHtml(dispName(b))+'\u2026"></textarea>'
+    + '<div style="margin-top:8px"><button class="linkbtn" id="ingest-dump">Dump it \u2192</button> <span class="fineprint" id="ingest-status"></span></div>'
+    + '<div id="ingest-feed" style="margin-top:8px"></div></div>'
     + '<div class="bp-sec"><h3>What it does</h3><p class="bp-mission">'+escHtml(b.mission)+'</p>'
     + '<p class="fineprint">The mission is the brief\u2019s executive summary — tweak it through the buddy\u2019s chat thread and it updates everywhere.</p></div>'
     + photos
@@ -457,11 +466,6 @@ function renderBuddy(id){
     + '<div class="bp-sec"><h3>Shared notes</h3><p class="fineprint">Saved to the buddy\u2019s repo (docs/notes.md) \u2014 visible to everyone with repo access.</p>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Shared notes\u2026"></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-sec"><h3>Ingest</h3><p class="fineprint">Brain-dump anything about this buddy \u2014 raw and unfiltered. '
-    + 'Each dump lands in the buddy\u2019s repo (docs/ingest.md) as a timestamped entry, ready to be worked into the dossier later.</p>'
-    + '<textarea class="notes" id="bp-ingest" placeholder="Dump what\u2019s in your head about '+escHtml(dispName(b))+'\u2026"></textarea>'
-    + '<div style="margin-top:8px"><button class="linkbtn" id="ingest-dump">Dump it \u2192</button> <span class="fineprint" id="ingest-status"></span></div>'
-    + '<div id="ingest-feed" style="margin-top:8px"></div></div>'
     + '<div class="bp-build">Build __BUILD__</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
