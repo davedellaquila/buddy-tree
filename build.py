@@ -137,8 +137,8 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 #buddy-home{position:relative}
 #bp-resize{position:absolute;left:-8px;top:0;bottom:0;width:12px;cursor:ew-resize;z-index:20;
   display:flex;align-items:center;justify-content:center}
-#bp-resize::after{content:'';width:4px;height:40px;border-radius:2px;background:#30363d}
-#bp-resize:hover::after{background:#1f6feb}
+#bp-resize::after{content:'';width:6px;height:56px;border-radius:3px;background:#6e7681}
+#bp-resize:hover::after{background:#58a6ff}
 #bp-resize:hover{background:rgba(31,111,235,.1)}
 #sb-gear{position:absolute;top:10px;right:10px;z-index:10;width:36px;height:36px;background:none;border:none;
   border-radius:8px;color:#8b949e;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center}
