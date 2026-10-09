@@ -148,7 +148,7 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 .dumps-head h4{margin:0;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#8b949e}
 .dumps-head .darrow{font-size:25px;color:#8b949e;transition:transform .15s;display:inline-block;line-height:1;position:relative;top:-2px}
 .bp-sec > h3{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}
-.bp-sec > h3 .secarrow{font-size:14px;color:#8b949e;transition:transform .15s;display:inline-block;line-height:1}
+.bp-sec > h3 .secarrow{font-size:25px;color:#8b949e;transition:transform .15s;display:inline-block;line-height:1}
 .bp-sec.collapsed > *:not(h3){display:none}
 .bp-sec.collapsed .secarrow{transform:rotate(-90deg)}
 .dumps.collapsed .darrow{transform:rotate(-90deg)}
