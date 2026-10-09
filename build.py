@@ -85,7 +85,7 @@ body.light #zoombar{background:#ffffff;border-color:#d0d7de}
 .bp-topnav{display:flex;gap:4px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
 .bp-topnav .sep{color:#6e7681;margin:0 2px}
 #journal-bar{display:none;margin:0 0 12px;background:#0d1a30;border:1px solid #1f6feb;border-radius:10px;padding:9px 13px;font-size:13px}
-#journal-bar.show{display:block}
+#journal-bar.show{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 #journal-bar ul{margin:8px 0 4px;padding-left:18px;display:none}
 #journal-bar.open ul{display:block}
 #journal-bar li{margin:3px 0;color:#c9d1d9}
@@ -1263,8 +1263,12 @@ function renderJournal(){
   const items = S.journal.map(c => '<li>' + escHtml(c.desc) + '<span class="jtime">' + new Date(c.t).toLocaleString() + '</span></li>').join('');
   bar.innerHTML = '<button class="linkbtn" id="j-revert">Revert (' + n + ')</button>'
     + '<button class="linkbtn" id="j-toggle">What changed?</button>'
-    + '<ul>' + items + '</ul>';
+    + '<ul>' + items + '</ul>'
+    + '<button class="linkbtn" id="j-dismiss" title="Dismiss" style="margin-left:auto">\\u2715</button>';
   bar.classList.add('show');
+  document.getElementById('j-dismiss').addEventListener('click', () => {
+    bar.classList.remove('show');
+  });
 }
 function applyBrand(){
   const bn = document.getElementById('brand-name'); const name = S.appName || 'Buddies';
