@@ -344,9 +344,17 @@ function renderNav(){
   const views = [['tree','Tree','▦'],['projects','Projects','☰'],['plans','Plans','💼'],['manifest','Manifest','✓']];
   document.getElementById('view-nav').innerHTML = views.map(([v,l,ic]) =>
     '<button class="navbtn'+(S.sel==='view:'+v?' sel':'')+'" data-view="'+v+'"><span class="nic">'+ic+'</span>'+l+'</button>').join('');
+  const q = (document.getElementById('buddy-search').value || '').toLowerCase().trim();
+  const words = q.split(/\s+/).filter(Boolean);
   let h = '';
+  function matches(b){
+    if (!words.length) return true;
+    const hay = ((b.name || '') + ' ' + (b.tagline || '')).toLowerCase();
+    return words.every(w => hay.includes(w));
+  }
   function row(id, depth){
     const b = byId[id]; if(!b) return;
+    if (words.length && !matches(b)) { (kidsOf[id] || []).forEach(c => row(c.id, depth+1)); return; }
     const un = descUnseen(id);
     const kind = b.kind === 'root' ? 'root' : (b.parent === 'project-buddy' ? 'direct' : b.kind);
     h += '<button class="brow'+(S.sel==='buddy:'+id?' sel':'')+(un?' has-unseen':'')+'" data-buddy="'+id+'"'
@@ -844,6 +852,7 @@ function show(sel, push){
 document.addEventListener('keydown', e => {
   if (e.target && e.target.matches && e.target.matches('input, textarea, [contenteditable="true"]')) return;
   if (e.key === 'Escape') { closeDetail(); return; }
+  if (e.key === '/' && !e.target.matches('input, textarea, [contenteditable="true"]')) { e.preventDefault(); const bs = document.getElementById('buddy-search'); if (bs) bs.focus(); return; }
   if (e.key === '+' || e.key === '=') { S.zoom = Math.min(160, (S.zoom || 100) + 5); save(); applyZoom(); return; }
   if (e.key === '-' || e.key === '_') { S.zoom = Math.max(50, (S.zoom || 100) - 5); save(); applyZoom(); return; }
   if (e.key === '0') { S.zoom = 100; save(); applyZoom(); return; }
@@ -1109,6 +1118,8 @@ function initTokenPill(){
     toast('Token removed.');
   });
   updateTokenPill();
+  const bs = document.getElementById('buddy-search');
+  if (bs) bs.addEventListener('input', () => renderNav());
 }
 function refreshTokenUI(id){
   updateTokenPill();
@@ -1240,7 +1251,10 @@ initTokenPill();
 <div id="sb-resize" title="Drag to resize sidebar"></div>
   <div class="brand"><div class="eyebrow">Project Buddy &middot; macro view</div><h1 id="brand-name" title="Click to rename">Buddies</h1><div class="bcount">NBUD buddies &middot; one family</div></div>
   <div class="nav-sec"><h3>Views</h3><div id="view-nav"></div></div>
-  <div class="nav-sec"><h3>Buddies <span id="attn-pill" class="zero">0</span></h3><div id="buddy-nav"></div></div>
+  <div class="nav-sec"><h3>Buddies <span id="attn-pill" class="zero">0</span></h3>
+  <div style="padding:0 10px 8px"><input type="search" id="buddy-search" placeholder="Search buddies\u2026" aria-label="Search buddies"
+    style="width:100%;box-sizing:border-box;background:#0d1117;border:1px solid #30363d;color:#e6edf3;border-radius:8px;padding:7px 10px;font-size:13px"></div>
+  <div id="buddy-nav"></div></div>
   <div class="nav-sec"><h3>Business Plans</h3><div id="plan-nav"></div></div>
 </aside>
 <main id="main">
