@@ -8,6 +8,9 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
 ### Added
 - **No more phantom highlighting** — text selection disabled on the chart
   tiles (was leaving blue selection blocks when panning/zooming).
+- **Token gating** — shared notes, ingest, and photo upload are now
+  disabled until a GitHub token is saved; a prominent amber banner on every
+  buddy page pushes for the token.
 - **Zoom keyboard shortcuts** — `+`/`=` zoom in, `-`/`_` zoom out,
   `0` resets to 100%.
 - **Zoom slider floats over the chart** — moved from the margin into the

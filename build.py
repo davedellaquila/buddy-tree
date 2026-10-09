@@ -89,6 +89,13 @@ body.light #zoombar{background:#ffffff;border-color:#d0d7de}
 .pdrop.over{border-color:#1f6feb;background:#0d1a30;color:#e6edf3}
 .pstrip:empty{display:none}
 .ghtoken{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center}
+#token-banner{display:none;border:2px solid #d29922;background:#1c1a12;border-radius:12px;padding:14px 16px;margin-bottom:18px}
+#token-banner.show{display:block}
+#token-banner h4{margin:0 0 6px;font-size:14px;color:#e6edf3}
+#token-banner p{margin:0 0 10px;font-size:13px;color:#c9b98a}
+#token-banner .ghtoken{margin-top:0}
+.locked{opacity:.45;pointer-events:none}
+textarea[disabled]{opacity:.5;cursor:not-allowed}
 .ghtoken input{flex:1;min-width:180px;background:#0d1117;border:1px solid #30363d;color:#e6edf3;border-radius:8px;padding:7px 10px;font-size:13px}
 .linkbtn{background:none;border:none;color:#1f6feb;cursor:pointer;font-size:13px;padding:2px 4px}
 .linkbtn:hover{text-decoration:underline}
@@ -390,6 +397,10 @@ function renderBuddy(id){
   }
   document.getElementById('buddy-home').innerHTML =
     '<div class="bp-wrap">'
+    + '<div id="token-banner"><h4>\U0001f511 Connect GitHub to unlock this buddy</h4>'
+    + '<p>Photos, shared notes, and ingest save to the buddy\u2019s repo. Paste a token once \u2014 it stays on this device.</p>'
+    + '<div class="ghtoken"><input type="password" id="ghtok2" placeholder="GitHub token (repo scope)" aria-label="GitHub token">'
+    + '<button class="linkbtn" id="ghtok2-save">Save token</button></div></div>'
     + '<div class="sa-bar"><span>\U0001f516 Standalone view</span><button class="linkbtn" id="sa-full">Open full dashboard \u2192</button></div>'
     + '<div class="bp-topnav"><button class="linkbtn" data-navbtn="back">\u2190 Back</button>'
     + '<button class="linkbtn" data-navbtn="prev">\u2039 Prev</button><button class="linkbtn" data-navbtn="next">Next \u203a</button>'
@@ -442,6 +453,7 @@ function renderBuddy(id){
   });
   loadPhotos(id);
   initPhotoDrop(id);
+  updateTokenGating(id);
   loadSharedNotes(id);
   renderIngestFeed(id);
   renderJournal();
@@ -908,17 +920,7 @@ async function dumpIngest(id){
   const b = byId[id];
   const stamp = new Date().toLocaleString();
   const entry = '## ' + stamp + String.fromCharCode(10,10) + text + String.fromCharCode(10,10);
-  if (!ghToken() || !b.repo) {
-    const key = 'ingest:' + id;
-    let arr = [];
-    try { arr = JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) {}
-    arr.push({t: Date.now(), text});
-    try { localStorage.setItem(key, JSON.stringify(arr)); } catch (e) {}
-    ta.value = '';
-    if (st) st.textContent = 'Saved on this device (add a GitHub token to sync it to the repo).';
-    renderIngestFeed(id);
-    return;
-  }
+  if (!ghToken() || !b.repo) { if (st) st.textContent = 'Add a GitHub token above to unlock ingest.'; return; }
   if (st) st.textContent = 'Dumping\u2026';
   try {
     const cur = await ghGetFile(b.repo, 'docs/ingest.md') || '# Ingest log \u2014 ' + b.name + String.fromCharCode(10,10);
@@ -1051,11 +1053,24 @@ function initPhotoDrop(id){
   if (!ghToken()) renderTokenRow(id);
 }
 /* ---------- shared notes ---------- */
+function updateTokenGating(id){
+  const has = !!ghToken();
+  const banner = document.getElementById('token-banner');
+  if (banner) banner.classList.toggle('show', !has);
+  const sn = document.getElementById('bp-shared-notes');
+  if (sn) { sn.disabled = !has; sn.placeholder = has ? 'Shared notes\u2026' : 'Add a GitHub token above to unlock shared notes.'; }
+  const ig = document.getElementById('bp-ingest');
+  if (ig) { ig.disabled = !has; ig.placeholder = has ? ig.placeholder : 'Add a GitHub token above to unlock ingest.'; }
+  const db = document.getElementById('ingest-dump');
+  if (db) db.classList.toggle('locked', !has);
+  const pz = document.getElementById('pdrop');
+  if (pz) pz.classList.toggle('locked', !has);
+}
 async function loadSharedNotes(id){
   const ta = document.getElementById('bp-shared-notes'), st = document.getElementById('shared-status');
   if (!ta) return;
   const b = byId[id];
-  if (!ghToken() || !b.repo) { if (st) st.textContent = ghToken() ? 'No repo linked for shared notes.' : 'Add a GitHub token (in the Photos section) to sync shared notes.'; return; }
+  if (!ghToken() || !b.repo) { if (st) st.textContent = ghToken() ? 'No repo linked for shared notes.' : 'Locked \u2014 add a GitHub token above.'; return; }
   if (st) st.textContent = 'Loading\u2026';
   const txt = await ghGetFile(b.repo, 'docs/notes.md');
   ta.value = txt || '';
@@ -1073,6 +1088,14 @@ async function loadSharedNotes(id){
 document.addEventListener('click', e => {
   if (e.target.closest && e.target.closest('#bp-close')) { closeDetail(); return; }
   if (e.target.closest && e.target.closest('#menu-btn')) { document.getElementById('sidebar').classList.toggle('open'); return; }
+  if (e.target.closest && e.target.closest('#ghtok2-save')) {
+    const v = document.getElementById('ghtok2').value.trim();
+    if (!v) return;
+    S.ghToken = v; save();
+    const m = S.sel.match(/^buddy:(.+)$/); if (m) { updateTokenGating(m[1]); loadSharedNotes(m[1]); renderIngestFeed(m[1]); }
+    toast('Token saved on this device.');
+    return;
+  }
   if (e.target.closest && e.target.closest('#bp-desktop')) { const m = S.sel.match(/^buddy:(.+)$/); if (m) saveToDesktop(m[1]); return; }
   if (e.target.closest && e.target.closest('#sa-full')) { try { location.hash = '#/' + S.sel; } catch (e) {} document.body.classList.remove('standalone'); return; }
   if (e.target.closest && e.target.closest('.grip')) { e.preventDefault(); return; }

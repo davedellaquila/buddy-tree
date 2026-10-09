@@ -45,8 +45,11 @@ Build: `build.py` generates `index.html` from `buddies.json` + `plans.json`.
 - **Shared notes** — sync to the buddy's repo at `docs/notes.md` via the
   GitHub Contents API (needs a token; falls back to device-local).
 - **Ingest box** — brain-dump raw thoughts about the buddy; each dump is
-  appended as a timestamped entry to the buddy's repo `docs/ingest.md`
-  (device-local fallback). Raw material for later dossier work.
+  appended as a timestamped entry to the buddy's repo `docs/ingest.md`.
+  Raw material for later dossier work.
+- **Token gating** — photos, shared notes, and ingest are locked until a
+  GitHub token is saved; an amber banner at the top of every buddy page
+  prompts for it.
 - **Photo strip** — photos from `photos/<buddy-id>/` in the dashboard repo;
   drag/drop upload area; HEIC files are converted to JPEG in-browser
   (`heic2any`); uploads push to the repo via the GitHub API.
