@@ -681,6 +681,18 @@ function renderBuddy(id){
         if (st && lastDumped) st.textContent = 'dumped \u2713';
       }, 2000);
     });
+    ta.addEventListener('keydown', async e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        clearTimeout(t);
+        const cur = ta.value.trim();
+        if (!cur || cur === lastDumped) return;
+        if (st) st.textContent = 'dumping\u2026';
+        await dumpIngest(bid, false);
+        lastDumped = '';
+        if (st) st.textContent = 'dumped \u2713';
+      }
+    });
   })(id);
   loadPhotos(id);
   initPhotoDrop(id);
