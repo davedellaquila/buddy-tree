@@ -131,7 +131,7 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 .fset-row .fl{flex:1;font-size:13px}
 .fset-row input[type=checkbox]{width:16px;height:16px}
 .bp-close-x{position:absolute;top:10px;right:10px;z-index:10;width:36px;height:36px;
-  background:none;border:none;border-radius:8px;color:#8b949e;font-size:20px;
+  background:none;border:none;border-radius:8px;color:#8b949e;font-size:24px;
   cursor:pointer;display:flex;align-items:center;justify-content:center}
 .bp-close-x:hover{color:#e6edf3}
 #buddy-home{position:relative}
@@ -140,8 +140,10 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 #bp-resize::after{content:'';width:4px;height:40px;border-radius:2px;background:#30363d}
 #bp-resize:hover::after{background:#1f6feb}
 #sb-gear{position:absolute;top:10px;right:10px;z-index:10;width:36px;height:36px;background:none;border:none;
-  border-radius:8px;color:#8b949e;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  border-radius:8px;color:#8b949e;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 #sb-gear:hover{color:#e6edf3}
+#plans-sec.collapsed #plan-nav{display:none}
+#plans-sec.collapsed #plans-arrow{transform:rotate(-90deg);display:inline-block}
 
 #avatar-picker{position:fixed;z-index:2000;background:#161b22;border:1px solid #30363d;border-radius:12px;
   padding:16px;width:280px;display:none;box-shadow:0 12px 40px rgba(0,0,0,.6)}
@@ -602,7 +604,7 @@ function renderBuddy(id){
     + '<button class="linkbtn" id="ghtok2-save">Save token</button></div></div>'
     + '<div class="sa-bar"><span>\U0001f516 Standalone view</span><button class="linkbtn" id="sa-full">Open full dashboard \u2192</button></div>'
     + '<div id="bp-resize" title="Drag to resize panel"></div>'
-    + '<button class="bp-close-x" id="bp-close-x" title="Close">\u24e7</button>'
+    + '<button class="bp-close-x" id="bp-close-x" title="Close">\u2715</button>'
     + '<div class="bp-topnav"><button class="linkbtn" data-navbtn="back">\u2190 Back</button>'
     + '<button class="linkbtn" data-navbtn="prev">\u2039 Prev</button><button class="linkbtn" data-navbtn="next">Next \u203a</button>'
     + '<span class="sep">\u00b7</span><button class="linkbtn" data-view="tree">All buddies</button>'
@@ -1396,6 +1398,18 @@ function setBuddyIcon(bid, emoji){
   renderNav(); refreshViews();
   toast('Avatar updated.');
 }
+function initPlansToggle(){
+  const t = document.getElementById('plans-toggle');
+  const sec = document.getElementById('plans-sec');
+  if (!t || !sec || t.dataset.init) return;
+  t.dataset.init = '1';
+  if (S.plansCollapsed) sec.classList.add('collapsed');
+  t.addEventListener('click', () => {
+    sec.classList.toggle('collapsed');
+    S.plansCollapsed = sec.classList.contains('collapsed');
+    save();
+  });
+}
 function initGear(){
   const g = document.getElementById('sb-gear');
   if (g && !g.dataset.init) { g.dataset.init = '1'; g.addEventListener('click', () => openFieldSettings()); }
@@ -1516,6 +1530,7 @@ renderJournal();
 initTokenPill();
 initSearch();
 initGear();
+initPlansToggle();
 """
     js = js.replace("BUDDIES_JSON", buddies_js).replace("ORDER_JSON", order_js).replace("PLANS_JSON", plans_js)
     js = js.replace("ICON_DOC", "'" + ICON_DOC.replace("'", "\\'") + "'")
@@ -1545,7 +1560,7 @@ initGear();
   <div style="padding:0 10px 8px"><input type="search" id="buddy-search" placeholder="Search buddies\u2026" aria-label="Search buddies"
     style="width:100%;box-sizing:border-box;background:#0d1117;border:1px solid #30363d;color:#e6edf3;border-radius:8px;padding:7px 10px;font-size:13px"></div>
   <h3>Buddies <span id="attn-pill" class="zero">0</span></h3><div id="buddy-nav"></div></div>
-  <div class="nav-sec"><h3>Business Plans</h3><div id="plan-nav"></div></div>
+  <div class="nav-sec" id="plans-sec"><h3 style="cursor:pointer" id="plans-toggle"><span id="plans-arrow">\u25be</span> Business Plans</h3><div id="plan-nav"></div></div>
 </aside>
 <main id="main">
 <div id="journal-bar"></div>
