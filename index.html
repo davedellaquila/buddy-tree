@@ -799,7 +799,7 @@ function renderBuddy(id){
     + '<textarea class="notes" id="bp-ingest" placeholder="Dump what’s in your head about '+escHtml(dispName(b))+'…"></textarea>'
     + '<div style="margin-top:8px"><button class="linkbtn" id="ingest-dump">Dump it →</button> <span class="fineprint" id="ingest-status"></span></div>'
     + '<div id="ingest-feed" style="margin-top:8px"></div></div>'
-    + '<div class="bp-build">Build 20261009.1517</div>'
+    + '<div class="bp-build">Build 20261009.1518</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -1161,7 +1161,7 @@ function renderPlan(id){
     + '<div class="bp-sec"><h3>Related buddies</h3>'+buds+'</div>'
     + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this plan…">'+escHtml(S.notes[id]||'')+'</textarea>'
     + '<p class="fineprint">Saved on this device only.</p></div>'
-    + '<div class="bp-build">Build 20261009.1517</div>'
+    + '<div class="bp-build">Build 20261009.1518</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
@@ -1472,8 +1472,10 @@ function initTokenPill(){
     toast('Token removed.');
   });
   updateTokenPill();
+}
+function initSearch(){
   const bs = document.getElementById('buddy-search');
-  if (bs) bs.addEventListener('input', () => renderNav());
+  if (bs && !bs.dataset.init) { bs.dataset.init = '1'; bs.addEventListener('input', () => renderNav()); }
 }
 function refreshTokenUI(id){
   updateTokenPill();
@@ -1580,6 +1582,7 @@ refreshViews();
 })();
 renderJournal();
 initTokenPill();
+initSearch();
 
 </script>
 </body>

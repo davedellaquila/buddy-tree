@@ -1135,8 +1135,10 @@ function initTokenPill(){
     toast('Token removed.');
   });
   updateTokenPill();
+}
+function initSearch(){
   const bs = document.getElementById('buddy-search');
-  if (bs) bs.addEventListener('input', () => renderNav());
+  if (bs && !bs.dataset.init) { bs.dataset.init = '1'; bs.addEventListener('input', () => renderNav()); }
 }
 function refreshTokenUI(id){
   updateTokenPill();
@@ -1243,6 +1245,7 @@ refreshViews();
 })();
 renderJournal();
 initTokenPill();
+initSearch();
 """
     js = js.replace("BUDDIES_JSON", buddies_js).replace("ORDER_JSON", order_js).replace("PLANS_JSON", plans_js)
     js = js.replace("ICON_DOC", "'" + ICON_DOC.replace("'", "\\'") + "'")
