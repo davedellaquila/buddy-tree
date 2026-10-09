@@ -874,13 +874,16 @@ document.addEventListener('keydown', e => {
   if (e.key === '-' || e.key === '_') { S.zoom = Math.max(50, (S.zoom || 100) - 5); save(); applyZoom(); return; }
   if (e.key === '0') { S.zoom = 100; save(); applyZoom(); return; }
   if (/^[1-9]$/.test(e.key)) { S.zoom = parseInt(e.key, 10) * 10; save(); applyZoom(); return; }
-  if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+  if (!['ArrowDown','ArrowUp','ArrowLeft','ArrowRight'].includes(e.key)) return;
   const items = Array.from(document.querySelectorAll('#buddy-nav [data-buddy]'));
   if (!items.length) return;
   e.preventDefault();
   const curId = (S.sel || '').startsWith('buddy:') ? S.sel.slice(6) : null;
   let idx = items.findIndex(el => el.dataset.buddy === curId);
-  idx = e.key === 'ArrowDown' ? idx + 1 : idx - 1;
+  if (e.key === 'ArrowDown') idx = idx + 1;
+  else if (e.key === 'ArrowUp') idx = idx - 1;
+  else if (e.key === 'ArrowLeft') idx = 0;
+  else if (e.key === 'ArrowRight') idx = items.length - 1;
   idx = Math.max(0, Math.min(items.length - 1, idx));
   show('buddy:' + items[idx].dataset.buddy);
 });
@@ -1136,9 +1139,33 @@ function initTokenPill(){
   });
   updateTokenPill();
 }
+function centerOnBuddy(id){
+  const tz = document.getElementById('treezoom');
+  const node = tz ? tz.querySelector('.node[data-buddy="' + id + '"]') : null;
+  if (!tz || !node) return;
+  const nr = node.getBoundingClientRect(), tr = tz.getBoundingClientRect();
+  tz.scrollLeft += (nr.left + nr.width / 2) - (tr.left + tr.width / 2);
+  tz.scrollTop += (nr.top + nr.height / 2) - (tr.top + tr.height / 2);
+}
+function firstSearchMatch(){
+  const q = (document.getElementById('buddy-search').value || '').toLowerCase().trim();
+  const words = q.split(/\s+/).filter(Boolean);
+  if (!words.length) return null;
+  for (const b of BUDDIES) {
+    const hay = ((b.name || '') + ' ' + (b.tagline || '')).toLowerCase();
+    if (words.every(w => hay.includes(w))) return b.id;
+  }
+  return null;
+}
 function initSearch(){
   const bs = document.getElementById('buddy-search');
-  if (bs && !bs.dataset.init) { bs.dataset.init = '1'; bs.addEventListener('input', () => renderNav()); }
+  if (bs && !bs.dataset.init) {
+    bs.dataset.init = '1';
+    bs.addEventListener('input', () => {
+      renderNav();
+      if (S.sel === 'view:tree') { const m = firstSearchMatch(); if (m) centerOnBuddy(m); }
+    });
+  }
 }
 function refreshTokenUI(id){
   updateTokenPill();
