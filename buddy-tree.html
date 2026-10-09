@@ -78,6 +78,9 @@
   .node.standalone .tag { background: #21262d; color: #8b949e; }
 
   .standalones { margin-top: 56px; }
+  .subkids { list-style: none; margin: 10px 0 0; padding: 0 0 0 14px; border-left: 2px solid #3a4a63; }
+  .subkids li { list-style: none; margin-top: 8px; }
+  .subkids .node { width: 100%; }
   .standalones h2, .projects-view h2 { text-align: center; font-size: 20px; margin-bottom: 6px; }
   .standalones p.sub, .projects-view p.sub { text-align: center; color: #8b949e; font-size: 14px; margin-bottom: 24px; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(196px, 1fr)); gap: 12px; }
@@ -138,7 +141,7 @@
   <header>
     <div class="eyebrow">Project Buddy &middot; macro view</div>
     <h1>Buddies</h1>
-    <p class="sub">39 buddies &middot; one family &middot; Project Buddy is the parent of them all</p>
+    <p class="sub">41 buddies &middot; one family &middot; Project Buddy is the parent of them all</p>
     <p class="stamp">Dashboard basis &middot; drawn 2026-10-09</p>
   </header>
 
@@ -313,7 +316,12 @@
       <h2>Direct children of Project Buddy</h2>
       <p class="sub">Standalone buddies &mdash; parent is Project Buddy itself. Two meta-projects are tagged.</p>
       <div class="grid">
-        <div class="node standalone"><div class="name">Car Buddy</div><div class="desc">Per-car service tracking &mdash; MGA coupe + ML500.</div><div class="tag">direct</div></div>
+        <div class="node standalone"><div class="name">Car Buddy</div><div class="desc">Per-car service tracking &mdash; MGA coupe + ML500.</div><div class="tag">direct</div>
+          <ul class="subkids">
+            <li><div class="node standalone"><div class="name">🏎️ MGA Buddy</div><div class="desc">1959 MGA coupe &mdash; the British roadster.</div><div class="tag">child</div></div></li>
+            <li><div class="node standalone"><div class="name">🚙 ML500 Buddy</div><div class="desc">2002 Mercedes ML500 &mdash; the white SUV.</div><div class="tag">child</div></div></li>
+          </ul>
+        </div>
         <div class="node standalone"><div class="name">TV Buddy</div><div class="desc">Mood-matched pick playing in under 2 minutes.</div><div class="tag">direct</div></div>
         <div class="node standalone"><div class="name">News Buddy</div><div class="desc">Personalized news companion, listen mode.</div><div class="tag">direct</div></div>
         <div class="node standalone"><div class="name">Wisdom Buddy</div><div class="desc">Daily wisdom nuggets to Quentin and Sawyer.</div><div class="tag">direct</div></div>
@@ -363,6 +371,8 @@
         <div class="proj-row d2"><span class="dot">└</span><span class="pname">Investment Buddy</span><span class="pdesc">Investment ideas, research, signals podcast, dog detection</span><span class="status st-live">Live · M2 shipped</span></div>
         <div class="proj-row d1"><span class="dot">└</span><span class="pname">Work Buddy</span><span class="pdesc">Succeed at the job — dossiers, briefs, estimate calibration</span><span class="status st-brief">Brief review</span></div>
         <div class="proj-row d1"><span class="dot">└</span><span class="pname">Car Buddy</span><span class="pdesc">Per-car service tracking — MGA coupe + ML500</span><span class="status st-prd">PRD review</span></div>
+        <div class="proj-row d2"><span class="dot">└</span><span class="pname">🏎️ MGA Buddy</span><span class="pdesc">1959 MGA coupe — the British roadster</span><span class="status st-new">New</span></div>
+        <div class="proj-row d2"><span class="dot">└</span><span class="pname">🚙 ML500 Buddy</span><span class="pdesc">2002 Mercedes ML500 — the white SUV</span><span class="status st-new">New</span></div>
         <div class="proj-row d1"><span class="dot">└</span><span class="pname">TV Buddy</span><span class="pdesc">Mood-matched pick playing in under 2 minutes</span><span class="status st-prd">PRD review</span></div>
         <div class="proj-row d1"><span class="dot">└</span><span class="pname">News Buddy</span><span class="pdesc">Personalized news companion, listen mode</span><span class="status st-brief">Brief review</span></div>
         <div class="proj-row d1"><span class="dot">└</span><span class="pname">Wisdom Buddy</span><span class="pdesc">Daily wisdom nuggets to Quentin and Sawyer</span><span class="status st-pilot">Pilot</span></div>

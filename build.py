@@ -13,7 +13,7 @@ HERE = "/home/hatch/workspace/projects/buddy-tree"
 ROOT_ORDER = [
     "project-buddy",
     "personal-buddy", "family-buddy", "property-buddy", "finance-buddy", "work-buddy",
-    "car-buddy", "tv-buddy", "news-buddy", "wisdom-buddy", "birthday-buddy",
+    "car-buddy", "mga-buddy", "ml500-buddy", "tv-buddy", "news-buddy", "wisdom-buddy", "birthday-buddy",
     "job-buddy", "reminder-buddy", "housing-buddy", "zen-buddy", "school-buddy",
     "document-buddy", "dream-buddy", "tech-buddy", "feedback-buddy",
     "scaffold-buddy", "buddy-suite",
@@ -57,6 +57,14 @@ body{padding:0}
   border:1px solid #1f6feb;color:#e6edf3;padding:10px 20px;border-radius:999px;
   font-size:14px;z-index:99;box-shadow:0 4px 24px rgba(0,0,0,.5);white-space:nowrap;
   max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+.zoombar{display:flex;align-items:center;gap:10px;justify-content:flex-end;
+  padding:2px 4px 14px;color:#8b949e;font-size:13px}
+.zoombar input{width:170px;accent-color:#1f6feb}
+.zoombar .zv{min-width:46px;text-align:right;font-variant-numeric:tabular-nums}
+.pstrip{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 6px}
+.pstrip a{flex:0 0 auto}
+.pstrip img{height:150px;border-radius:10px;border:1px solid #30363d;display:block}
+.pstrip img:hover{border-color:#1f6feb}
 /* ---- buddy homepage ---- */
 .bp-wrap{max-width:880px;margin:0 auto;padding:6px 4px}
 .bp-crumb{font-size:12.5px;color:#8b949e;margin-bottom:10px}
@@ -189,9 +197,10 @@ function buildKids(){
   BUDDIES.forEach(b => { const p = effParent(b) || '__root'; (kidsOf[p] = kidsOf[p] || []).push(b); });
 }
 const LS_KEY = 'buddyTree.v3';
-let S = {seen:{}, notes:{}, names:{}, parents:{}, sel:'view:tree'};
+let S = {seen:{}, notes:{}, names:{}, parents:{}, zoom:100, sel:'view:tree'};
 try { Object.assign(S, JSON.parse(localStorage.getItem(LS_KEY) || '{}')); } catch(e) {}
 S.parents = S.parents || {};
+S.zoom = S.zoom || 100;
 buildKids();
 function save(){ localStorage.setItem(LS_KEY, JSON.stringify(S)); }
 function dispName(b){ return S.names[b.id] || b.name; }
@@ -256,6 +265,12 @@ function renderBuddy(id){
   if (b.repo) arts += artRow(ICON_REPO, 'GitHub Repo', 'davedellaquila/'+b.repo+' (private)', 'https://github.com/davedellaquila/'+b.repo);
   (b.docs || []).forEach(d => { arts += artRow(ICON_LINK, d.label, 'Related document — Google Doc', d.url); });
   if (!arts) arts = '<p class="bp-empty">No artifacts yet — the drill adds the brief and repo here when they exist.</p>';
+  let photos = '';
+  if ((b.photos || []).length) {
+    photos = '<div class="bp-sec"><h3>Photos</h3><div class="pstrip">'
+      + b.photos.map(u => '<a href="'+escHtml(u)+'" target="_blank" rel="noopener"><img src="'+escHtml(u)+'" loading="lazy" alt=""></a>').join('')
+      + '</div></div>';
+  }
   const linkedPlans = PLANS.filter(p => (p.buddies || []).includes(id));
   let planSec = '';
   if (linkedPlans.length) {
@@ -286,6 +301,7 @@ function renderBuddy(id){
     + '<p class="bp-tagline">'+escHtml(b.tagline||'')+'</p>'
     + '<div class="bp-sec"><h3>What it does</h3><p class="bp-mission">'+escHtml(b.mission)+'</p>'
     + '<p class="fineprint">The mission is the brief\u2019s executive summary — tweak it through the buddy\u2019s chat thread and it updates everywhere.</p></div>'
+    + photos
     + (id === 'project-buddy'
         ? '<div class="bp-sec"><h3>The Buddy Tree</h3><div class="bp-tree-wrap"></div>'
           + '<p class="fineprint"><button class="linkbtn" data-view="tree">Open the tree as its own view \u2192</button></p></div>'
@@ -310,7 +326,7 @@ function renderBuddy(id){
   if (id === 'project-buddy') {
     const tw = document.querySelector('#buddy-home .bp-tree-wrap');
     const src = document.getElementById('view-tree');
-    if (tw && src) tw.innerHTML = src.innerHTML;
+    if (tw && src) { tw.innerHTML = src.innerHTML; const zb = tw.querySelector('#zoombar'); if (zb) zb.remove(); }
   }
 }
 function toast(msg){
@@ -363,6 +379,14 @@ function nodeTag(b, depth){
   return depth === 2 ? 'child' : 'grandchild';
 }
 function iconName(b){ return escHtml((b.icon ? b.icon + ' ' : '') + dispName(b)); }
+function gridKids(b){
+  const kids = kidsOf[b.id] || [];
+  if (!kids.length) return '';
+  return '<ul class="subkids">' + kids.map(c =>
+    '<li><div class="node ' + c.kind + '"><div class="name">' + iconName(c) + '</div>'
+    + '<div class="desc">' + escHtml(c.tagline || '') + '</div><div class="tag">' + nodeTag(c, 2) + '</div>'
+    + gridKids(c) + '</div></li>').join('') + '</ul>';
+}
 function orgNode(b, depth){
   const kids = kidsOf[b.id] || [];
   let s = '<li><div class="node ' + b.kind + '"><div class="name">' + iconName(b) + '</div>'
@@ -386,10 +410,11 @@ function renderOrgTree(){
       + '<p class="sub">Standalone buddies &mdash; parent is ' + escHtml(dispName(root)) + ' itself. Two meta-projects are tagged.</p>'
       + '<div class="grid">'
       + rest.map(b => '<div class="node ' + b.kind + '"><div class="name">' + iconName(b) + '</div>'
-        + '<div class="desc">' + escHtml(b.tagline || '') + '</div><div class="tag">' + nodeTag(b, 1) + '</div></div>').join('')
+        + '<div class="desc">' + escHtml(b.tagline || '') + '</div><div class="tag">' + nodeTag(b, 1) + '</div>'
+        + gridKids(b) + '</div>').join('')
       + '</div></section>';
   }
-  document.getElementById('view-tree').innerHTML = s;
+  document.getElementById('treezoom').innerHTML = s;
 }
 function renderProjects(){
   let s = '<section class="projects-view" style="margin-top:24px"><h2>Projects by Buddy</h2>'
@@ -408,11 +433,31 @@ function renderProjects(){
 }
 let treeHTML0 = null, projHTML0 = null;
 function refreshViews(){
-  const vt = document.getElementById('view-tree'), vp = document.getElementById('view-projects');
-  if (treeHTML0 === null) { treeHTML0 = vt.innerHTML; projHTML0 = vp.innerHTML; }
+  const tz = document.getElementById('treezoom'), vp = document.getElementById('view-projects');
+  if (treeHTML0 === null) { treeHTML0 = tz.innerHTML; projHTML0 = vp.innerHTML; }
   if (Object.keys(S.parents).length) { renderOrgTree(); renderProjects(); }
-  else { vt.innerHTML = treeHTML0; vp.innerHTML = projHTML0; }
+  else { tz.innerHTML = treeHTML0; vp.innerHTML = projHTML0; }
 }
+function applyZoom(){
+  const tz = document.getElementById('treezoom');
+  if (tz) tz.style.zoom = (S.zoom || 100) + '%';
+  const r = document.getElementById('zoomrange'), v = document.getElementById('zoomval');
+  if (r) r.value = S.zoom || 100;
+  if (v) v.textContent = (S.zoom || 100) + '%';
+}
+(function initZoom(){
+  const vt = document.getElementById('view-tree');
+  vt.insertAdjacentHTML('afterbegin',
+    '<div class="zoombar" id="zoombar"><span>Zoom</span>'
+    + '<input type="range" id="zoomrange" min="50" max="160" step="5" value="100" aria-label="Tree zoom">'
+    + '<span class="zv" id="zoomval">100%</span></div><div id="treezoom"></div>');
+  const tz = document.getElementById('treezoom');
+  Array.from(vt.childNodes).forEach(n => { if (n.id !== 'zoombar' && n.id !== 'treezoom') tz.appendChild(n); });
+  document.getElementById('zoomrange').addEventListener('input', e => {
+    S.zoom = parseInt(e.target.value, 10) || 100; save(); applyZoom();
+  });
+  applyZoom();
+})();
 (function initDrag(){
   const nav = document.getElementById('buddy-nav');
   let dragId = null;

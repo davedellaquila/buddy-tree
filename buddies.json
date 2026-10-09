@@ -24,7 +24,8 @@
    "status": "Spec review",
    "statusClass": "st-spec",
    "tagline": "The macro view — status & next actions for every buddy",
-   "icon": "🧭"
+   "icon": "🧭",
+   "photos": []
   },
   {
    "attention": [
@@ -45,7 +46,8 @@
    "status": "Brief review",
    "statusClass": "st-brief",
    "tagline": "Personal-ops — the “figure it out later” list with teeth",
-   "icon": "🙋"
+   "icon": "🙋",
+   "photos": []
   },
   {
    "attention": [
@@ -66,7 +68,8 @@
    "status": "Brief review",
    "statusClass": "st-brief",
    "tagline": "Trip planning, itineraries, logistics",
-   "icon": "✈️"
+   "icon": "✈️",
+   "photos": []
   },
   {
    "attention": [
@@ -87,7 +90,8 @@
    "status": "Brief review",
    "statusClass": "st-brief",
    "tagline": "Stay-in-touch nudges, notes, milestones",
-   "icon": "💞"
+   "icon": "💞",
+   "photos": []
   },
   {
    "attention": [
@@ -108,7 +112,8 @@
    "status": "Brief review",
    "statusClass": "st-brief",
    "tagline": "Career goals, skill growth, job-search readiness",
-   "icon": "💼"
+   "icon": "💼",
+   "photos": []
   },
   {
    "attention": [],
@@ -123,7 +128,8 @@
    "status": "New",
    "statusClass": "st-new",
    "tagline": "Family projects — shared with the household",
-   "icon": "👨‍👩‍👧‍👦"
+   "icon": "👨‍👩‍👧‍👦",
+   "photos": []
   },
   {
    "attention": [
@@ -144,7 +150,8 @@
    "status": "Brief review",
    "statusClass": "st-brief",
    "tagline": "Per-pet profiles, meds, vet visits",
-   "icon": "🐾"
+   "icon": "🐾",
+   "photos": []
   },
   {
    "attention": [
@@ -165,7 +172,8 @@
    "status": "Brief review",
    "statusClass": "st-brief",
    "tagline": "One shape for every property",
-   "icon": "🏠"
+   "icon": "🏠",
+   "photos": []
   },
   {
    "attention": [],
@@ -180,7 +188,8 @@
    "status": "Active",
    "statusClass": "st-active",
    "tagline": "Fiddletown cabin ops",
-   "icon": "🏕️"
+   "icon": "🏕️",
+   "photos": []
   },
   {
    "attention": [],
@@ -195,7 +204,8 @@
    "status": "Brief review",
    "statusClass": "st-brief",
    "tagline": "Sundance Optima 880 — treatments & chemistry",
-   "icon": "♨️"
+   "icon": "♨️",
+   "photos": []
   },
   {
    "attention": [
@@ -216,7 +226,8 @@
    "status": "Brief review",
    "statusClass": "st-brief",
    "tagline": "Plans and tracks hosted gatherings",
-   "icon": "🎉"
+   "icon": "🎉",
+   "photos": []
   },
   {
    "attention": [
@@ -237,7 +248,8 @@
    "status": "Brief review",
    "statusClass": "st-brief",
    "tagline": "Ideas for the future of the San Jose house",
-   "icon": "🏡"
+   "icon": "🏡",
+   "photos": []
   },
   {
    "attention": [],
@@ -252,7 +264,8 @@
    "status": "New",
    "statusClass": "st-new",
    "tagline": "Parent container for money projects",
-   "icon": "💰"
+   "icon": "💰",
+   "photos": []
   },
   {
    "attention": [],
@@ -267,7 +280,8 @@
    "status": "Live · pre-alpha",
    "statusClass": "st-live",
    "tagline": "The expense tracker app",
-   "icon": "💵"
+   "icon": "💵",
+   "photos": []
   },
   {
    "attention": [],
@@ -282,7 +296,8 @@
    "status": "Live · M2 shipped",
    "statusClass": "st-live",
    "tagline": "Investment ideas, research, signals podcast",
-   "icon": "📈"
+   "icon": "📈",
+   "photos": []
   },
   {
    "attention": [
@@ -308,7 +323,8 @@
    "status": "Brief review",
    "statusClass": "st-brief",
    "tagline": "Dossiers, meeting briefs, estimate calibration",
-   "icon": "💻"
+   "icon": "💻",
+   "photos": []
   },
   {
    "attention": [],
@@ -328,7 +344,8 @@
    "status": "PRD review",
    "statusClass": "st-prd",
    "tagline": "Per-car service tracking",
-   "icon": "🚗"
+   "icon": "🚗",
+   "photos": []
   },
   {
    "attention": [],
@@ -343,7 +360,8 @@
    "status": "PRD review",
    "statusClass": "st-prd",
    "tagline": "Mood-matched pick in under 2 minutes",
-   "icon": "📺"
+   "icon": "📺",
+   "photos": []
   },
   {
    "attention": [],
@@ -358,7 +376,8 @@
    "status": "Brief review",
    "statusClass": "st-brief",
    "tagline": "Personalized news companion",
-   "icon": "📰"
+   "icon": "📰",
+   "photos": []
   },
   {
    "attention": [],
@@ -378,7 +397,8 @@
    "status": "Pilot",
    "statusClass": "st-pilot",
    "tagline": "Daily wisdom nuggets to the kids",
-   "icon": "🦉"
+   "icon": "🦉",
+   "photos": []
   },
   {
    "attention": [],
@@ -398,7 +418,8 @@
    "status": "PRD review",
    "statusClass": "st-prd",
    "tagline": "Witty birthday sayings",
-   "icon": "🎂"
+   "icon": "🎂",
+   "photos": []
   },
   {
    "attention": [
@@ -419,7 +440,8 @@
    "status": "PRD review",
    "statusClass": "st-prd",
    "tagline": "Job search — discovery, profile, triage",
-   "icon": "🔎"
+   "icon": "🔎",
+   "photos": []
   },
   {
    "attention": [
@@ -440,7 +462,8 @@
    "status": "Brief review",
    "statusClass": "st-brief",
    "tagline": "Fire-and-forget nudges",
-   "icon": "⏰"
+   "icon": "⏰",
+   "photos": []
   },
   {
    "attention": [
@@ -466,7 +489,8 @@
    "status": "PRD review",
    "statusClass": "st-prd",
    "tagline": "Know-your-market real estate",
-   "icon": "🏘️"
+   "icon": "🏘️",
+   "photos": []
   },
   {
    "attention": [
@@ -487,7 +511,8 @@
    "status": "Brief review",
    "statusClass": "st-brief",
    "tagline": "Meditation, breathwork, practice",
-   "icon": "🧘"
+   "icon": "🧘",
+   "photos": []
   },
   {
    "attention": [
@@ -513,7 +538,8 @@
    "status": "Brief review",
    "statusClass": "st-brief",
    "tagline": "Learning companion",
-   "icon": "🎓"
+   "icon": "🎓",
+   "photos": []
   },
   {
    "attention": [
@@ -534,7 +560,8 @@
    "status": "Brief review",
    "statusClass": "st-brief",
    "tagline": "The Google Docs layer",
-   "icon": "📄"
+   "icon": "📄",
+   "photos": []
   },
   {
    "attention": [
@@ -555,7 +582,8 @@
    "status": "Brief review",
    "statusClass": "st-brief",
    "tagline": "Tech inventory + gadget tutor",
-   "icon": "🤖"
+   "icon": "🤖",
+   "photos": []
   },
   {
    "attention": [
@@ -576,7 +604,8 @@
    "status": "Brief review",
    "statusClass": "st-brief",
    "tagline": "The skeleton every buddy is born with",
-   "icon": "🏗️"
+   "icon": "🏗️",
+   "photos": []
   },
   {
    "attention": [
@@ -597,7 +626,8 @@
    "status": "Brief review",
    "statusClass": "st-brief",
    "tagline": "Brand, monetization, marketing",
-   "icon": "🧩"
+   "icon": "🧩",
+   "photos": []
   },
   {
    "attention": [
@@ -618,7 +648,8 @@
    "status": "Brief review",
    "statusClass": "st-brief",
    "tagline": "Dream journal buddy",
-   "icon": "💭"
+   "icon": "💭",
+   "photos": []
   },
   {
    "attention": [
@@ -639,7 +670,8 @@
    "status": "Brief review",
    "statusClass": "st-brief",
    "tagline": "Feedback to outside parties",
-   "icon": "📣"
+   "icon": "📣",
+   "photos": []
   },
   {
    "id": "quentin-buddy",
@@ -660,7 +692,8 @@
      "text": "Product brief ready for review — looks good, edits, or defer? Open: older (31) vs younger (28) not established."
     }
    ],
-   "icon": "🧑"
+   "icon": "🧑",
+   "photos": []
   },
   {
    "id": "sawyer-buddy",
@@ -681,7 +714,8 @@
      "text": "Product brief ready for review — looks good, edits, or defer? Open: older (31) vs younger (28) not established."
     }
    ],
-   "icon": "👦"
+   "icon": "👦",
+   "photos": []
   },
   {
    "id": "amanda-buddy",
@@ -702,7 +736,8 @@
      "text": "Product brief ready for review — looks good, edits, or defer? Open: surname unknown."
     }
    ],
-   "icon": "👩"
+   "icon": "👩",
+   "photos": []
   },
   {
    "id": "emile-buddy",
@@ -723,7 +758,8 @@
      "text": "Product brief ready for review — looks good, edits, or defer? Key active thread: Morgan Hill sale coordination."
     }
    ],
-   "icon": "🧔"
+   "icon": "🧔",
+   "photos": []
   },
   {
    "id": "nancy-buddy",
@@ -744,7 +780,8 @@
      "text": "Product brief ready for review — looks good, edits, or defer? Open: relationship to Dave unstated."
     }
    ],
-   "icon": "👩‍🍳"
+   "icon": "👩‍🍳",
+   "photos": []
   },
   {
    "id": "jessica-buddy",
@@ -765,7 +802,8 @@
      "text": "Product brief ready for review — looks good, edits, or defer? Open: which side of the family unknown."
     }
    ],
-   "icon": "👱‍♀️"
+   "icon": "👱‍♀️",
+   "photos": []
   },
   {
    "id": "pops-buddy",
@@ -786,7 +824,40 @@
      "text": "Product brief ready for review — looks good, edits, or defer? Dossier thin — identity/relationship unknown."
     }
    ],
-   "icon": "👴"
+   "icon": "👴",
+   "photos": []
+  },
+  {
+   "id": "mga-buddy",
+   "name": "MGA Buddy",
+   "kind": "standalone",
+   "parent": "car-buddy",
+   "status": "New",
+   "statusClass": "st-new",
+   "tagline": "1959 MGA coupe — the British roadster",
+   "mission": "Living dossier for the 1959 MGA coupe: 1800cc MGB engine with close-ratio 5-speed (modified, non-original drivetrain) — a good driver that presents well, not perfect. Tracks service, parts, and the paused sale discussion (working auction estimate $20–25k; Bring a Trailer the likely venue when Dave returns to it).",
+   "brief": "",
+   "repo": "",
+   "docs": [],
+   "attention": [],
+   "icon": "🏎️",
+   "photos": []
+  },
+  {
+   "id": "ml500-buddy",
+   "name": "ML500 Buddy",
+   "kind": "standalone",
+   "parent": "car-buddy",
+   "status": "New",
+   "statusClass": "st-new",
+   "tagline": "2002 Mercedes ML500 — the white SUV",
+   "mission": "Living dossier for the 2002 Mercedes-Benz ML500: service history, parts, mileage log. Notable: the dipstick question is settled — the 722.6 transmission has no factory dipstick; the ordered dipstick is for engine oil.",
+   "brief": "",
+   "repo": "",
+   "docs": [],
+   "attention": [],
+   "icon": "🚙",
+   "photos": []
   }
  ]
 }
