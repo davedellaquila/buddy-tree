@@ -265,18 +265,18 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 .fset-row .fh{color:#8b949e;cursor:grab;font-size:14px}
 .fset-row .fl{flex:1;font-size:13px}
 .fset-row input[type=checkbox]{width:16px;height:16px}
-.bp-close-x{position:absolute;top:12px;right:12px;z-index:10;width:32px;height:32px;
-  background:#161b22;border:1px solid #30363d;border-radius:8px;color:#8b949e;font-size:16px;
+.bp-close-x{position:absolute;top:10px;right:10px;z-index:10;width:36px;height:36px;
+  background:none;border:none;border-radius:8px;color:#8b949e;font-size:20px;
   cursor:pointer;display:flex;align-items:center;justify-content:center}
-.bp-close-x:hover{color:#e6edf3;border-color:#1f6feb;background:#1c2128}
+.bp-close-x:hover{color:#e6edf3}
 #buddy-home{position:relative}
 #bp-resize{position:absolute;left:0;top:0;bottom:0;width:8px;cursor:ew-resize;z-index:20;
   display:flex;align-items:center;justify-content:center}
 #bp-resize::after{content:'';width:4px;height:40px;border-radius:2px;background:#30363d}
 #bp-resize:hover::after{background:#1f6feb}
-#sb-gear{position:absolute;top:12px;right:12px;z-index:10;width:32px;height:32px;background:none;border:1px solid #30363d;
-  border-radius:8px;color:#8b949e;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-#sb-gear:hover{color:#e6edf3;border-color:#1f6feb}
+#sb-gear{position:absolute;top:10px;right:10px;z-index:10;width:36px;height:36px;background:none;border:none;
+  border-radius:8px;color:#8b949e;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#sb-gear:hover{color:#e6edf3}
 #sidebar{position:relative}
 #avatar-picker{position:fixed;z-index:2000;background:#161b22;border:1px solid #30363d;border-radius:12px;
   padding:16px;width:280px;display:none;box-shadow:0 12px 40px rgba(0,0,0,.6)}
@@ -939,7 +939,7 @@ function renderBuddy(id){
     + '<button class="linkbtn" id="ghtok2-save">Save token</button></div></div>'
     + '<div class="sa-bar"><span>🔖 Standalone view</span><button class="linkbtn" id="sa-full">Open full dashboard →</button></div>'
     + '<div id="bp-resize" title="Drag to resize panel"></div>'
-    + '<button class="bp-close-x" id="bp-close-x" title="Close">✕</button>'
+    + '<button class="bp-close-x" id="bp-close-x" title="Close">ⓧ</button>'
     + '<div class="bp-topnav"><button class="linkbtn" data-navbtn="back">← Back</button>'
     + '<button class="linkbtn" data-navbtn="prev">‹ Prev</button><button class="linkbtn" data-navbtn="next">Next ›</button>'
     + '<span class="sep">·</span><button class="linkbtn" data-view="tree">All buddies</button>'
@@ -966,7 +966,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Saved to the buddy’s repo (docs/notes.md) — visible to everyone with repo access.">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Shared notes…"></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261009.1545</div>'
+    + '<div class="bp-build">Build 20261009.1547</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -1366,7 +1366,7 @@ function renderPlan(id){
     + '<div class="bp-sec"><h3>Related buddies</h3>'+buds+'</div>'
     + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this plan…">'+escHtml(S.notes[id]||'')+'</textarea>'
     + '<p class="fineprint">Saved on this device only.</p></div>'
-    + '<div class="bp-build">Build 20261009.1545</div>'
+    + '<div class="bp-build">Build 20261009.1547</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
