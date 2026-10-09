@@ -1372,9 +1372,28 @@ async function loadPhotos(id){
 }
 async function handlePhotoFiles(id, files){
   const st = document.getElementById('pstat');
+  const strip = document.getElementById('pstrip');
+  const dropz = document.getElementById('pdrop');
   const list = Array.from(files || []).filter(f => /^image\//.test(f.type) || /\.hei[cf]$/i.test(f.name));
   if (!list.length) { toast('No image files in that drop.'); return; }
   if (!ghToken()) { toast('Add your GitHub token first — click the token pill (top right).'); document.getElementById('token-pop').classList.add('show'); return; }
+  let progTile = null, progBar = null, progLabel = null;
+  if (strip) {
+    progTile = document.createElement('div');
+    progTile.className = 'pupload';
+    progTile.innerHTML = '<div class="pbar"><div style="width:0%"></div></div><div class="plabel">Uploading</div>';
+    strip.appendChild(progTile);
+    progBar = progTile.querySelector('.pbar > div');
+    progLabel = progTile.querySelector('.plabel');
+  }
+  const updateProg = function(done, total) {
+    const pct = total ? Math.round(done / total * 100) : 0;
+    if (progBar) progBar.style.width = pct + '%';
+    if (progLabel) progLabel.textContent = done + '/' + total;
+    if (st) st.textContent = 'Uploaded ' + done + '/' + total + '...';
+    if (dropz) dropz.style.background = 'linear-gradient(to right, rgba(26,127,55,.45) ' + pct + '%, transparent ' + pct + '%)';
+  };
+  updateProg(0, list.length);
   let n = 0;
   for (const f of list) {
     try {
@@ -1392,7 +1411,7 @@ async function handlePhotoFiles(id, files){
       const upPath = (byId[id] && byId[id].repo) ? 'photos/' + Date.now() + '-' + safe + '.' + ext : 'photos/' + id + '/' + Date.now() + '-' + safe + '.' + ext;
       await ghPutFile(upRepo, upPath, b64, 'Add photo for ' + id);
       n++;
-      if (st) st.textContent = 'Uploaded ' + n + '/' + list.length + '\u2026';
+      updateProg(n, list.length);
     } catch (err) { toast('Photo failed: ' + (err.message || err)); }
   }
   if (progTile) progTile.remove();
