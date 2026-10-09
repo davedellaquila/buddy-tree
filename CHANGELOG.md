@@ -8,6 +8,8 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
 ### Added
 - **No more phantom highlighting** — text selection disabled on the chart
   tiles (was leaving blue selection blocks when panning/zooming).
+- **Sidebar buddy search** — filter the buddy list by keywords (AND match
+  on name + tagline); press `/` to jump to the search box.
 - **Global token pill** — GitHub token status lives in a fixed top-right pill
   (amber 'Token needed' / green 'GitHub check'), not buried per-buddy; saving
   shows a green checkmark confirmation.
