@@ -142,7 +142,7 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 #bp-resize:hover{background:rgba(31,111,235,.1)}
 .dumps-head{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px;margin:12px 0 0}
 .dumps-head h4{margin:0;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#8b949e}
-.dumps-head .darrow{font-size:10px;color:#8b949e;transition:transform .15s;display:inline-block}
+.dumps-head .darrow{font-size:14px;color:#8b949e;transition:transform .15s;display:inline-block;line-height:1}
 .dumps.collapsed .darrow{transform:rotate(-90deg)}
 .dumps.collapsed .dumps-body{display:none}
 #sb-gear{position:absolute;top:10px;right:10px;z-index:10;width:36px;height:36px;background:none;border:none;
