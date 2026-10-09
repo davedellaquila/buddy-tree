@@ -63,6 +63,9 @@ body{padding:0}
   font-size:14px;z-index:99;box-shadow:0 4px 24px rgba(0,0,0,.5);white-space:nowrap;
   max-width:92vw;overflow:hidden;text-overflow:ellipsis}
 .treewrap{display:flex;gap:10px;align-items:flex-start}
+#treezoom{flex:1;min-width:0;overflow:auto;max-height:calc(100vh - 150px);cursor:grab;border-radius:12px}
+#treezoom.panning{cursor:grabbing}
+#treezoom.panning,#treezoom.panning *{user-select:none!important;-webkit-user-select:none!important}
 #zoombar{position:sticky;top:12px;flex:0 0 54px;height:248px;background:#161b22;border:1px solid #30363d;border-radius:12px;z-index:5}
 #zoombar .zt{position:absolute;top:8px;left:0;right:0;text-align:center;font-size:11px;color:#8b949e;cursor:help}
 #zoomrange{position:absolute;left:50%;top:50%;width:188px;margin:0;padding:0;transform:translate(-50%,-50%) rotate(-90deg);accent-color:#1f6feb;cursor:pointer}
@@ -533,31 +536,34 @@ function applyZoom(){
 })();
 (function initPan(){
   const tz = document.getElementById('treezoom');
-  let pan = null;
+  let pan = null, swallow = false;
   tz.addEventListener('pointerdown', e => {
     if (e.pointerType !== 'mouse' || e.button !== 0) return;
-    const ch = e.target.closest('.chart');
-    if (!ch) return;
-    pan = { el: ch, x: e.clientX, y: e.clientY, sl: ch.scrollLeft, st: window.scrollY, moved: false, id: e.pointerId };
+    pan = { x: e.clientX, y: e.clientY, sl: tz.scrollLeft, st: tz.scrollTop, moved: false, id: e.pointerId };
   });
   tz.addEventListener('pointermove', e => {
     if (!pan || e.pointerId !== pan.id) return;
     const dx = e.clientX - pan.x, dy = e.clientY - pan.y;
     if (!pan.moved && Math.abs(dx) + Math.abs(dy) < 5) return;
     pan.moved = true;
-    pan.el.classList.add('panning');
-    pan.el.scrollLeft = pan.sl - dx;
-    window.scrollTo(0, pan.st - dy);
+    tz.classList.add('panning');
+    tz.scrollLeft = pan.sl - dx;
+    tz.scrollTop = pan.st - dy;
+    e.preventDefault();
   });
   function endPan(e){
     if (!pan) return;
     if (e && e.pointerId !== pan.id) return;
-    pan.el.classList.remove('panning');
+    tz.classList.remove('panning');
+    if (pan.moved) { swallow = true; setTimeout(() => { swallow = false; }, 80); }
     pan = null;
   }
   tz.addEventListener('pointerup', endPan);
   tz.addEventListener('pointercancel', endPan);
   window.addEventListener('pointerup', () => endPan(null));
+  tz.addEventListener('click', e => {
+    if (swallow) { e.preventDefault(); e.stopPropagation(); }
+  }, true);
 })();
 (function initTreeDrop(){
   function target(e){
