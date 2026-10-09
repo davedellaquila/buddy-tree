@@ -592,7 +592,8 @@ function renderBuddy(id){
       + '<span class="art-go">→</span></a>').join('') + '</div>';
   }
   let attn = '';
-  if (!items.length) attn = '<p class="bp-empty">Nothing needs your attention right now.</p>';
+  let unseenCount = 0;
+  if (!items.length) attn = '';
   else {
     attn = items.map(a => {
       const seen = !!S.seen[a.id];
@@ -602,6 +603,7 @@ function renderBuddy(id){
         + '<button class="seenbtn" data-seen="'+a.id+'">Mark seen</button></div>';
     }).join('');
     const un = items.filter(a => !S.seen[a.id]).length;
+    unseenCount = un;
     if (un > 1) attn += '<div class="attn-all"><button class="seenbtn" data-seen-all="'+id+'">Mark all seen</button></div>';
   }
   document.getElementById('buddy-home').innerHTML =
@@ -626,7 +628,7 @@ function renderBuddy(id){
     + '<div style="margin-top:8px"><span class="fineprint" id="ingest-status"></span></div>'
     + '<div id="ingest-feed" style="margin-top:8px"></div></div>'
     + '<div class="bp-sec" data-field="mission"><h3>What it does<span class="info-tip" data-tip="The mission is the brief\\u2019s executive summary \\u2014 tweak it through the buddy\\u2019s chat thread and it updates everywhere.">\\u24d8</span></h3><p class="bp-mission">'+escHtml(b.mission)+'</p></div>'
-    + '<div class="bp-sec" data-field="attention"><h3>Needs your attention</h3>'+attn+'</div>'
+    + (unseenCount > 0 ? '<div class="bp-sec" data-field="attention"><h3>Needs your attention</h3>'+attn+'</div>' : '')
     + photos
     + (id === 'project-buddy'
         ? '<div class="bp-sec" data-field="tree"><h3>The Buddy Tree</h3><div class="bp-tree-wrap"></div>'
