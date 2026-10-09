@@ -188,10 +188,14 @@ body{padding:0}
   border:1px solid #1f6feb;color:#e6edf3;padding:10px 20px;border-radius:999px;
   font-size:14px;z-index:99;box-shadow:0 4px 24px rgba(0,0,0,.5);white-space:nowrap;
   max-width:92vw;overflow:hidden;text-overflow:ellipsis}
-.zoombar{display:flex;align-items:center;gap:10px;justify-content:flex-end;
-  padding:2px 4px 14px;color:#8b949e;font-size:13px}
-.zoombar input{width:170px;accent-color:#1f6feb}
-.zoombar .zv{min-width:46px;text-align:right;font-variant-numeric:tabular-nums}
+.treewrap{display:flex;gap:10px;align-items:flex-start}
+#zoombar{position:sticky;top:12px;flex:0 0 54px;height:248px;background:#161b22;border:1px solid #30363d;border-radius:12px;z-index:5}
+#zoombar .zt{position:absolute;top:8px;left:0;right:0;text-align:center;font-size:11px;color:#8b949e;cursor:help}
+#zoomrange{position:absolute;left:50%;top:50%;width:188px;margin:0;padding:0;transform:translate(-50%,-50%) rotate(-90deg);accent-color:#1f6feb;cursor:pointer}
+#zoombar .zv{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:12px;color:#8b949e;font-variant-numeric:tabular-nums}
+body.light #zoombar{background:#ffffff;border-color:#d0d7de}
+.bp-topnav{margin-bottom:6px}
+.bp-build{margin:26px 0 6px;font-size:11px;color:#6e7681;text-align:center}
 .pstrip{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 6px}
 .pstrip a{flex:0 0 auto}
 .pstrip img{height:150px;border-radius:10px;border:1px solid #30363d;display:block}
@@ -624,6 +628,7 @@ function renderBuddy(id){
   }
   document.getElementById('buddy-home').innerHTML =
     '<div class="bp-wrap">'
+    + '<div class="bp-topnav"><button class="linkbtn" data-view="tree">← All buddies</button></div>'
     + '<div class="bp-crumb">'+crumb(id)+'</div>'
     + '<div class="bp-top"><span class="bp-icon">'+escHtml(b.icon||'')+'</span><h2 class="bp-name" id="bp-name" contenteditable="true" spellcheck="false" data-buddy="'+id+'">'+escHtml(dispName(b))+'</h2>'
     + '<span class="status '+b.statusClass+'">'+escHtml(b.status)+'</span></div>'
@@ -640,6 +645,7 @@ function renderBuddy(id){
     + '<div class="bp-sec"><h3>Needs your attention</h3>'+attn+'</div>'
     + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this buddy…">'+escHtml(S.notes[id]||'')+'</textarea>'
     + '<p class="fineprint">Saved on this device only.</p></div>'
+    + '<div class="bp-build">Build 20261009.1425</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -777,11 +783,11 @@ function applyZoom(){
 (function initZoom(){
   const vt = document.getElementById('view-tree');
   vt.insertAdjacentHTML('afterbegin',
-    '<div class="zoombar" id="zoombar"><span title="Tip: hold Shift and scroll over the tree to zoom">Zoom</span>'
+    '<div class="treewrap" id="zoomwrap"><div class="zoombar" id="zoombar"><span class="zt" title="Tip: hold Shift and scroll over the tree to zoom">Zoom</span>'
     + '<input type="range" id="zoomrange" min="50" max="160" step="5" value="100" aria-label="Tree zoom">'
-    + '<span class="zv" id="zoomval">100%</span></div><div id="treezoom"></div>');
-  const tz = document.getElementById('treezoom');
-  Array.from(vt.childNodes).forEach(n => { if (n.id !== 'zoombar' && n.id !== 'treezoom') tz.appendChild(n); });
+    + '<span class="zv" id="zoomval">100%</span></div><div id="treezoom"></div></div>');
+  const tw = document.getElementById('zoomwrap'), tz = document.getElementById('treezoom');
+  Array.from(vt.childNodes).forEach(n => { if (n !== tw) tz.appendChild(n); });
   document.getElementById('zoomrange').addEventListener('input', e => {
     S.zoom = parseInt(e.target.value, 10) || 100; save(); applyZoom();
   });
@@ -917,6 +923,7 @@ function renderPlan(id){
     + '<div class="bp-sec"><h3>Related buddies</h3>'+buds+'</div>'
     + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this plan…">'+escHtml(S.notes[id]||'')+'</textarea>'
     + '<p class="fineprint">Saved on this device only.</p></div>'
+    + '<div class="bp-build">Build 20261009.1425</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
