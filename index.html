@@ -944,7 +944,7 @@ function renderBuddy(id){
     + '<div class="bp-sec"><h3>Shared notes<span class="info-tip" data-tip="Saved to the buddy’s repo (docs/notes.md) — visible to everyone with repo access.">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Shared notes…"></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261009.1537</div>'
+    + '<div class="bp-build">Build 20261009.1540</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -1071,7 +1071,7 @@ function gridKids(b){
 }
 function gripHtml(b){
   if (b.id === 'project-buddy') return '';
-  return '<span class="grip" draggable="true" data-buddy="' + b.id + '" title="Drag to move under a different parent">⣿</span>';
+  return '<span class="grip" draggable="true" data-buddy="' + b.id + '" title="Drag to move under a different parent">⠿</span>';
 }
 function orgNode(b, depth){
   const kids = kidsOf[b.id] || [];
@@ -1343,7 +1343,7 @@ function renderPlan(id){
     + '<div class="bp-sec"><h3>Related buddies</h3>'+buds+'</div>'
     + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this plan…">'+escHtml(S.notes[id]||'')+'</textarea>'
     + '<p class="fineprint">Saved on this device only.</p></div>'
-    + '<div class="bp-build">Build 20261009.1537</div>'
+    + '<div class="bp-build">Build 20261009.1540</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;

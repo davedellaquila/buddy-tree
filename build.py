@@ -734,7 +734,7 @@ function gridKids(b){
 }
 function gripHtml(b){
   if (b.id === 'project-buddy') return '';
-  return '<span class="grip" draggable="true" data-buddy="' + b.id + '" title="Drag to move under a different parent">\u28ff</span>';
+  return '<span class="grip" draggable="true" data-buddy="' + b.id + '" title="Drag to move under a different parent">\u283f</span>';
 }
 function orgNode(b, depth){
   const kids = kidsOf[b.id] || [];
