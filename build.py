@@ -29,6 +29,7 @@ body{padding:0}
 .brand{padding:0 8px 14px}
 .brand .eyebrow{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8b949e}
 .brand h1{font-size:22px;margin:4px 0 0}
+.brand .bcount{font-size:12.5px;color:#8b949e;margin-top:4px}
 .nav-sec{margin-top:18px}
 .nav-sec>h3{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8b949e;
   margin:0 8px 8px;display:flex;align-items:center;gap:8px}
@@ -146,6 +147,7 @@ def build():
 
     buddies_js = json.dumps(buddies)
     order_js = json.dumps(ROOT_ORDER)
+    n_buddies = len(buddies)
 
     js = """const BUDDIES = BUDDIES_JSON;
 const ROOT_ORDER = ORDER_JSON;
@@ -300,7 +302,7 @@ show(S.sel || 'view:tree');
 <body>
 <div class="app">
 <aside id="sidebar">
-  <div class="brand"><div class="eyebrow">Project Buddy &middot; macro view</div><h1>The Buddy Tree</h1></div>
+  <div class="brand"><div class="eyebrow">Project Buddy &middot; macro view</div><h1>The Buddy Tree</h1><div class="bcount">NBUD buddies &middot; one family</div></div>
   <div class="nav-sec"><h3>Views</h3><div id="view-nav"></div></div>
   <div class="nav-sec"><h3>Buddies <span id="attn-pill" class="zero">0</span></h3><div id="buddy-nav"></div></div>
 </aside>
@@ -315,6 +317,7 @@ show(S.sel || 'view:tree');
 </body>
 </html>
 """
+    out = out.replace("NBUD", str(n_buddies))
     open(f"{HERE}/index.html", "w").write(out)
     print("wrote index.html", len(out), "bytes")
 
