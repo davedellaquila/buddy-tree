@@ -63,7 +63,7 @@ body{padding:0}
   font-size:14px;z-index:99;box-shadow:0 4px 24px rgba(0,0,0,.5);white-space:nowrap;
   max-width:92vw;overflow:hidden;text-overflow:ellipsis}
 .treewrap{display:flex;gap:10px;align-items:flex-start}
-#treezoom{flex:1;min-width:0;overflow:auto;max-height:calc(100vh - 150px);cursor:grab;border-radius:12px}
+#treezoom{flex:1;min-width:0;overflow:auto;height:calc(100vh - 170px);border:1px solid #30363d;cursor:grab;border-radius:12px;background:#0d1117}
 #treezoom.panning{cursor:grabbing}
 #treezoom.panning,#treezoom.panning *{user-select:none!important;-webkit-user-select:none!important}
 #zoombar{position:sticky;top:12px;flex:0 0 54px;height:248px;background:#161b22;border:1px solid #30363d;border-radius:12px;z-index:5}
@@ -124,7 +124,7 @@ body.standalone .sa-bar{display:flex}
   .node{display:block;width:auto;margin:0 0 10px}
   .node.root{width:auto}
   .standalones .grid{display:block}
-  #treezoom{max-height:none;overflow:visible;cursor:default}
+  #treezoom{height:auto;max-height:none;overflow:visible;cursor:default}
   #zoombar{display:none}
   #view-buddy.sheet{position:fixed;left:0;right:0;bottom:0;top:10%;z-index:96;
     background:#0d1117;border-top:1px solid #30363d;border-radius:18px 18px 0 0;
