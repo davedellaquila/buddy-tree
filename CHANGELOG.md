@@ -6,6 +6,13 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
 ## 2026-10-09
 
 ### Added
+- **Responsive layouts** — three breakpoints: small (<640px) stacks tiles as
+  full-width cards with a drawer sidebar (hamburger) and detail as a bottom
+  sheet; medium (640–1100px) has a collapsible sidebar, horizontal segmented
+  view control, and detail as a right-docked side sheet; large (>1100px) is
+  tri-pane with a persistent detail panel. **⛶ Fit button** next to the zoom
+  slider zooms to fit content. Tile child counts. Keyboard navigation
+  (arrows move between buddies, Esc closes detail). (`d606e04`)
 - **Standalone buddy mode** — hash deep-links (`#/buddy:<id>`, `#/view:tree`,
   `#/plan:<id>`) with working back/forward; chromeless standalone view
   (`#/buddy:<id>/standalone`) hiding the sidebar; **💾 Save to desktop**
