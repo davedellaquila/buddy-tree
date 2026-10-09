@@ -38,6 +38,9 @@
   .view.active { display: block; }
 
   .chart { overflow-x: auto; padding: 24px 0 8px; }
+  .chart { cursor: grab; }
+  .chart.panning { cursor: grabbing; user-select: none; }
+  .chart.panning * { user-select: none; }
 
   /* ---- classic CSS org tree ---- */
   .tree, .tree ul { display: flex; justify-content: center; margin: 0; padding: 0; }
@@ -154,6 +157,9 @@ body{padding:0}
 .brand{padding:0 8px 14px}
 .brand .eyebrow{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8b949e}
 .brand h1{font-size:22px;margin:4px 0 0}
+#brand-name{outline:none;border-bottom:2px dashed transparent;cursor:text;display:inline-block;min-width:60px}
+#brand-name:hover{border-bottom-color:#30363d}
+#brand-name:focus{border-bottom-color:#1f6feb}
 .brand .bcount{font-size:12.5px;color:#8b949e;margin-top:4px}
 .nav-sec{margin-top:18px}
 .nav-sec>h3{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8b949e;
@@ -267,7 +273,7 @@ body{padding:0}
 <body>
 <div class="app">
 <aside id="sidebar">
-  <div class="brand"><div class="eyebrow">Project Buddy &middot; macro view</div><h1>Buddies</h1><div class="bcount">41 buddies &middot; one family</div></div>
+  <div class="brand"><div class="eyebrow">Project Buddy &middot; macro view</div><h1 id="brand-name" title="Click to rename">Buddies</h1><div class="bcount">41 buddies &middot; one family</div></div>
   <div class="nav-sec"><h3>Views</h3><div id="view-nav"></div></div>
   <div class="nav-sec"><h3>Buddies <span id="attn-pill" class="zero">0</span></h3><div id="buddy-nav"></div></div>
   <div class="nav-sec"><h3>Business Plans</h3><div id="plan-nav"></div></div>
@@ -792,7 +798,7 @@ function applyZoom(){
 (function initZoom(){
   const vt = document.getElementById('view-tree');
   vt.insertAdjacentHTML('afterbegin',
-    '<div class="zoombar" id="zoombar"><span>Zoom</span>'
+    '<div class="zoombar" id="zoombar"><span title="Tip: hold Shift and scroll over the tree to zoom">Zoom</span>'
     + '<input type="range" id="zoomrange" min="50" max="160" step="5" value="100" aria-label="Tree zoom">'
     + '<span class="zv" id="zoomval">100%</span></div><div id="treezoom"></div>');
   const tz = document.getElementById('treezoom');
@@ -802,6 +808,57 @@ function applyZoom(){
   });
   applyZoom();
 })();
+(function initBrand(){
+  const bn = document.getElementById('brand-name');
+  const name = S.appName || 'Buddies';
+  bn.textContent = name;
+  document.title = name;
+  bn.setAttribute('contenteditable', 'true');
+  bn.setAttribute('spellcheck', 'false');
+  bn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); bn.blur(); } });
+  bn.addEventListener('blur', () => {
+    const v = bn.textContent.trim();
+    if (v && v !== 'Buddies') S.appName = v; else delete S.appName;
+    const n = S.appName || 'Buddies';
+    bn.textContent = n;
+    document.title = n;
+    save();
+  });
+})();
+(function initPan(){
+  const tz = document.getElementById('treezoom');
+  let pan = null;
+  tz.addEventListener('pointerdown', e => {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    const ch = e.target.closest('.chart');
+    if (!ch) return;
+    pan = { el: ch, x: e.clientX, y: e.clientY, sl: ch.scrollLeft, st: window.scrollY, moved: false, id: e.pointerId };
+  });
+  tz.addEventListener('pointermove', e => {
+    if (!pan || e.pointerId !== pan.id) return;
+    const dx = e.clientX - pan.x, dy = e.clientY - pan.y;
+    if (!pan.moved && Math.abs(dx) + Math.abs(dy) < 5) return;
+    pan.moved = true;
+    pan.el.classList.add('panning');
+    pan.el.scrollLeft = pan.sl - dx;
+    window.scrollTo(0, pan.st - dy);
+  });
+  function endPan(e){
+    if (!pan) return;
+    if (e && e.pointerId !== pan.id) return;
+    pan.el.classList.remove('panning');
+    pan = null;
+  }
+  tz.addEventListener('pointerup', endPan);
+  tz.addEventListener('pointercancel', endPan);
+  window.addEventListener('pointerup', () => endPan(null));
+})();
+document.getElementById('view-tree').addEventListener('wheel', e => {
+  if (!e.shiftKey) return;
+  e.preventDefault();
+  S.zoom = Math.min(160, Math.max(50, (S.zoom || 100) + (e.deltaY > 0 ? -5 : 5)));
+  save(); applyZoom();
+}, { passive: false });
 (function initDrag(){
   const nav = document.getElementById('buddy-nav');
   let dragId = null;

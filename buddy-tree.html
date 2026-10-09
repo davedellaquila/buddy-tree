@@ -29,6 +29,9 @@
   .view.active { display: block; }
 
   .chart { overflow-x: auto; padding: 24px 0 8px; }
+  .chart { cursor: grab; }
+  .chart.panning { cursor: grabbing; user-select: none; }
+  .chart.panning * { user-select: none; }
 
   /* ---- classic CSS org tree ---- */
   .tree, .tree ul { display: flex; justify-content: center; margin: 0; padding: 0; }
