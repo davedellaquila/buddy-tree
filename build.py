@@ -135,10 +135,11 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
   cursor:pointer;display:flex;align-items:center;justify-content:center}
 .bp-close-x:hover{color:#e6edf3}
 #buddy-home{position:relative}
-#bp-resize{position:absolute;left:0;top:0;bottom:0;width:8px;cursor:ew-resize;z-index:20;
+#bp-resize{position:absolute;left:0;top:0;bottom:0;width:12px;cursor:ew-resize;z-index:20;
   display:flex;align-items:center;justify-content:center}
 #bp-resize::after{content:'';width:4px;height:40px;border-radius:2px;background:#30363d}
 #bp-resize:hover::after{background:#1f6feb}
+#bp-resize:hover{background:rgba(31,111,235,.1)}
 #sb-gear{position:absolute;top:10px;right:10px;z-index:10;width:36px;height:36px;background:none;border:none;
   border-radius:8px;color:#8b949e;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 #sb-gear:hover{color:#e6edf3}
@@ -613,7 +614,6 @@ function renderBuddy(id){
     + '<div class="ghtoken"><input type="password" id="ghtok2" placeholder="GitHub token (repo scope)" aria-label="GitHub token">'
     + '<button class="linkbtn" id="ghtok2-save">Save token</button></div></div>'
     + '<div class="sa-bar"><span>\U0001f516 Standalone view</span><button class="linkbtn" id="sa-full">Open full dashboard \u2192</button></div>'
-    + '<div id="bp-resize" title="Drag to resize panel"></div>'
     + '<button class="bp-close-x" id="bp-close-x" title="Close">\u2715</button>'
     + '<div class="bp-topnav"><button class="linkbtn" data-navbtn="back">\u2190 Back</button>'
     + '<button class="linkbtn" data-navbtn="prev">\u2039 Prev</button><button class="linkbtn" data-navbtn="next">Next \u203a</button>'
@@ -1639,7 +1639,7 @@ initPlansToggle();
 <main id="main">
 <div id="journal-bar"></div>
 """ + vt + vp + vpl + vm + """
-<section id="view-buddy" class="view"><div id="buddy-home"></div></section>
+<section id="view-buddy" class="view"><div id="bp-resize" title="Drag to resize panel"></div><div id="buddy-home"></div></section>
 </main>
 </div>
 <script>
