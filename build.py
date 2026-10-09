@@ -63,7 +63,7 @@ body{padding:0}
   font-size:14px;z-index:99;box-shadow:0 4px 24px rgba(0,0,0,.5);white-space:nowrap;
   max-width:92vw;overflow:hidden;text-overflow:ellipsis}
 .treewrap{position:relative;display:flex;gap:10px;align-items:flex-start}
-#view-tree{margin:-36px -32px -80px;display:flex;flex-direction:column;min-height:calc(100vh - 0px)}
+#view-tree{margin:-36px -32px -80px;display:flex;flex-direction:column;height:calc(100vh - 0px);overflow:auto}
 #view-tree #zoomwrap{flex:1;min-height:0;align-items:stretch}
 #treezoom{flex:1;min-width:0;min-height:0;overflow:auto;border:1px solid #30363d;border-left:none;border-right:none;cursor:grab;border-radius:0;background:#0d1117}
 #treezoom.panning{cursor:grabbing}
@@ -142,7 +142,7 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 #sb-gear{position:absolute;top:10px;right:10px;z-index:10;width:36px;height:36px;background:none;border:none;
   border-radius:8px;color:#8b949e;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 #sb-gear:hover{color:#e6edf3}
-#sidebar{position:relative}
+
 #avatar-picker{position:fixed;z-index:2000;background:#161b22;border:1px solid #30363d;border-radius:12px;
   padding:16px;width:280px;display:none;box-shadow:0 12px 40px rgba(0,0,0,.6)}
 #avatar-picker.show{display:block}
@@ -664,7 +664,7 @@ function renderBuddy(id){
         const cur = ta.value.trim();
         if (!cur || cur === lastDumped) return;
         if (st) st.textContent = 'dumping\u2026';
-        await dumpIngest(bid, true);
+        await dumpIngest(bid, false);
         lastDumped = ta.value.trim();
         if (st && lastDumped) st.textContent = 'dumped \u2713';
       }, 2000);
