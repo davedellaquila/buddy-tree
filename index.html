@@ -196,6 +196,8 @@ body{padding:0}
 .pstrip a{flex:0 0 auto}
 .pstrip img{height:150px;border-radius:10px;border:1px solid #30363d;display:block}
 .pstrip img:hover{border-color:#1f6feb}
+.node.drop-target{outline:2px solid #1f6feb;outline-offset:3px}
+.proj-row.drop-target{background:#1c2330;box-shadow:inset 0 0 0 2px #1f6feb}
 /* ---- buddy homepage ---- */
 .bp-wrap{max-width:880px;margin:0 auto;padding:6px 4px}
 .bp-crumb{font-size:12.5px;color:#8b949e;margin-bottom:10px}
@@ -282,8 +284,7 @@ body{padding:0}
 <div id="view-tree" class="view">
     <div class="chart">
       <div style="text-align:center">
-        <div class="node root">
-          <div class="name">Project Buddy</div>
+        <div class="node root" data-buddy="project-buddy">Project Buddy
           <div class="desc">The macro view &mdash; status &amp; next action items for every buddy.<br>Every buddy inherits its tools, knowledge base &amp; dashboard behavior from here.</div>
         </div>
       </div>
@@ -292,24 +293,20 @@ body{padding:0}
       <div class="tree">
         <ul>
           <li>
-            <div class="node personal">
-              <div class="name">Personal Buddy</div>
+            <div class="node personal" data-buddy="personal-buddy">Personal Buddy
               <div class="desc">Personal-ops &mdash; the &ldquo;figure it out later&rdquo; list with teeth.</div>
               <div class="tag">family</div>
             </div>
             <ul>
-              <li><div class="node personal">
-                <div class="name">Travel Buddy</div>
+              <li><div class="node personal" data-buddy="travel-buddy">Travel Buddy
                 <div class="desc">Trip planning, itineraries, logistics.</div>
                 <div class="tag">child</div>
               </div></li>
-              <li><div class="node personal">
-                <div class="name">Relationship Buddy</div>
+              <li><div class="node personal" data-buddy="relationship-buddy">Relationship Buddy
                 <div class="desc">Stay-in-touch nudges, notes, milestones.</div>
                 <div class="tag">child</div>
               </div></li>
-              <li><div class="node personal">
-                <div class="name">Career Buddy</div>
+              <li><div class="node personal" data-buddy="career-buddy">Career Buddy
                 <div class="desc">Career goals, skill growth, job-search readiness.</div>
                 <div class="tag">child</div>
               </div></li>
@@ -317,49 +314,40 @@ body{padding:0}
           </li>
 
           <li>
-            <div class="node family">
-              <div class="name">Family Buddy</div>
+            <div class="node family" data-buddy="family-buddy">Family Buddy
               <div class="desc">Family projects &mdash; shared with the household, not just Dave.</div>
               <div class="tag">family &middot; new</div>
             </div>
             <ul>
-              <li><div class="node family">
-                <div class="name">Pet Buddy</div>
+              <li><div class="node family" data-buddy="pet-buddy">Pet Buddy
                 <div class="desc">Per-pet profiles, meds, vet visits, vaccinations.</div>
                 <div class="tag">child</div>
               </div></li>
-              <li><div class="node family">
-                <div class="name">Quentin Buddy</div>
+              <li><div class="node family" data-buddy="quentin-buddy">Quentin Buddy
                 <div class="desc">Living dossier for Dave&rsquo;s son Quentin.</div>
                 <div class="tag">child</div>
               </div></li>
-              <li><div class="node family">
-                <div class="name">Sawyer Buddy</div>
+              <li><div class="node family" data-buddy="sawyer-buddy">Sawyer Buddy
                 <div class="desc">Living dossier for Dave&rsquo;s son Sawyer.</div>
                 <div class="tag">child</div>
               </div></li>
-              <li><div class="node family">
-                <div class="name">Amanda Buddy</div>
+              <li><div class="node family" data-buddy="amanda-buddy">Amanda Buddy
                 <div class="desc">Living dossier for Amanda.</div>
                 <div class="tag">child</div>
               </div></li>
-              <li><div class="node family">
-                <div class="name">Emile Buddy</div>
+              <li><div class="node family" data-buddy="emile-buddy">Emile Buddy
                 <div class="desc">Living dossier for Dave&rsquo;s middle brother.</div>
                 <div class="tag">child</div>
               </div></li>
-              <li><div class="node family">
-                <div class="name">Nancy Buddy</div>
+              <li><div class="node family" data-buddy="nancy-buddy">Nancy Buddy
                 <div class="desc">Living dossier for Nan.</div>
                 <div class="tag">child</div>
               </div></li>
-              <li><div class="node family">
-                <div class="name">Jessica Buddy</div>
+              <li><div class="node family" data-buddy="jessica-buddy">Jessica Buddy
                 <div class="desc">Living dossier for Sawyer&rsquo;s aunt.</div>
                 <div class="tag">child</div>
               </div></li>
-              <li><div class="node family">
-                <div class="name">Pops Buddy</div>
+              <li><div class="node family" data-buddy="pops-buddy">Pops Buddy
                 <div class="desc">Living dossier for Pops.</div>
                 <div class="tag">child</div>
               </div></li>
@@ -367,33 +355,28 @@ body{padding:0}
           </li>
 
           <li>
-            <div class="node property">
-              <div class="name">Property Buddy</div>
+            <div class="node property" data-buddy="property-buddy">Property Buddy
               <div class="desc">One shape for every property &mdash; deeds, repairs, maintenance, history.</div>
               <div class="tag">family</div>
             </div>
             <ul>
               <li>
-                <div class="node property">
-                  <div class="name">Cabin Buddy</div>
+                <div class="node property" data-buddy="cabin-buddy">Cabin Buddy
                   <div class="desc">Fiddletown cabin ops.</div>
                   <div class="tag">child</div>
                 </div>
                 <ul>
-                  <li><div class="node property">
-                    <div class="name">Hot Tub Buddy</div>
+                  <li><div class="node property" data-buddy="hot-tub-buddy">Hot Tub Buddy
                     <div class="desc">Sundance Optima 880 &mdash; treatment schedule, log, chemistry KB.</div>
                     <div class="tag">grandchild</div>
                   </div></li>
-                  <li><div class="node property">
-                    <div class="name">Party Buddy</div>
+                  <li><div class="node property" data-buddy="party-buddy">Party Buddy
                     <div class="desc">Plans and tracks hosted gatherings — guest lists, food, setup.</div>
                     <div class="tag">grandchild</div>
                   </div></li>
                 </ul>
               </li>
-              <li><div class="node property">
-                <div class="name">Lenwood Buddy</div>
+              <li><div class="node property" data-buddy="lenwood-buddy">Lenwood Buddy
                 <div class="desc">Ideas for the future of 6929 Lenwood Way, San Jose.</div>
                 <div class="tag">child</div>
               </div></li>
@@ -401,19 +384,16 @@ body{padding:0}
           </li>
 
           <li>
-            <div class="node finance">
-              <div class="name">Finance Buddy</div>
+            <div class="node finance" data-buddy="finance-buddy">Finance Buddy
               <div class="desc">Parent container for all money projects.</div>
               <div class="tag">family</div>
             </div>
             <ul>
-              <li><div class="node finance">
-                <div class="name">Money Buddy</div>
+              <li><div class="node finance" data-buddy="money-buddy">Money Buddy
                 <div class="desc">The expense tracker app &mdash; craftsmanship as the moat.</div>
                 <div class="tag">child</div>
               </div></li>
-              <li><div class="node finance">
-                <div class="name">Investment Buddy</div>
+              <li><div class="node finance" data-buddy="investment-buddy">Investment Buddy
                 <div class="desc">Investment ideas, research, signals podcast, dog detection.</div>
                 <div class="tag">child</div>
               </div></li>
@@ -421,8 +401,7 @@ body{padding:0}
           </li>
 
           <li>
-            <div class="node work">
-              <div class="name">Work Buddy</div>
+            <div class="node work" data-buddy="work-buddy">Work Buddy
               <div class="desc">Succeed at the job &mdash; dossiers, meeting briefs, estimate calibration.</div>
               <div class="tag">direct child</div>
             </div>
@@ -435,27 +414,27 @@ body{padding:0}
       <h2>Direct children of Project Buddy</h2>
       <p class="sub">Standalone buddies &mdash; parent is Project Buddy itself. Two meta-projects are tagged.</p>
       <div class="grid">
-        <div class="node standalone"><div class="name">Car Buddy</div><div class="desc">Per-car service tracking &mdash; MGA coupe + ML500.</div><div class="tag">direct</div>
+        <div class="node standalone" data-buddy="car-buddy">Car Buddy<div class="desc">Per-car service tracking &mdash; MGA coupe + ML500.</div><div class="tag">direct</div>
           <ul class="subkids">
-            <li><div class="node standalone"><div class="name">🏎️ MGA Buddy</div><div class="desc">1959 MGA coupe &mdash; the British roadster.</div><div class="tag">child</div></div></li>
-            <li><div class="node standalone"><div class="name">🚙 ML500 Buddy</div><div class="desc">2002 Mercedes ML500 &mdash; the white SUV.</div><div class="tag">child</div></div></li>
+            <li><div class="node standalone" data-buddy="mga-buddy">🏎️ MGA Buddy<div class="desc">1959 MGA coupe &mdash; the British roadster.</div><div class="tag">child</div></div></li>
+            <li><div class="node standalone" data-buddy="ml500-buddy">🚙 ML500 Buddy<div class="desc">2002 Mercedes ML500 &mdash; the white SUV.</div><div class="tag">child</div></div></li>
           </ul>
         </div>
-        <div class="node standalone"><div class="name">TV Buddy</div><div class="desc">Mood-matched pick playing in under 2 minutes.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">News Buddy</div><div class="desc">Personalized news companion, listen mode.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">Wisdom Buddy</div><div class="desc">Daily wisdom nuggets to Quentin and Sawyer.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">Birthday Buddy</div><div class="desc">Witty birthday sayings with a little wisdom.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">Job Buddy</div><div class="desc">Job search &mdash; discovery, master profile, recruiter triage.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">Reminder Buddy</div><div class="desc">Fire-and-forget nudges.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">Housing Buddy</div><div class="desc">Know-your-market real estate &mdash; valuation + search.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">Zen Buddy</div><div class="desc">Meditation, breathwork, practice.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">School Buddy</div><div class="desc">Learning companion &mdash; &ldquo;what do you want to learn?&rdquo;</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">Document Buddy</div><div class="desc">Google Docs layer &mdash; folders, meta, what-are-we-working-on.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">Tech Buddy</div><div class="desc">Tech inventory + gadget tutor.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">Dream Buddy</div><div class="desc">Dream journal — capture on waking, spot patterns.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">Feedback Buddy</div><div class="desc">Feedback to outside parties — capture, route, file.</div><div class="tag">direct</div></div>
-        <div class="node meta"><div class="name">Scaffold Buddy</div><div class="desc">The skeleton every buddy project is born with.</div><div class="tag">meta</div></div>
-        <div class="node meta"><div class="name">Buddy Suite</div><div class="desc">Shared brand, monetization, marketing across buddies.</div><div class="tag">meta</div></div>
+        <div class="node standalone" data-buddy="tv-buddy">TV Buddy<div class="desc">Mood-matched pick playing in under 2 minutes.</div><div class="tag">direct</div></div>
+        <div class="node standalone" data-buddy="news-buddy">News Buddy<div class="desc">Personalized news companion, listen mode.</div><div class="tag">direct</div></div>
+        <div class="node standalone" data-buddy="wisdom-buddy">Wisdom Buddy<div class="desc">Daily wisdom nuggets to Quentin and Sawyer.</div><div class="tag">direct</div></div>
+        <div class="node standalone" data-buddy="birthday-buddy">Birthday Buddy<div class="desc">Witty birthday sayings with a little wisdom.</div><div class="tag">direct</div></div>
+        <div class="node standalone" data-buddy="job-buddy">Job Buddy<div class="desc">Job search &mdash; discovery, master profile, recruiter triage.</div><div class="tag">direct</div></div>
+        <div class="node standalone" data-buddy="reminder-buddy">Reminder Buddy<div class="desc">Fire-and-forget nudges.</div><div class="tag">direct</div></div>
+        <div class="node standalone" data-buddy="housing-buddy">Housing Buddy<div class="desc">Know-your-market real estate &mdash; valuation + search.</div><div class="tag">direct</div></div>
+        <div class="node standalone" data-buddy="zen-buddy">Zen Buddy<div class="desc">Meditation, breathwork, practice.</div><div class="tag">direct</div></div>
+        <div class="node standalone" data-buddy="school-buddy">School Buddy<div class="desc">Learning companion &mdash; &ldquo;what do you want to learn?&rdquo;</div><div class="tag">direct</div></div>
+        <div class="node standalone" data-buddy="document-buddy">Document Buddy<div class="desc">Google Docs layer &mdash; folders, meta, what-are-we-working-on.</div><div class="tag">direct</div></div>
+        <div class="node standalone" data-buddy="tech-buddy">Tech Buddy<div class="desc">Tech inventory + gadget tutor.</div><div class="tag">direct</div></div>
+        <div class="node standalone" data-buddy="dream-buddy">Dream Buddy<div class="desc">Dream journal — capture on waking, spot patterns.</div><div class="tag">direct</div></div>
+        <div class="node standalone" data-buddy="feedback-buddy">Feedback Buddy<div class="desc">Feedback to outside parties — capture, route, file.</div><div class="tag">direct</div></div>
+        <div class="node meta" data-buddy="scaffold-buddy">Scaffold Buddy<div class="desc">The skeleton every buddy project is born with.</div><div class="tag">meta</div></div>
+        <div class="node meta" data-buddy="buddy-suite">Buddy Suite<div class="desc">Shared brand, monetization, marketing across buddies.</div><div class="tag">meta</div></div>
       </div>
     </section>
   </div>
@@ -466,47 +445,47 @@ body{padding:0}
       <h2>Projects by Buddy</h2>
       <p class="sub">Every buddy, in hierarchy order, with its current status.</p>
       <div class="proj-list">
-        <div class="proj-row d0"><span class="pname">Project Buddy</span><span class="pdesc">The macro view — status &amp; next actions for every buddy</span><span class="status st-spec">Spec review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Personal Buddy</span><span class="pdesc">Personal-ops, the "figure it out later" list with teeth</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Travel Buddy</span><span class="pdesc">Trip planning, itineraries, logistics</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Relationship Buddy</span><span class="pdesc">Stay-in-touch nudges, notes, milestones</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Career Buddy</span><span class="pdesc">Career goals, skill growth, job-search readiness</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Family Buddy</span><span class="pdesc">Family projects — shared with the household, not just Dave</span><span class="status st-new">New</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Pet Buddy</span><span class="pdesc">Per-pet profiles, meds, vet visits, vaccinations</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Quentin Buddy</span><span class="pdesc">Living dossier for Dave's son Quentin</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Sawyer Buddy</span><span class="pdesc">Living dossier for Dave's son Sawyer</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Amanda Buddy</span><span class="pdesc">Living dossier for Amanda</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Emile Buddy</span><span class="pdesc">Living dossier for Dave's middle brother</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Nancy Buddy</span><span class="pdesc">Living dossier for Nan</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Jessica Buddy</span><span class="pdesc">Living dossier for Sawyer's aunt</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Pops Buddy</span><span class="pdesc">Living dossier for Pops</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Property Buddy</span><span class="pdesc">One shape for every property — deeds, repairs, maintenance</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Cabin Buddy</span><span class="pdesc">Fiddletown cabin ops</span><span class="status st-active">Active</span></div>
-        <div class="proj-row d3"><span class="dot">└</span><span class="pname">Hot Tub Buddy</span><span class="pdesc">Sundance Optima 880 — treatment schedule, log, chemistry KB</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d3"><span class="dot">└</span><span class="pname">Party Buddy</span><span class="pdesc">Plans and tracks hosted gatherings — guest lists, food/drink, setup checklists</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Lenwood Buddy</span><span class="pdesc">Ideas for the future of 6929 Lenwood Way, San Jose</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Finance Buddy</span><span class="pdesc">Parent container for all money projects</span><span class="status st-new">New</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Money Buddy</span><span class="pdesc">The expense tracker app — craftsmanship as the moat</span><span class="status st-live">Live · pre-alpha</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Investment Buddy</span><span class="pdesc">Investment ideas, research, signals podcast, dog detection</span><span class="status st-live">Live · M2 shipped</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Work Buddy</span><span class="pdesc">Succeed at the job — dossiers, briefs, estimate calibration</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Car Buddy</span><span class="pdesc">Per-car service tracking — MGA coupe + ML500</span><span class="status st-prd">PRD review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">🏎️ MGA Buddy</span><span class="pdesc">1959 MGA coupe — the British roadster</span><span class="status st-new">New</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">🚙 ML500 Buddy</span><span class="pdesc">2002 Mercedes ML500 — the white SUV</span><span class="status st-new">New</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">TV Buddy</span><span class="pdesc">Mood-matched pick playing in under 2 minutes</span><span class="status st-prd">PRD review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">News Buddy</span><span class="pdesc">Personalized news companion, listen mode</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Wisdom Buddy</span><span class="pdesc">Daily wisdom nuggets to Quentin and Sawyer</span><span class="status st-pilot">Pilot</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Birthday Buddy</span><span class="pdesc">Witty birthday sayings with a little wisdom</span><span class="status st-prd">PRD review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Job Buddy</span><span class="pdesc">Job search — discovery, master profile, recruiter triage</span><span class="status st-prd">PRD review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Reminder Buddy</span><span class="pdesc">Fire-and-forget nudges</span><span class="status st-idea">Idea</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Housing Buddy</span><span class="pdesc">Know-your-market real estate — valuation + search</span><span class="status st-prd">PRD review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Zen Buddy</span><span class="pdesc">Meditation, breathwork, practice</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">School Buddy</span><span class="pdesc">Learning companion — "what do you want to learn?"</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Document Buddy</span><span class="pdesc">Google Docs layer — folders, meta, what-are-we-working-on</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Tech Buddy</span><span class="pdesc">Tech inventory + gadget tutor</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Dream Buddy</span><span class="pdesc">Dream journal — capture on waking, spot patterns over time</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Feedback Buddy</span><span class="pdesc">Feedback to outside parties — capture, route, file, ship-watch</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Scaffold Buddy</span><span class="pdesc">The skeleton every buddy project is born with</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Buddy Suite</span><span class="pdesc">Shared brand, monetization, marketing across buddies</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d0" data-buddy="project-buddy">Project Buddy<span class="pdesc">The macro view — status &amp; next actions for every buddy</span><span class="status st-spec">Spec review</span></div>
+        <div class="proj-row d1" data-buddy="personal-buddy">Personal Buddy<span class="pdesc">Personal-ops, the "figure it out later" list with teeth</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d2" data-buddy="travel-buddy">Travel Buddy<span class="pdesc">Trip planning, itineraries, logistics</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d2" data-buddy="relationship-buddy">Relationship Buddy<span class="pdesc">Stay-in-touch nudges, notes, milestones</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d2" data-buddy="career-buddy">Career Buddy<span class="pdesc">Career goals, skill growth, job-search readiness</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1" data-buddy="family-buddy">Family Buddy<span class="pdesc">Family projects — shared with the household, not just Dave</span><span class="status st-new">New</span></div>
+        <div class="proj-row d2" data-buddy="pet-buddy">Pet Buddy<span class="pdesc">Per-pet profiles, meds, vet visits, vaccinations</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d2" data-buddy="quentin-buddy">Quentin Buddy<span class="pdesc">Living dossier for Dave's son Quentin</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d2" data-buddy="sawyer-buddy">Sawyer Buddy<span class="pdesc">Living dossier for Dave's son Sawyer</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d2" data-buddy="amanda-buddy">Amanda Buddy<span class="pdesc">Living dossier for Amanda</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d2" data-buddy="emile-buddy">Emile Buddy<span class="pdesc">Living dossier for Dave's middle brother</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d2" data-buddy="nancy-buddy">Nancy Buddy<span class="pdesc">Living dossier for Nan</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d2" data-buddy="jessica-buddy">Jessica Buddy<span class="pdesc">Living dossier for Sawyer's aunt</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d2" data-buddy="pops-buddy">Pops Buddy<span class="pdesc">Living dossier for Pops</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1" data-buddy="property-buddy">Property Buddy<span class="pdesc">One shape for every property — deeds, repairs, maintenance</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d2" data-buddy="cabin-buddy">Cabin Buddy<span class="pdesc">Fiddletown cabin ops</span><span class="status st-active">Active</span></div>
+        <div class="proj-row d3" data-buddy="hot-tub-buddy">Hot Tub Buddy<span class="pdesc">Sundance Optima 880 — treatment schedule, log, chemistry KB</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d3" data-buddy="party-buddy">Party Buddy<span class="pdesc">Plans and tracks hosted gatherings — guest lists, food/drink, setup checklists</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d2" data-buddy="lenwood-buddy">Lenwood Buddy<span class="pdesc">Ideas for the future of 6929 Lenwood Way, San Jose</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1" data-buddy="finance-buddy">Finance Buddy<span class="pdesc">Parent container for all money projects</span><span class="status st-new">New</span></div>
+        <div class="proj-row d2" data-buddy="money-buddy">Money Buddy<span class="pdesc">The expense tracker app — craftsmanship as the moat</span><span class="status st-live">Live · pre-alpha</span></div>
+        <div class="proj-row d2" data-buddy="investment-buddy">Investment Buddy<span class="pdesc">Investment ideas, research, signals podcast, dog detection</span><span class="status st-live">Live · M2 shipped</span></div>
+        <div class="proj-row d1" data-buddy="work-buddy">Work Buddy<span class="pdesc">Succeed at the job — dossiers, briefs, estimate calibration</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1" data-buddy="car-buddy">Car Buddy<span class="pdesc">Per-car service tracking — MGA coupe + ML500</span><span class="status st-prd">PRD review</span></div>
+        <div class="proj-row d2" data-buddy="mga-buddy">🏎️ MGA Buddy<span class="pdesc">1959 MGA coupe — the British roadster</span><span class="status st-new">New</span></div>
+        <div class="proj-row d2" data-buddy="ml500-buddy">🚙 ML500 Buddy<span class="pdesc">2002 Mercedes ML500 — the white SUV</span><span class="status st-new">New</span></div>
+        <div class="proj-row d1" data-buddy="tv-buddy">TV Buddy<span class="pdesc">Mood-matched pick playing in under 2 minutes</span><span class="status st-prd">PRD review</span></div>
+        <div class="proj-row d1" data-buddy="news-buddy">News Buddy<span class="pdesc">Personalized news companion, listen mode</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1" data-buddy="wisdom-buddy">Wisdom Buddy<span class="pdesc">Daily wisdom nuggets to Quentin and Sawyer</span><span class="status st-pilot">Pilot</span></div>
+        <div class="proj-row d1" data-buddy="birthday-buddy">Birthday Buddy<span class="pdesc">Witty birthday sayings with a little wisdom</span><span class="status st-prd">PRD review</span></div>
+        <div class="proj-row d1" data-buddy="job-buddy">Job Buddy<span class="pdesc">Job search — discovery, master profile, recruiter triage</span><span class="status st-prd">PRD review</span></div>
+        <div class="proj-row d1" data-buddy="reminder-buddy">Reminder Buddy<span class="pdesc">Fire-and-forget nudges</span><span class="status st-idea">Idea</span></div>
+        <div class="proj-row d1" data-buddy="housing-buddy">Housing Buddy<span class="pdesc">Know-your-market real estate — valuation + search</span><span class="status st-prd">PRD review</span></div>
+        <div class="proj-row d1" data-buddy="zen-buddy">Zen Buddy<span class="pdesc">Meditation, breathwork, practice</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1" data-buddy="school-buddy">School Buddy<span class="pdesc">Learning companion — "what do you want to learn?"</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1" data-buddy="document-buddy">Document Buddy<span class="pdesc">Google Docs layer — folders, meta, what-are-we-working-on</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1" data-buddy="tech-buddy">Tech Buddy<span class="pdesc">Tech inventory + gadget tutor</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1" data-buddy="dream-buddy">Dream Buddy<span class="pdesc">Dream journal — capture on waking, spot patterns over time</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1" data-buddy="feedback-buddy">Feedback Buddy<span class="pdesc">Feedback to outside parties — capture, route, file, ship-watch</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1" data-buddy="scaffold-buddy">Scaffold Buddy<span class="pdesc">The skeleton every buddy project is born with</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1" data-buddy="buddy-suite">Buddy Suite<span class="pdesc">Shared brand, monetization, marketing across buddies</span><span class="status st-brief">Brief review</span></div>
       </div>
     </section>
   </div>
@@ -733,13 +712,13 @@ function gridKids(b){
   const kids = kidsOf[b.id] || [];
   if (!kids.length) return '';
   return '<ul class="subkids">' + kids.map(c =>
-    '<li><div class="node ' + c.kind + '"><div class="name">' + iconName(c) + '</div>'
+    '<li><div class="node ' + c.kind + '" data-buddy="' + c.id + '"><div class="name">' + iconName(c) + '</div>'
     + '<div class="desc">' + escHtml(c.tagline || '') + '</div><div class="tag">' + nodeTag(c, 2) + '</div>'
     + gridKids(c) + '</div></li>').join('') + '</ul>';
 }
 function orgNode(b, depth){
   const kids = kidsOf[b.id] || [];
-  let s = '<li><div class="node ' + b.kind + '"><div class="name">' + iconName(b) + '</div>'
+  let s = '<li><div class="node ' + b.kind + '" data-buddy="' + b.id + '"><div class="name">' + iconName(b) + '</div>'
     + '<div class="desc">' + escHtml(b.tagline || '') + '</div>'
     + '<div class="tag">' + nodeTag(b, depth) + '</div></div>';
   if (kids.length) s += '<ul>' + kids.map(c => orgNode(c, depth + 1)).join('') + '</ul>';
@@ -750,7 +729,7 @@ function renderOrgTree(){
   const kids = kidsOf['project-buddy'] || [];
   const fam = kids.filter(b => FAMKINDS.includes(b.kind));
   const rest = kids.filter(b => !FAMKINDS.includes(b.kind));
-  let s = '<div class="chart"><div style="text-align:center"><div class="node root">'
+  let s = '<div class="chart"><div style="text-align:center"><div class="node root" data-buddy="project-buddy">'
     + '<div class="name">' + iconName(root) + '</div>'
     + '<div class="desc">' + escHtml(root.tagline || '') + '</div></div></div>'
     + '<div class="root-stub"></div><div class="tree"><ul>'
@@ -759,7 +738,7 @@ function renderOrgTree(){
     s += '<section class="standalones"><h2>Direct children of ' + escHtml(dispName(root)) + '</h2>'
       + '<p class="sub">Standalone buddies &mdash; parent is ' + escHtml(dispName(root)) + ' itself. Two meta-projects are tagged.</p>'
       + '<div class="grid">'
-      + rest.map(b => '<div class="node ' + b.kind + '"><div class="name">' + iconName(b) + '</div>'
+      + rest.map(b => '<div class="node ' + b.kind + '" data-buddy="' + b.id + '"><div class="name">' + iconName(b) + '</div>'
         + '<div class="desc">' + escHtml(b.tagline || '') + '</div><div class="tag">' + nodeTag(b, 1) + '</div>'
         + gridKids(b) + '</div>').join('')
       + '</div></section>';
@@ -771,7 +750,7 @@ function renderProjects(){
     + '<p class="sub">Every buddy, in hierarchy order, with its current status.</p><div class="proj-list">';
   (function walk(id, depth){
     const b = byId[id]; if (!b) return;
-    s += '<div class="proj-row d' + Math.min(depth, 3) + '">'
+    s += '<div class="proj-row d' + Math.min(depth, 3) + '" data-buddy="' + b.id + '">'
       + (depth ? '<span class="dot">└</span>' : '')
       + '<span class="pname">' + iconName(b) + '</span>'
       + '<span class="pdesc">' + escHtml(b.tagline || '') + '</span>'
@@ -853,15 +832,38 @@ function applyZoom(){
   tz.addEventListener('pointercancel', endPan);
   window.addEventListener('pointerup', () => endPan(null));
 })();
+(function initTreeDrop(){
+  function target(e){
+    return (e.target && e.target.closest) ? e.target.closest('#treezoom .node[data-buddy], #view-projects .proj-row[data-buddy]') : null;
+  }
+  function clearHl(){ document.querySelectorAll('.node.drop-target,.proj-row.drop-target').forEach(x => x.classList.remove('drop-target')); }
+  document.addEventListener('dragover', e => {
+    const n = target(e);
+    if (!n || !dragId || n.dataset.buddy === dragId) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    document.querySelectorAll('.node.drop-target,.proj-row.drop-target').forEach(x => { if (x !== n) x.classList.remove('drop-target'); });
+    n.classList.add('drop-target');
+  });
+  document.addEventListener('drop', e => {
+    const n = target(e);
+    if (!n || !dragId) return;
+    e.preventDefault();
+    const src = dragId, dst = n.dataset.buddy;
+    dragId = null; clearHl();
+    moveBuddy(src, dst);
+  });
+  document.addEventListener('dragend', () => { dragId = null; clearHl(); });
+})();
 document.getElementById('view-tree').addEventListener('wheel', e => {
   if (!e.shiftKey) return;
   e.preventDefault();
   S.zoom = Math.min(160, Math.max(50, (S.zoom || 100) + (e.deltaY > 0 ? -5 : 5)));
   save(); applyZoom();
 }, { passive: false });
+let dragId = null;
 (function initDrag(){
   const nav = document.getElementById('buddy-nav');
-  let dragId = null;
   nav.addEventListener('dragstart', e => {
     const r = e.target.closest('[data-buddy]');
     if (!r || r.dataset.buddy === 'project-buddy') { e.preventDefault(); return; }

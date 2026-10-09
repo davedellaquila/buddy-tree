@@ -68,6 +68,8 @@ body{padding:0}
 .pstrip a{flex:0 0 auto}
 .pstrip img{height:150px;border-radius:10px;border:1px solid #30363d;display:block}
 .pstrip img:hover{border-color:#1f6feb}
+.node.drop-target{outline:2px solid #1f6feb;outline-offset:3px}
+.proj-row.drop-target{background:#1c2330;box-shadow:inset 0 0 0 2px #1f6feb}
 /* ---- buddy homepage ---- */
 .bp-wrap{max-width:880px;margin:0 auto;padding:6px 4px}
 .bp-crumb{font-size:12.5px;color:#8b949e;margin-bottom:10px}
@@ -386,13 +388,13 @@ function gridKids(b){
   const kids = kidsOf[b.id] || [];
   if (!kids.length) return '';
   return '<ul class="subkids">' + kids.map(c =>
-    '<li><div class="node ' + c.kind + '"><div class="name">' + iconName(c) + '</div>'
+    '<li><div class="node ' + c.kind + '" data-buddy="' + c.id + '"><div class="name">' + iconName(c) + '</div>'
     + '<div class="desc">' + escHtml(c.tagline || '') + '</div><div class="tag">' + nodeTag(c, 2) + '</div>'
     + gridKids(c) + '</div></li>').join('') + '</ul>';
 }
 function orgNode(b, depth){
   const kids = kidsOf[b.id] || [];
-  let s = '<li><div class="node ' + b.kind + '"><div class="name">' + iconName(b) + '</div>'
+  let s = '<li><div class="node ' + b.kind + '" data-buddy="' + b.id + '"><div class="name">' + iconName(b) + '</div>'
     + '<div class="desc">' + escHtml(b.tagline || '') + '</div>'
     + '<div class="tag">' + nodeTag(b, depth) + '</div></div>';
   if (kids.length) s += '<ul>' + kids.map(c => orgNode(c, depth + 1)).join('') + '</ul>';
@@ -403,7 +405,7 @@ function renderOrgTree(){
   const kids = kidsOf['project-buddy'] || [];
   const fam = kids.filter(b => FAMKINDS.includes(b.kind));
   const rest = kids.filter(b => !FAMKINDS.includes(b.kind));
-  let s = '<div class="chart"><div style="text-align:center"><div class="node root">'
+  let s = '<div class="chart"><div style="text-align:center"><div class="node root" data-buddy="project-buddy">'
     + '<div class="name">' + iconName(root) + '</div>'
     + '<div class="desc">' + escHtml(root.tagline || '') + '</div></div></div>'
     + '<div class="root-stub"></div><div class="tree"><ul>'
@@ -412,7 +414,7 @@ function renderOrgTree(){
     s += '<section class="standalones"><h2>Direct children of ' + escHtml(dispName(root)) + '</h2>'
       + '<p class="sub">Standalone buddies &mdash; parent is ' + escHtml(dispName(root)) + ' itself. Two meta-projects are tagged.</p>'
       + '<div class="grid">'
-      + rest.map(b => '<div class="node ' + b.kind + '"><div class="name">' + iconName(b) + '</div>'
+      + rest.map(b => '<div class="node ' + b.kind + '" data-buddy="' + b.id + '"><div class="name">' + iconName(b) + '</div>'
         + '<div class="desc">' + escHtml(b.tagline || '') + '</div><div class="tag">' + nodeTag(b, 1) + '</div>'
         + gridKids(b) + '</div>').join('')
       + '</div></section>';
@@ -424,7 +426,7 @@ function renderProjects(){
     + '<p class="sub">Every buddy, in hierarchy order, with its current status.</p><div class="proj-list">';
   (function walk(id, depth){
     const b = byId[id]; if (!b) return;
-    s += '<div class="proj-row d' + Math.min(depth, 3) + '">'
+    s += '<div class="proj-row d' + Math.min(depth, 3) + '" data-buddy="' + b.id + '">'
       + (depth ? '<span class="dot">\u2514</span>' : '')
       + '<span class="pname">' + iconName(b) + '</span>'
       + '<span class="pdesc">' + escHtml(b.tagline || '') + '</span>'
@@ -506,15 +508,38 @@ function applyZoom(){
   tz.addEventListener('pointercancel', endPan);
   window.addEventListener('pointerup', () => endPan(null));
 })();
+(function initTreeDrop(){
+  function target(e){
+    return (e.target && e.target.closest) ? e.target.closest('#treezoom .node[data-buddy], #view-projects .proj-row[data-buddy]') : null;
+  }
+  function clearHl(){ document.querySelectorAll('.node.drop-target,.proj-row.drop-target').forEach(x => x.classList.remove('drop-target')); }
+  document.addEventListener('dragover', e => {
+    const n = target(e);
+    if (!n || !dragId || n.dataset.buddy === dragId) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    document.querySelectorAll('.node.drop-target,.proj-row.drop-target').forEach(x => { if (x !== n) x.classList.remove('drop-target'); });
+    n.classList.add('drop-target');
+  });
+  document.addEventListener('drop', e => {
+    const n = target(e);
+    if (!n || !dragId) return;
+    e.preventDefault();
+    const src = dragId, dst = n.dataset.buddy;
+    dragId = null; clearHl();
+    moveBuddy(src, dst);
+  });
+  document.addEventListener('dragend', () => { dragId = null; clearHl(); });
+})();
 document.getElementById('view-tree').addEventListener('wheel', e => {
   if (!e.shiftKey) return;
   e.preventDefault();
   S.zoom = Math.min(160, Math.max(50, (S.zoom || 100) + (e.deltaY > 0 ? -5 : 5)));
   save(); applyZoom();
 }, { passive: false });
+let dragId = null;
 (function initDrag(){
   const nav = document.getElementById('buddy-nav');
-  let dragId = null;
   nav.addEventListener('dragstart', e => {
     const r = e.target.closest('[data-buddy]');
     if (!r || r.dataset.buddy === 'project-buddy') { e.preventDefault(); return; }
