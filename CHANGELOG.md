@@ -8,6 +8,9 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
 ### Added
 - **No more phantom highlighting** — text selection disabled on the chart
   tiles (was leaving blue selection blocks when panning/zooming).
+- **Global token pill** — GitHub token status lives in a fixed top-right pill
+  (amber 'Token needed' / green 'GitHub check'), not buried per-buddy; saving
+  shows a green checkmark confirmation.
 - **Zoom presets** — keys `1`–`9` jump to 10%–90% zoom, `0` is 100%.
 - **Edge-to-edge chart** — the chart viewport now fills the usable area
   with no surrounding margins; the border sits at the edges.
