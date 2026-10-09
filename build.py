@@ -93,6 +93,14 @@ body.light #zoombar{background:#ffffff;border-color:#d0d7de}
 .bp-build{margin:26px 0 6px;font-size:11px;color:#6e7681;text-align:center}
 .pstrip{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 6px}
 .pstrip a{flex:0 0 auto}
+/* ---- standalone buddy mode ---- */
+body.standalone #sidebar{display:none}
+body.standalone .app{display:block}
+body.standalone #main{max-width:880px;margin:0 auto;padding:28px 24px 80px}
+.sa-bar{display:none;align-items:center;gap:10px;margin-bottom:18px;padding:10px 14px;
+  background:#161b22;border:1px solid #30363d;border-radius:12px;font-size:13px;color:#8b949e}
+body.standalone .sa-bar{display:flex}
+.sa-bar .linkbtn{font-size:13px}
 .pstrip img{height:150px;border-radius:10px;border:1px solid #30363d;display:block}
 .pstrip img:hover{border-color:#1f6feb}
 .node.drop-target{outline:2px solid #1f6feb;outline-offset:3px}
@@ -326,9 +334,11 @@ function renderBuddy(id){
   }
   document.getElementById('buddy-home').innerHTML =
     '<div class="bp-wrap">'
+    + '<div class="sa-bar"><span>\U0001f516 Standalone view</span><button class="linkbtn" id="sa-full">Open full dashboard \u2192</button></div>'
     + '<div class="bp-topnav"><button class="linkbtn" data-navbtn="back">\u2190 Back</button>'
     + '<button class="linkbtn" data-navbtn="prev">\u2039 Prev</button><button class="linkbtn" data-navbtn="next">Next \u203a</button>'
-    + '<span class="sep">\u00b7</span><button class="linkbtn" data-view="tree">All buddies</button></div>'
+    + '<span class="sep">\u00b7</span><button class="linkbtn" data-view="tree">All buddies</button>'
+    + '<span class="sep">\u00b7</span><button class="linkbtn" id="bp-desktop">\U0001f4be Save to desktop</button></div>'
     + '<div class="bp-crumb">'+crumb(id)+'</div>'
     + '<div class="bp-top"><span class="bp-icon">'+escHtml(b.icon||'')+'</span><h2 class="bp-name" id="bp-name" contenteditable="true" spellcheck="false" data-buddy="'+id+'">'+escHtml(dispName(b))+'</h2>'
     + '<span class="status '+b.statusClass+'">'+escHtml(b.status)+'</span></div>'
@@ -687,9 +697,15 @@ function renderPlan(id){
   nt.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => { S.notes[id] = nt.value; save(); }, 400); });
 }
 const navHist = [];
+function locHash(){ try { return (typeof location !== 'undefined' && location.hash) || ''; } catch (e) { return ''; } }
+function isStandalone(){ return /(^|\/)standalone$/.test(locHash().replace(/^#\//, '')); }
+function hashFor(sel){ return '#/' + sel + (isStandalone() ? '/standalone' : ''); }
 function show(sel, push){
   if (push !== false && S.sel && sel !== S.sel) { navHist.push(S.sel); if (navHist.length > 60) navHist.shift(); }
   S.sel = sel; save();
+  const h = hashFor(sel);
+  try { if (typeof location !== 'undefined' && location.hash !== h) location.hash = h; } catch (e) {}
+  document.body.classList.toggle('standalone', isStandalone());
   document.querySelectorAll('#main .view').forEach(v => v.classList.remove('active'));
   if (sel.startsWith('view:')) {
     document.getElementById('view-' + sel.slice(5)).classList.add('active');
@@ -760,6 +776,32 @@ function revertJournal(){
   if (S.sel.startsWith('buddy:')) renderBuddy(S.sel.slice(6));
   renderJournal();
   toast('Reverted ' + n + ' change' + (n === 1 ? '' : 's') + '.');
+}
+function buddyStandaloneUrl(id){
+  return 'https://davedellaquila.github.io/buddy-tree/#/buddy:' + id + '/standalone';
+}
+function saveToDesktop(id){
+  const b = byId[id]; if (!b) return;
+  const url = buddyStandaloneUrl(id);
+  const isMac = /mac/i.test(navigator.platform || '') || /mac/i.test(navigator.userAgent || '');
+  let filename, content, type;
+  if (isMac) {
+    filename = b.name + '.webloc';
+    content = '<?xml version="1.0" encoding="UTF-8"?>' + String.fromCharCode(10)
+      + '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' + String.fromCharCode(10)
+      + '<plist version="1.0"><dict><key>URL</key><string>' + url + '</string></dict></plist>';
+    type = 'application/xml';
+  } else {
+    filename = b.name + '.url';
+    content = '[InternetShortcut]' + String.fromCharCode(13,10) + 'URL=' + url + String.fromCharCode(13,10);
+    type = 'text/plain';
+  }
+  const blob = new Blob([content], {type: type});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+  toast('Saved ' + filename + ' ' + String.fromCharCode(8212) + ' move it to your desktop.');
 }
 /* ---------- ingest ---------- */
 async function dumpIngest(id){
@@ -932,6 +974,8 @@ async function loadSharedNotes(id){
   });
 }
 document.addEventListener('click', e => {
+  if (e.target.closest && e.target.closest('#bp-desktop')) { const m = S.sel.match(/^buddy:(.+)$/); if (m) saveToDesktop(m[1]); return; }
+  if (e.target.closest && e.target.closest('#sa-full')) { try { location.hash = '#/' + S.sel; } catch (e) {} document.body.classList.remove('standalone'); return; }
   if (e.target.closest && e.target.closest('.grip')) { e.preventDefault(); return; }
   const vb = e.target.closest('[data-view]');
   if (vb) { show('view:' + vb.dataset.view); return; }
@@ -956,7 +1000,17 @@ document.addEventListener('click', e => {
     toast('Hierarchy reset to the registry.'); return; }
 });
 refreshViews();
-show(S.sel || 'view:tree');
+(function initRoute(){
+  const m = locHash().match(/^#\/(buddy:[^\/]+|view:[^\/]+|plan:[^\/]+)(\/standalone)?$/);
+  if (m) { document.body.classList.toggle('standalone', !!m[2]); show(m[1], false); }
+  else show(S.sel || 'view:tree');
+  window.addEventListener('hashchange', () => {
+    const mm = locHash().match(/^#\/(buddy:[^\/]+|view:[^\/]+|plan:[^\/]+)(\/standalone)?$/);
+    if (!mm) return;
+    document.body.classList.toggle('standalone', !!mm[2]);
+    if (mm[1] !== S.sel) show(mm[1], false);
+  });
+})();
 renderJournal();
 """
     js = js.replace("BUDDIES_JSON", buddies_js).replace("ORDER_JSON", order_js).replace("PLANS_JSON", plans_js)
