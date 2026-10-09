@@ -49,6 +49,14 @@ body{padding:0}
 .brow.has-unseen .bdot{visibility:visible}
 .bname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bkind{font-size:10px;color:#6e7681;letter-spacing:.5px;text-transform:uppercase}
+.bicon{width:20px;flex:0 0 20px;text-align:center;font-size:15px}
+.brow.dragging{opacity:.35}
+.brow.drop-target{background:#1c2330;box-shadow:inset 0 0 0 2px #1f6feb}
+.bp-icon{font-size:38px;line-height:1}
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#161b22;
+  border:1px solid #1f6feb;color:#e6edf3;padding:10px 20px;border-radius:999px;
+  font-size:14px;z-index:99;box-shadow:0 4px 24px rgba(0,0,0,.5);white-space:nowrap;
+  max-width:92vw;overflow:hidden;text-overflow:ellipsis}
 /* ---- buddy homepage ---- */
 .bp-wrap{max-width:880px;margin:0 auto;padding:6px 4px}
 .bp-crumb{font-size:12.5px;color:#8b949e;margin-bottom:10px}
@@ -90,6 +98,8 @@ body{padding:0}
 .notes:focus{outline:none;border-color:#1f6feb}
 .fineprint{font-size:12.5px;color:#6e7681;margin-top:8px;line-height:1.5}
 .bp-empty{color:#8b949e;font-size:14px}
+.proj-row[data-plan]{cursor:pointer}
+.proj-row[data-plan]:hover{background:#161b22}
 .bp-tree-wrap{border:1px solid #21262d;border-radius:12px;padding:18px 8px;background:#0d1117;overflow:hidden}
 .linkbtn{background:none;border:0;color:#1f6feb;font:inherit;font-size:12.5px;cursor:pointer;padding:0}
 .linkbtn:hover{text-decoration:underline}
@@ -103,6 +113,8 @@ body{padding:0}
   .navbtn,.brow{color:#1f2328}
   .navbtn:hover,.brow:hover{background:#eaeef2}
   .navbtn.sel,.brow.sel{background:#ddf4ff}
+  .brow.drop-target{background:#ddf4ff;box-shadow:inset 0 0 0 2px #1f6feb}
+  .toast{background:#fff;border-color:#1f6feb;color:#1f2328}
   .brand .eyebrow,.nav-sec>h3,.bkind,.bp-crumb,.bp-tagline,.attn-date,.art-sub,.fineprint,.bp-empty{color:#57606a}
   .bp-crumb b{color:#1f2328}
   .bp-mission{background:#f6f8fa;border-color:#d0d7de}
@@ -114,6 +126,7 @@ body{padding:0}
   .notes{background:#fff;border-color:#d0d7de;color:#1f2328}
   .seenbtn{background:#eaeef2;border-color:#d0d7de;color:#1f2328}
   .bp-name:focus{background:#ddf4ff}
+  .proj-row[data-plan]:hover{background:#f6f8fa}
 }
 """
 
@@ -147,16 +160,39 @@ def build():
 
     buddies_js = json.dumps(buddies)
     order_js = json.dumps(ROOT_ORDER)
+    plans = json.load(open(f"{HERE}/plans.json"))["plans"]
+    plans_js = json.dumps(plans)
     n_buddies = len(buddies)
+
+    plan_rows = "".join(
+        f'<div class="proj-row d1" data-plan="{p["id"]}">'
+        f'<span class="pname">{esc(p["icon"] + " " + p["name"])}</span>'
+        f'<span class="pdesc">{esc(p["desc"][:110])}</span>'
+        f'<span class="status {p["statusClass"]}">{esc(p["status"])}</span></div>'
+        for p in plans
+    )
+    vpl = ('<div id="view-plans" class="view"><section class="projects-view" style="margin-top:24px">'
+           '<h2>Business Plans</h2>'
+           '<p class="sub">BRDs and business plans \u2014 real-world ventures, separate from the buddy-app '
+           'software projects. Plans link to the buddies that build them.</p>'
+           f'<div class="proj-list">{plan_rows}</div></section></div>')
 
     js = """const BUDDIES = BUDDIES_JSON;
 const ROOT_ORDER = ORDER_JSON;
 const byId = Object.fromEntries(BUDDIES.map(b => [b.id, b]));
+const PLANS = PLANS_JSON;
+const planById = Object.fromEntries(PLANS.map(p => [p.id, p]));
 const kidsOf = {};
-BUDDIES.forEach(b => { const p = b.parent || '__root'; (kidsOf[p] = kidsOf[p] || []).push(b); });
+function effParent(b){ return (S.parents && S.parents[b.id]) || b.parent; }
+function buildKids(){
+  for (const k in kidsOf) delete kidsOf[k];
+  BUDDIES.forEach(b => { const p = effParent(b) || '__root'; (kidsOf[p] = kidsOf[p] || []).push(b); });
+}
 const LS_KEY = 'buddyTree.v3';
-let S = {seen:{}, notes:{}, names:{}, sel:'view:tree'};
+let S = {seen:{}, notes:{}, names:{}, parents:{}, sel:'view:tree'};
 try { Object.assign(S, JSON.parse(localStorage.getItem(LS_KEY) || '{}')); } catch(e) {}
+S.parents = S.parents || {};
+buildKids();
 function save(){ localStorage.setItem(LS_KEY, JSON.stringify(S)); }
 function dispName(b){ return S.names[b.id] || b.name; }
 function unseenItems(b){ return (b.attention || []).filter(a => !S.seen[a.id]); }
@@ -169,14 +205,14 @@ function descUnseen(id){
 function totalUnseen(){ return ROOT_ORDER.reduce((n,id) => n + (byId[id] && byId[id].parent === null ? descUnseen(id) : 0), 0); }
 function crumb(id){
   const chain = []; let b = byId[id];
-  while (b) { chain.unshift(b); b = b.parent ? byId[b.parent] : null; }
+  while (b) { chain.unshift(b); const p = effParent(b); b = p ? byId[p] : null; }
   return chain.map((c,i) => i < chain.length-1
     ? '<a href="#" data-goto="'+c.id+'" style="color:#8b949e">'+escHtml(dispName(c))+'</a>'
     : '<b>'+escHtml(dispName(c))+'</b>').join(' <span style="color:#6e7681">/</span> ');
 }
 function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function renderNav(){
-  const views = [['tree','Tree','▦'],['projects','Projects','☰'],['manifest','Manifest','✓']];
+  const views = [['tree','Tree','▦'],['projects','Projects','☰'],['plans','Plans','💼'],['manifest','Manifest','✓']];
   document.getElementById('view-nav').innerHTML = views.map(([v,l,ic]) =>
     '<button class="navbtn'+(S.sel==='view:'+v?' sel':'')+'" data-view="'+v+'"><span class="nic">'+ic+'</span>'+l+'</button>').join('');
   let h = '';
@@ -185,16 +221,26 @@ function renderNav(){
     const un = descUnseen(id);
     const kind = b.kind === 'root' ? 'root' : (b.parent === 'project-buddy' ? 'direct' : b.kind);
     h += '<button class="brow'+(S.sel==='buddy:'+id?' sel':'')+(un?' has-unseen':'')+'" data-buddy="'+id+'"'
+      + ' draggable="'+(id==='project-buddy'?'false':'true')+'"'
       + ' style="padding-left:'+(8+depth*16)+'px" title="'+escHtml(b.tagline||'')+'">'
-      + '<span class="bdot"></span><span class="bname">'+escHtml(dispName(b))+'</span>'
+      + '<span class="bdot"></span><span class="bicon">'+escHtml(b.icon||'')+'</span><span class="bname">'+escHtml(dispName(b))+'</span>'
       + '<span class="bkind">'+kind+'</span></button>';
     (kidsOf[id] || []).forEach(c => row(c.id, depth+1));
   }
-  ROOT_ORDER.forEach(id => row(id, 0));
+  ROOT_ORDER.filter(id => { const b = byId[id]; const p = b ? effParent(b) : null; return p === null || p === 'project-buddy'; })
+    .forEach(id => row(id, 0));
   document.getElementById('buddy-nav').innerHTML = h;
+  if (Object.keys(S.parents).length) {
+    document.getElementById('buddy-nav').insertAdjacentHTML('beforeend',
+      '<div style="padding:10px 10px 0"><button class="linkbtn" id="reset-parents">Reset moved buddies</button></div>'
+      + '<div class="fineprint" style="padding:2px 10px 0">Hierarchy moves save on this device.</div>');
+  }
   const t = totalUnseen();
   const pill = document.getElementById('attn-pill');
   pill.textContent = t; pill.classList.toggle('zero', t === 0);
+  document.getElementById('plan-nav').innerHTML = PLANS.map(p =>
+    '<button class="brow'+(S.sel==='plan:'+p.id?' sel':'')+'" data-plan="'+p.id+'" style="padding-left:8px">'
+    + '<span class="bicon">'+escHtml(p.icon||'')+'</span><span class="bname">'+escHtml(p.name)+'</span></button>').join('');
 }
 function artRow(icon, label, sub, url){
   return '<a class="art-row" href="'+url+'" target="_blank" rel="noopener">'
@@ -210,6 +256,15 @@ function renderBuddy(id){
   if (b.repo) arts += artRow(ICON_REPO, 'GitHub Repo', 'davedellaquila/'+b.repo+' (private)', 'https://github.com/davedellaquila/'+b.repo);
   (b.docs || []).forEach(d => { arts += artRow(ICON_LINK, d.label, 'Related document — Google Doc', d.url); });
   if (!arts) arts = '<p class="bp-empty">No artifacts yet — the drill adds the brief and repo here when they exist.</p>';
+  const linkedPlans = PLANS.filter(p => (p.buddies || []).includes(id));
+  let planSec = '';
+  if (linkedPlans.length) {
+    planSec = '<div class="bp-sec"><h3>Business plans</h3>' + linkedPlans.map(p =>
+      '<a class="art-row" href="#" data-plan="'+p.id+'">'
+      + '<span class="art-ic">'+escHtml(p.icon||'💼')+'</span>'
+      + '<span><span class="art-label">'+escHtml(p.name)+'</span><div class="art-sub">BRD / business plan · '+escHtml(p.status)+'</div></span>'
+      + '<span class="art-go">→</span></a>').join('') + '</div>';
+  }
   let attn = '';
   if (!items.length) attn = '<p class="bp-empty">Nothing needs your attention right now.</p>';
   else {
@@ -226,7 +281,7 @@ function renderBuddy(id){
   document.getElementById('buddy-home').innerHTML =
     '<div class="bp-wrap">'
     + '<div class="bp-crumb">'+crumb(id)+'</div>'
-    + '<div class="bp-top"><h2 class="bp-name" id="bp-name" contenteditable="true" spellcheck="false" data-buddy="'+id+'">'+escHtml(dispName(b))+'</h2>'
+    + '<div class="bp-top"><span class="bp-icon">'+escHtml(b.icon||'')+'</span><h2 class="bp-name" id="bp-name" contenteditable="true" spellcheck="false" data-buddy="'+id+'">'+escHtml(dispName(b))+'</h2>'
     + '<span class="status '+b.statusClass+'">'+escHtml(b.status)+'</span></div>'
     + '<p class="bp-tagline">'+escHtml(b.tagline||'')+'</p>'
     + '<div class="bp-sec"><h3>What it does</h3><p class="bp-mission">'+escHtml(b.mission)+'</p>'
@@ -236,6 +291,7 @@ function renderBuddy(id){
           + '<p class="fineprint"><button class="linkbtn" data-view="tree">Open the tree as its own view \u2192</button></p></div>'
         : '')
     + '<div class="bp-sec"><h3>Artifacts</h3>'+arts+'</div>'
+    + planSec
     + '<div class="bp-sec"><h3>Needs your attention</h3>'+attn+'</div>'
     + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this buddy\u2026">'+escHtml(S.notes[id]||'')+'</textarea>'
     + '<p class="fineprint">Saved on this device only.</p></div>'
@@ -257,11 +313,175 @@ function renderBuddy(id){
     if (tw && src) tw.innerHTML = src.innerHTML;
   }
 }
+function toast(msg){
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => { if (t.parentNode) t.remove(); }, 3400);
+}
+function setIcon(emoji){
+  if (!emoji) return;
+  const svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>"+emoji+"</text></svg>";
+  let l = document.querySelector("link[rel='icon']");
+  if (!l) { l = document.createElement('link'); l.rel = 'icon'; document.head.appendChild(l); }
+  l.type = 'image/svg+xml';
+  l.href = 'data:image/svg+xml,' + encodeURIComponent(svg);
+  try {
+    const c = document.createElement('canvas'); c.width = c.height = 180;
+    const x = c.getContext('2d');
+    x.fillStyle = '#0d1117'; x.fillRect(0, 0, 180, 180);
+    x.font = '135px serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillText(emoji, 90, 96);
+    let a = document.querySelector("link[rel='apple-touch-icon']");
+    if (!a) { a = document.createElement('link'); a.rel = 'apple-touch-icon'; document.head.appendChild(a); }
+    a.href = c.toDataURL('image/png');
+  } catch (e) {}
+}
+function isDesc(id, anc){
+  let p = byId[id] ? effParent(byId[id]) : null;
+  while (p) { if (p === anc) return true; p = byId[p] ? effParent(byId[p]) : null; }
+  return false;
+}
+function moveBuddy(src, target){
+  if (!src || !target || src === target) return;
+  const b = byId[src]; if (!b || !byId[target]) return;
+  if (isDesc(target, src)) { toast('Can\u2019t move ' + dispName(b) + ' under ' + dispName(byId[target]) + ' \u2014 that would create a loop.'); return; }
+  if (target === b.parent) delete S.parents[src]; else S.parents[src] = target;
+  save(); buildKids(); renderNav(); refreshViews();
+  if (S.sel === 'buddy:' + src || S.sel === 'buddy:' + target || S.sel === 'buddy:project-buddy') renderBuddy(S.sel.slice(6));
+  toast(dispName(b) + ' moved under ' + dispName(byId[target]) + '.');
+}
+const FAMKINDS = ['personal', 'family', 'property', 'finance', 'work'];
+function nodeTag(b, depth){
+  if (depth === 1) {
+    if (b.kind === 'work') return 'direct child';
+    if (b.kind === 'meta') return 'meta';
+    if (b.kind === 'standalone') return 'direct';
+    return 'family';
+  }
+  return depth === 2 ? 'child' : 'grandchild';
+}
+function iconName(b){ return escHtml((b.icon ? b.icon + ' ' : '') + dispName(b)); }
+function orgNode(b, depth){
+  const kids = kidsOf[b.id] || [];
+  let s = '<li><div class="node ' + b.kind + '"><div class="name">' + iconName(b) + '</div>'
+    + '<div class="desc">' + escHtml(b.tagline || '') + '</div>'
+    + '<div class="tag">' + nodeTag(b, depth) + '</div></div>';
+  if (kids.length) s += '<ul>' + kids.map(c => orgNode(c, depth + 1)).join('') + '</ul>';
+  return s + '</li>';
+}
+function renderOrgTree(){
+  const root = byId['project-buddy'];
+  const kids = kidsOf['project-buddy'] || [];
+  const fam = kids.filter(b => FAMKINDS.includes(b.kind));
+  const rest = kids.filter(b => !FAMKINDS.includes(b.kind));
+  let s = '<div class="chart"><div style="text-align:center"><div class="node root">'
+    + '<div class="name">' + iconName(root) + '</div>'
+    + '<div class="desc">' + escHtml(root.tagline || '') + '</div></div></div>'
+    + '<div class="root-stub"></div><div class="tree"><ul>'
+    + fam.map(b => orgNode(b, 1)).join('') + '</ul></div></div>';
+  if (rest.length) {
+    s += '<section class="standalones"><h2>Direct children of ' + escHtml(dispName(root)) + '</h2>'
+      + '<p class="sub">Standalone buddies &mdash; parent is ' + escHtml(dispName(root)) + ' itself. Two meta-projects are tagged.</p>'
+      + '<div class="grid">'
+      + rest.map(b => '<div class="node ' + b.kind + '"><div class="name">' + iconName(b) + '</div>'
+        + '<div class="desc">' + escHtml(b.tagline || '') + '</div><div class="tag">' + nodeTag(b, 1) + '</div></div>').join('')
+      + '</div></section>';
+  }
+  document.getElementById('view-tree').innerHTML = s;
+}
+function renderProjects(){
+  let s = '<section class="projects-view" style="margin-top:24px"><h2>Projects by Buddy</h2>'
+    + '<p class="sub">Every buddy, in hierarchy order, with its current status.</p><div class="proj-list">';
+  (function walk(id, depth){
+    const b = byId[id]; if (!b) return;
+    s += '<div class="proj-row d' + Math.min(depth, 3) + '">'
+      + (depth ? '<span class="dot">\u2514</span>' : '')
+      + '<span class="pname">' + iconName(b) + '</span>'
+      + '<span class="pdesc">' + escHtml(b.tagline || '') + '</span>'
+      + '<span class="status ' + b.statusClass + '">' + escHtml(b.status) + '</span></div>';
+    (kidsOf[id] || []).forEach(c => walk(c.id, depth + 1));
+  })('project-buddy', 0);
+  s += '</div></section>';
+  document.getElementById('view-projects').innerHTML = s;
+}
+let treeHTML0 = null, projHTML0 = null;
+function refreshViews(){
+  const vt = document.getElementById('view-tree'), vp = document.getElementById('view-projects');
+  if (treeHTML0 === null) { treeHTML0 = vt.innerHTML; projHTML0 = vp.innerHTML; }
+  if (Object.keys(S.parents).length) { renderOrgTree(); renderProjects(); }
+  else { vt.innerHTML = treeHTML0; vp.innerHTML = projHTML0; }
+}
+(function initDrag(){
+  const nav = document.getElementById('buddy-nav');
+  let dragId = null;
+  nav.addEventListener('dragstart', e => {
+    const r = e.target.closest('[data-buddy]');
+    if (!r || r.dataset.buddy === 'project-buddy') { e.preventDefault(); return; }
+    dragId = r.dataset.buddy;
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', dragId); } catch (_e) {}
+    r.classList.add('dragging');
+  });
+  nav.addEventListener('dragend', () => {
+    dragId = null;
+    nav.querySelectorAll('.dragging,.drop-target').forEach(x => x.classList.remove('dragging', 'drop-target'));
+  });
+  nav.addEventListener('dragover', e => {
+    const r = e.target.closest('[data-buddy]');
+    if (!r || !dragId || r.dataset.buddy === dragId) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    nav.querySelectorAll('.drop-target').forEach(x => { if (x !== r) x.classList.remove('drop-target'); });
+    r.classList.add('drop-target');
+  });
+  nav.addEventListener('drop', e => {
+    const r = e.target.closest('[data-buddy]');
+    if (!r || !dragId) return;
+    e.preventDefault();
+    const src = dragId, target = r.dataset.buddy;
+    dragId = null;
+    nav.querySelectorAll('.drop-target').forEach(x => x.classList.remove('drop-target'));
+    moveBuddy(src, target);
+  });
+})();
+function renderPlan(id){
+  const p = planById[id]; if(!p) return;
+  let docs = '';
+  (p.docs || []).forEach(d => { docs += artRow(ICON_LINK, d.label, 'Related document', d.url); });
+  if (!docs) docs = '<p class="bp-empty">No BRD or plan doc yet.</p>';
+  const rel = (p.buddies || []).map(bid => byId[bid]).filter(Boolean);
+  let buds = '';
+  if (!rel.length) buds = '<p class="bp-empty">No buddy linked yet.</p>';
+  else buds = rel.map(b => '<a class="art-row" href="#" data-buddy="'+b.id+'">'
+    + '<span class="art-ic">'+escHtml(b.icon||'')+'</span>'
+    + '<span><span class="art-label">'+escHtml(dispName(b))+'</span><div class="art-sub">'+escHtml(b.tagline||'')+'</div></span>'
+    + '<span class="art-go">→</span></a>').join('');
+  document.getElementById('buddy-home').innerHTML =
+    '<div class="bp-wrap">'
+    + '<div class="bp-crumb"><button class="linkbtn" data-view="plans">Business Plans</button> <span style="color:#6e7681">/</span> <b>'+escHtml(p.name)+'</b></div>'
+    + '<div class="bp-top"><span class="bp-icon">'+escHtml(p.icon||'')+'</span>'
+    + '<h2 style="font-size:32px;font-weight:700;margin:0">'+escHtml(p.name)+'</h2>'
+    + '<span class="status '+p.statusClass+'">'+escHtml(p.status)+'</span></div>'
+    + '<div class="bp-sec"><h3>What it is</h3><p class="bp-mission">'+escHtml(p.desc)+'</p></div>'
+    + '<div class="bp-sec"><h3>Documents</h3>'+docs+'</div>'
+    + '<div class="bp-sec"><h3>Related buddies</h3>'+buds+'</div>'
+    + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this plan\u2026">'+escHtml(S.notes[id]||'')+'</textarea>'
+    + '<p class="fineprint">Saved on this device only.</p></div>'
+    + '</div>';
+  const nt = document.getElementById('bp-notes');
+  let t = null;
+  nt.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => { S.notes[id] = nt.value; save(); }, 400); });
+}
 function show(sel){
   S.sel = sel; save();
   document.querySelectorAll('#main .view').forEach(v => v.classList.remove('active'));
   if (sel.startsWith('view:')) {
     document.getElementById('view-' + sel.slice(5)).classList.add('active');
+  } else if (sel.startsWith('plan:')) {
+    document.getElementById('view-buddy').classList.add('active');
+    renderPlan(sel.slice(5));
   } else {
     document.getElementById('view-buddy').classList.add('active');
     renderBuddy(sel.slice(6));
@@ -269,10 +489,14 @@ function show(sel){
   renderNav();
   document.getElementById('main').scrollTop = 0;
   window.scrollTo(0,0);
+  setIcon(sel.startsWith('plan:') ? ((planById[sel.slice(5)] || {}).icon)
+    : sel.startsWith('buddy:') ? ((byId[sel.slice(6)] || {}).icon) : byId['project-buddy'].icon);
 }
 document.addEventListener('click', e => {
   const vb = e.target.closest('[data-view]');
   if (vb) { show('view:' + vb.dataset.view); return; }
+  const pb = e.target.closest('[data-plan]');
+  if (pb) { e.preventDefault(); show('plan:' + pb.dataset.plan); return; }
   const bb = e.target.closest('[data-buddy]');
   if (bb) { show('buddy:' + bb.dataset.buddy); return; }
   const sb = e.target.closest('[data-seen]');
@@ -281,10 +505,15 @@ document.addEventListener('click', e => {
   if (sa) { (byId[sa.dataset.seenAll].attention || []).forEach(a => S.seen[a.id] = Date.now()); save(); renderBuddy(S.sel.slice(6)); renderNav(); return; }
   const gt = e.target.closest('[data-goto]');
   if (gt) { e.preventDefault(); show('buddy:' + gt.dataset.goto); return; }
+  const rp = e.target.closest('#reset-parents');
+  if (rp) { S.parents = {}; save(); buildKids(); renderNav(); refreshViews();
+    if (S.sel.startsWith('buddy:')) renderBuddy(S.sel.slice(6));
+    toast('Hierarchy reset to the registry.'); return; }
 });
+refreshViews();
 show(S.sel || 'view:tree');
 """
-    js = js.replace("BUDDIES_JSON", buddies_js).replace("ORDER_JSON", order_js)
+    js = js.replace("BUDDIES_JSON", buddies_js).replace("ORDER_JSON", order_js).replace("PLANS_JSON", plans_js)
     js = js.replace("ICON_DOC", "'" + ICON_DOC.replace("'", "\\'") + "'")
     js = js.replace("ICON_REPO", "'" + ICON_REPO.replace("'", "\\'") + "'")
     js = js.replace("ICON_LINK", "'" + ICON_LINK.replace("'", "\\'") + "'")
@@ -294,7 +523,9 @@ show(S.sel || 'view:tree');
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Buddy Tree — Project Buddy dashboard</title>
+<meta name="application-name" content="Buddies">
+<meta name="apple-mobile-web-app-title" content="Buddies">
+<title>Buddies</title>
 <style>
 """ + style + NEW_CSS + """
 </style>
@@ -302,12 +533,13 @@ show(S.sel || 'view:tree');
 <body>
 <div class="app">
 <aside id="sidebar">
-  <div class="brand"><div class="eyebrow">Project Buddy &middot; macro view</div><h1>The Buddy Tree</h1><div class="bcount">NBUD buddies &middot; one family</div></div>
+  <div class="brand"><div class="eyebrow">Project Buddy &middot; macro view</div><h1>Buddies</h1><div class="bcount">NBUD buddies &middot; one family</div></div>
   <div class="nav-sec"><h3>Views</h3><div id="view-nav"></div></div>
   <div class="nav-sec"><h3>Buddies <span id="attn-pill" class="zero">0</span></h3><div id="buddy-nav"></div></div>
+  <div class="nav-sec"><h3>Business Plans</h3><div id="plan-nav"></div></div>
 </aside>
 <main id="main">
-""" + vt + vp + vm + """
+""" + vt + vp + vpl + vm + """
 <section id="view-buddy" class="view"><div id="buddy-home"></div></section>
 </main>
 </div>
