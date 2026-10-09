@@ -1285,7 +1285,7 @@ async function loadPhotos(id){
   } catch (e) {}
   const all = seeds.concat(repo.filter(x => !seeds.some(s => s.src === x.src)));
   strip.innerHTML = all.map(p => {
-    const del = p.path ? '<button class="pdel" data-del="' + escHtml(p.path) + '" title="Delete photo">\u2715</button>' : '';
+    const del = p.path ? '<button class="pdel" data-del="' + escHtml(p.path) + '" data-repo="' + escHtml(p.repo || 'buddy-tree') + '" title="Delete photo">\u2715</button>' : '';
     return '<div class="pwrap"><a href="' + escHtml(p.href) + '" target="_blank" rel="noopener"><img src="' + escHtml(p.src) + '" loading="lazy" alt=""></a>' + del + '</div>';
   }).join('');
   const st = document.getElementById('pstat');
@@ -1311,7 +1311,9 @@ async function handlePhotoFiles(id, files){
       if (!/^(jpg|jpeg|png|gif|webp)$/.test(ext)) ext = 'jpg';
       const b64 = await blobToB64(blob);
       const safe = (f.name.replace(/\.[^.]+$/, '').replace(/[^\w\-]+/g, '_').slice(0, 40) || 'photo');
-      await ghPutFile('buddy-tree', 'photos/' + id + '/' + Date.now() + '-' + safe + '.' + ext, b64, 'Add photo for ' + id);
+      const upRepo = (byId[id] && byId[id].repo) ? byId[id].repo : 'buddy-tree';
+      const upPath = (byId[id] && byId[id].repo) ? 'photos/' + Date.now() + '-' + safe + '.' + ext : 'photos/' + id + '/' + Date.now() + '-' + safe + '.' + ext;
+      await ghPutFile(upRepo, upPath, b64, 'Add photo for ' + id);
       n++;
       if (st) st.textContent = 'Uploaded ' + n + '/' + list.length + '\u2026';
     } catch (err) { toast('Photo failed: ' + (err.message || err)); }
@@ -1522,10 +1524,11 @@ document.addEventListener('click', e => {
   if (pd) {
     e.preventDefault(); e.stopPropagation();
     const path = pd.dataset.del;
+    const repo = pd.dataset.repo || 'buddy-tree';
     const mm = S.sel.match(/^buddy:(.+)$/);
     const bid = mm ? mm[1] : null;
     if (!confirm('Delete this photo?')) return;
-    ghDeleteFile('buddy-tree', path, 'Delete photo for ' + (bid || 'buddy'))
+    ghDeleteFile(repo, path, 'Delete photo for ' + (bid || 'buddy'))
       .then(() => { toast('Photo deleted.'); if (bid) loadPhotos(bid); })
       .catch(err => toast('Delete failed: ' + (err.message || err)));
     return;
