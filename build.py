@@ -674,7 +674,7 @@ function renderBuddy(id){
         : '')
     + '<div class="bp-sec" data-field="artifacts"><h3>Artifacts</h3>'+arts+'</div>'
     + planSec
-    + '<div class="bp-sec" data-field="notes"><h3>Notes<span class="info-tip" data-tip="Saved on this device. (For your eyes only)">\u24d8</span></h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this buddy\u2026">'+escHtml(S.notes[id]||'')+'</textarea>'
+    + '<div class="bp-sec" data-field="notes"><h3>Notes<span class="info-tip" data-tip="Saved on this device. (For your eyes only)">\u24d8</span></h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this buddy\u2026 (For your eyes only)">'+escHtml(S.notes[id]||'')+'</textarea>'
     + '</div>'
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Saved to the buddy\u2019s repo (docs/notes.md) \u2014 visible to everyone with repo access.">\u24d8</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Shared notes\u2026"></textarea>'
