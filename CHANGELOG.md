@@ -8,6 +8,7 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
 ### Added
 - **No more phantom highlighting** — text selection disabled on the chart
   tiles (was leaving blue selection blocks when panning/zooming).
+- **Zoom presets** — keys `1`–`9` jump to 10%–90% zoom, `0` is 100%.
 - **Edge-to-edge chart** — the chart viewport now fills the usable area
   with no surrounding margins; the border sits at the edges.
 - **Token gating** — shared notes, ingest, and photo upload are now
