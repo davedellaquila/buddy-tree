@@ -8,6 +8,8 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
 ### Added
 - **No more phantom highlighting** — text selection disabled on the chart
   tiles (was leaving blue selection blocks when panning/zooming).
+- **Edge-to-edge chart** — the chart viewport now fills the usable area
+  with no surrounding margins; the border sits at the edges.
 - **Token gating** — shared notes, ingest, and photo upload are now
   disabled until a GitHub token is saved; a prominent amber banner on every
   buddy page pushes for the token.
