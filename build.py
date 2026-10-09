@@ -66,6 +66,7 @@ body{padding:0}
 #treezoom{flex:1;min-width:0;overflow:auto;height:calc(100vh - 170px);border:1px solid #30363d;cursor:grab;border-radius:12px;background:#0d1117}
 #treezoom.panning{cursor:grabbing}
 #treezoom.panning,#treezoom.panning *{user-select:none!important;-webkit-user-select:none!important}
+#treezoom,#treezoom *{user-select:none;-webkit-user-select:none}
 #zoombar{position:absolute;top:14px;left:14px;width:54px;height:248px;background:rgba(22,27,34,.94);border:1px solid #30363d;border-radius:12px;z-index:5;box-shadow:0 4px 16px rgba(0,0,0,.4)}
 #zoombar .zt{position:absolute;top:8px;left:0;right:0;text-align:center;font-size:11px;color:#8b949e;cursor:help}
 #zoomrange{position:absolute;left:50%;top:50%;width:188px;margin:0;padding:0;transform:translate(-50%,-50%) rotate(-90deg);accent-color:#1f6feb;cursor:pointer}
@@ -805,6 +806,9 @@ function show(sel, push){
 document.addEventListener('keydown', e => {
   if (e.target && e.target.matches && e.target.matches('input, textarea, [contenteditable="true"]')) return;
   if (e.key === 'Escape') { closeDetail(); return; }
+  if (e.key === '+' || e.key === '=') { S.zoom = Math.min(160, (S.zoom || 100) + 5); save(); applyZoom(); return; }
+  if (e.key === '-' || e.key === '_') { S.zoom = Math.max(50, (S.zoom || 100) - 5); save(); applyZoom(); return; }
+  if (e.key === '0') { S.zoom = 100; save(); applyZoom(); return; }
   if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
   const items = Array.from(document.querySelectorAll('#buddy-nav [data-buddy]'));
   if (!items.length) return;
