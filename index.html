@@ -1016,7 +1016,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Saved to the buddy’s repo (docs/notes.md) — visible to everyone with repo access.">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Shared notes…"></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261009.1632</div>'
+    + '<div class="bp-build">Build 20261009.1636</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -1281,6 +1281,7 @@ function attachPan(el){
     if (e.button !== 0) return;
     if (e.target.closest && (e.target.closest('.grip') || e.target.closest('input,textarea,button,a'))) return;
     pan = { x: e.clientX, y: e.clientY, sl: el.scrollLeft, st: el.scrollTop, moved: false, id: e.pointerId };
+    try { el.setPointerCapture(e.pointerId); } catch (err) {}
   });
   el.addEventListener('pointermove', e => {
     if (!pan || e.pointerId !== pan.id) return;
@@ -1295,13 +1296,14 @@ function attachPan(el){
   function endPan(e){
     if (!pan) return;
     if (e && e.pointerId !== pan.id) return;
+    try { el.releasePointerCapture(pan.id); } catch (err) {}
     el.classList.remove('panning');
     if (pan.moved) { swallow = true; setTimeout(() => { swallow = false; }, 80); }
     pan = null;
   }
   el.addEventListener('pointerup', endPan);
   el.addEventListener('pointercancel', endPan);
-  window.addEventListener('pointerup', () => endPan(null));
+  el.addEventListener('lostpointercapture', () => endPan(null));
   el.addEventListener('click', e => {
     if (swallow) { e.preventDefault(); e.stopPropagation(); }
   }, true);
@@ -1429,7 +1431,7 @@ function renderPlan(id){
     + '<div class="bp-sec"><h3>Related buddies</h3>'+buds+'</div>'
     + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this plan…">'+escHtml(S.notes[id]||'')+'</textarea>'
     + '<p class="fineprint">Saved on this device only.</p></div>'
-    + '<div class="bp-build">Build 20261009.1632</div>'
+    + '<div class="bp-build">Build 20261009.1636</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;

@@ -944,6 +944,7 @@ function attachPan(el){
     if (e.button !== 0) return;
     if (e.target.closest && (e.target.closest('.grip') || e.target.closest('input,textarea,button,a'))) return;
     pan = { x: e.clientX, y: e.clientY, sl: el.scrollLeft, st: el.scrollTop, moved: false, id: e.pointerId };
+    try { el.setPointerCapture(e.pointerId); } catch (err) {}
   });
   el.addEventListener('pointermove', e => {
     if (!pan || e.pointerId !== pan.id) return;
@@ -958,13 +959,14 @@ function attachPan(el){
   function endPan(e){
     if (!pan) return;
     if (e && e.pointerId !== pan.id) return;
+    try { el.releasePointerCapture(pan.id); } catch (err) {}
     el.classList.remove('panning');
     if (pan.moved) { swallow = true; setTimeout(() => { swallow = false; }, 80); }
     pan = null;
   }
   el.addEventListener('pointerup', endPan);
   el.addEventListener('pointercancel', endPan);
-  window.addEventListener('pointerup', () => endPan(null));
+  el.addEventListener('lostpointercapture', () => endPan(null));
   el.addEventListener('click', e => {
     if (swallow) { e.preventDefault(); e.stopPropagation(); }
   }, true);
