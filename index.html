@@ -1,635 +1,1897 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Buddy Tree — Project Buddy dashboard</title>
-<style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>Project Buddy</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap');
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif;
-    background: #0d1117;
-    color: #e6edf3;
-    padding: 40px 24px 64px;
-    -webkit-font-smoothing: antialiased;
-  }
-  .page { max-width: 1280px; margin: 0 auto; }
-  header { text-align: center; margin-bottom: 8px; }
-  header .eyebrow {
-    display: inline-block; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
-    color: #d29922; border: 1px solid #3d2e12; background: #231a08;
-    padding: 6px 14px; border-radius: 999px; margin-bottom: 16px;
-  }
-  header h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; }
-  header p.sub { color: #8b949e; margin-top: 10px; font-size: 15px; }
-  header p.stamp { color: #6e7681; margin-top: 6px; font-size: 12px; }
+    :root {
+      color-scheme: light dark;
+      --bg: #f4f6f1;
+      --surface: #ffffff;
+      --sidebar: #18231e;
+      --sidebar-2: #223129;
+      --ink: #17211c;
+      --muted: #5b6861;
+      --line: #d9ded8;
+      --line-strong: #c1c9c1;
+      --accent: #c5502e;
+      --accent-soft: #fae6dd;
+      --green: #2f7a52;
+      --gold: #9c6b11;
+      --blue: #306b8b;
+      --shadow: 0 18px 45px rgba(27, 41, 33, .1);
+      --radius: 14px;
+    }
 
-  .tabs { display: flex; justify-content: center; gap: 8px; margin: 24px 0 8px; }
-  .tabs button {
-    font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
-    color: #8b949e; background: #161b22; border: 1px solid #30363d;
-    padding: 9px 22px; border-radius: 999px;
-  }
-  .tabs button.active { color: #0d1117; background: #d29922; border-color: #d29922; }
-  .view { display: none; }
-  .view.active { display: block; }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111713;
+        --surface: #18201b;
+        --sidebar: #0d130f;
+        --sidebar-2: #18221b;
+        --ink: #edf3ee;
+        --muted: #aab7ae;
+        --line: #303b33;
+        --line-strong: #465348;
+        --accent: #ed7955;
+        --accent-soft: #42271f;
+        --green: #67b889;
+        --gold: #d4a24e;
+        --blue: #70a9c7;
+        --shadow: 0 18px 45px rgba(0, 0, 0, .28);
+      }
+    }
 
-  .chart { overflow-x: auto; padding: 24px 0 8px; }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Manrope", sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    a { color: inherit; }
 
-  /* ---- classic CSS org tree ---- */
-  .tree, .tree ul { display: flex; justify-content: center; margin: 0; padding: 0; }
-  .tree ul { padding-top: 26px; position: relative; }
-  .tree li { list-style: none; position: relative; padding: 26px 7px 0; text-align: center; }
-  .tree li::before, .tree li::after {
-    content: ''; position: absolute; top: 0; right: 50%;
-    width: 50%; height: 26px; border-top: 2px solid #3a4a63;
-  }
-  .tree li::after { right: auto; left: 50%; border-left: 2px solid #3a4a63; }
-  .tree li:only-child::before, .tree li:only-child::after { display: none; }
-  .tree li:only-child { padding-top: 0; }
-  .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
-  .tree li:last-child::before { border-right: 2px solid #3a4a63; border-radius: 0 8px 0 0; }
-  .tree li:first-child::after { border-radius: 8px 0 0 0; }
-  .tree ul ul::before {
-    content: ''; position: absolute; top: 0; left: 50%;
-    width: 0; height: 26px; border-left: 2px solid #3a4a63;
-  }
-  .root-stub { width: 0; height: 26px; border-left: 2px solid #3a4a63; margin: 0 auto; }
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 296px minmax(0, 1fr);
+    }
 
-  .node {
-    display: inline-block; width: 196px; vertical-align: top;
-    background: #161b22; border: 1px solid #30363d; border-top: 3px solid #8b949e;
-    border-radius: 10px; padding: 12px 12px 13px;
-  }
-  .node .name { font-weight: 700; font-size: 15px; margin-bottom: 5px; }
-  .node .desc { font-size: 12px; line-height: 1.45; color: #8b949e; }
-  .node .tag {
-    display: inline-block; margin-top: 8px; font-size: 10px; font-weight: 600;
-    letter-spacing: 0.6px; text-transform: uppercase; padding: 3px 8px; border-radius: 999px;
-  }
-  .node.root { width: 320px; border-top-color: #d29922; background: #1c1a12; border-color: #4a3c18; }
-  .node.root .name { font-size: 20px; }
-  .node.root .desc { font-size: 13px; color: #c9b98a; }
-  .node.personal { border-top-color: #a371f7; }
-  .node.personal .tag { background: #2a1f45; color: #c9a7f5; }
-  .node.property { border-top-color: #3fb950; }
-  .node.property .tag { background: #122b18; color: #7ee787; }
-  .node.finance { border-top-color: #39c5cf; }
-  .node.finance .tag { background: #0f2a2d; color: #76e3ea; }
-  .node.work { border-top-color: #58a6ff; }
-  .node.work .tag { background: #10243f; color: #79c0ff; }
-  .node.family { border-top-color: #f778ba; }
-  .node.family .tag { background: #33182a; color: #ff9bce; }
-  .node.meta .tag { background: #33182a; color: #ff9bce; }
-  .node.standalone .tag { background: #21262d; color: #8b949e; }
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: var(--sidebar);
+      color: #f2f7f3;
+      border-right: 1px solid rgba(255,255,255,.08);
+      z-index: 20;
+    }
+    .sidebar-head { padding: 24px 18px 14px; }
+    .sidebar-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+    .sidebar-label strong { font-size: 17px; letter-spacing: -.02em; }
+    .count {
+      min-width: 28px;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: rgba(255,255,255,.1);
+      color: #cad6ce;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      text-align: center;
+    }
+    .search-wrap { position: relative; }
+    .search-wrap svg {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      width: 16px;
+      transform: translateY(-50%);
+      color: #91a197;
+      pointer-events: none;
+    }
+    #buddySearch {
+      width: 100%;
+      height: 40px;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 9px;
+      outline: none;
+      background: rgba(255,255,255,.07);
+      color: #fff;
+      padding: 0 12px 0 36px;
+    }
+    #buddySearch::placeholder { color: #91a197; }
+    #buddySearch:focus { border-color: rgba(255,255,255,.38); }
 
-  .standalones { margin-top: 56px; }
-  .standalones h2, .projects-view h2 { text-align: center; font-size: 20px; margin-bottom: 6px; }
-  .standalones p.sub, .projects-view p.sub { text-align: center; color: #8b949e; font-size: 14px; margin-bottom: 24px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(196px, 1fr)); gap: 12px; }
-  .grid .node { width: 100%; }
+    .buddy-nav {
+      flex: 1;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 3px 10px 28px;
+      scrollbar-width: thin;
+      scrollbar-color: #425247 transparent;
+    }
+    .nav-group-title {
+      margin: 17px 10px 6px;
+      color: #829187;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .buddy-link {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 9px minmax(0,1fr) auto;
+      align-items: center;
+      gap: 10px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      padding: 9px 10px 9px calc(10px + var(--nav-depth, 0) * 12px);
+      cursor: pointer;
+      text-align: left;
+    }
+    .buddy-link:hover { background: rgba(255,255,255,.065); }
+    .buddy-link[aria-current="page"] { background: var(--sidebar-2); }
+    .buddy-link[aria-current="page"] .buddy-name { color: #fff; font-weight: 650; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--dot, #a7b3ab); }
+    .buddy-label { min-width: 0; display: grid; }
+    .buddy-name { color: #d7e0da; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .buddy-canonical { color: #829187; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .buddy-stage-mini {
+      color: #829187;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 9px;
+    }
+    .empty-filter { padding: 24px 10px; color: #91a197; font-size: 13px; }
 
-  /* ---- projects list view ---- */
-  .proj-list { max-width: 860px; margin: 0 auto; }
-  .proj-row {
-    display: flex; align-items: baseline; gap: 12px;
-    padding: 10px 14px; border-bottom: 1px solid #21262d;
-  }
-  .proj-row .pname { font-weight: 700; font-size: 14px; white-space: nowrap; }
-  .proj-row .pdesc { font-size: 13px; color: #8b949e; flex: 1; }
-  .proj-row .dot { color: #3a4a63; font-size: 12px; }
-  .status {
-    font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
-    padding: 3px 10px; border-radius: 999px; white-space: nowrap;
-  }
-  .st-live { background: #122b18; color: #7ee787; }
-  .st-pilot { background: #0f2a2d; color: #76e3ea; }
-  .st-prd { background: #10243f; color: #79c0ff; }
-  .st-brief { background: #2a1f45; color: #c9a7f5; }
-  .st-active { background: #122b18; color: #7ee787; }
-  .st-idea { background: #21262d; color: #8b949e; }
-  .st-new { background: #33182a; color: #ff9bce; }
-  .st-spec { background: #231a08; color: #e3b341; }
-  .d0 { padding-left: 14px; background: #161b22; border-radius: 8px; margin-top: 18px; }
-  .d0 .pname { font-size: 16px; }
-  .d1 { padding-left: 34px; }
-  .d2 { padding-left: 58px; }
-  .d3 { padding-left: 82px; }
+    .main { min-width: 0; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 clamp(20px, 4vw, 60px);
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--bg) 92%, transparent);
+      backdrop-filter: blur(12px);
+    }
+    .crumb { min-width: 0; color: var(--muted); font-size: 13px; }
+    .crumb strong { color: var(--ink); font-weight: 650; }
+    .updated { color: var(--muted); font-family: "IBM Plex Mono", monospace; font-size: 11px; white-space: nowrap; }
+    .menu-btn {
+      display: none;
+      width: 38px;
+      height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--surface);
+      cursor: pointer;
+    }
 
-  footer.legend {
-    margin-top: 48px; border-top: 1px solid #21262d; padding-top: 20px;
-    color: #8b949e; font-size: 13px; line-height: 1.7; text-align: center;
-  }
-  footer.legend b { color: #e6edf3; }
-  .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin: 0 4px 0 12px; vertical-align: baseline; }
+    .content {
+      width: min(1100px, 100%);
+      margin: 0 auto;
+      padding: 52px clamp(20px, 5vw, 68px) 80px;
+    }
+    .buddy-header {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 32px;
+      align-items: end;
+      padding-bottom: 34px;
+      border-bottom: 1px solid var(--line-strong);
+    }
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+    }
+    .eyebrow .dot { width: 8px; height: 8px; }
+    h1 {
+      margin: 0;
+      max-width: 760px;
+      font-size: clamp(38px, 6vw, 66px);
+      line-height: .98;
+      letter-spacing: -.055em;
+    }
+    .summary {
+      max-width: 720px;
+      margin: 20px 0 0;
+      color: var(--muted);
+      font-size: clamp(17px, 2vw, 20px);
+      line-height: 1.55;
+      letter-spacing: -.012em;
+    }
+    .status-stamp {
+      min-width: 132px;
+      padding: 15px 17px;
+      border-top: 3px solid var(--accent);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .status-stamp span { display: block; color: var(--muted); font-family: "IBM Plex Mono", monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+    .status-stamp strong { display: block; margin-top: 4px; font-size: 14px; }
 
-  /* light app theme */
-  html[data-theme="light"] body { background: #f6f8fa; color: #1f2328; }
-  html[data-theme="light"] .node { background: #ffffff; border-color: #d0d7de; }
-  html[data-theme="light"] .node .desc { color: #57606a; }
-  html[data-theme="light"] header p.sub, html[data-theme="light"] .standalones p.sub,
-  html[data-theme="light"] .projects-view p.sub, html[data-theme="light"] footer.legend { color: #57606a; }
-  html[data-theme="light"] header p.stamp { color: #8b949e; }
-  html[data-theme="light"] .node.root { background: #fff8e6; border-color: #e3b341; }
-  html[data-theme="light"] .node.root .desc { color: #7a5c1e; }
-  html[data-theme="light"] footer.legend { border-top-color: #d0d7de; }
-  html[data-theme="light"] footer.legend b { color: #1f2328; }
-  html[data-theme="light"] .tabs button { background: #ffffff; border-color: #d0d7de; color: #57606a; }
-  html[data-theme="light"] .proj-row { border-bottom-color: #e5e9ee; }
-  html[data-theme="light"] .proj-row .pdesc { color: #57606a; }
-  html[data-theme="light"] .d0 { background: #ffffff; border: 1px solid #e5e9ee; }
+    .section-tabs {
+      position: sticky;
+      top: 62px;
+      z-index: 8;
+      display: flex;
+      gap: 2px;
+      margin: 0 -8px;
+      padding: 14px 8px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .section-tabs a {
+      border-radius: 7px;
+      padding: 8px 11px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .section-tabs a:hover, .section-tabs a:focus-visible { color: var(--ink); background: var(--surface); }
 
-/* ---- app shell ---- */
-body{padding:0}
-.app{display:flex;min-height:100vh;align-items:stretch}
-#sidebar{width:308px;flex:0 0 308px;background:#0d1117;border-right:1px solid #21262d;
-  padding:22px 14px 32px;position:sticky;top:0;height:100vh;overflow-y:auto}
-#main{flex:1;min-width:0;padding:36px 32px 80px}
-.brand{padding:0 8px 14px}
-.brand .eyebrow{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8b949e}
-.brand h1{font-size:22px;margin:4px 0 0}
-.brand .bcount{font-size:12.5px;color:#8b949e;margin-top:4px}
-.nav-sec{margin-top:18px}
-.nav-sec>h3{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8b949e;
-  margin:0 8px 8px;display:flex;align-items:center;gap:8px}
-#attn-pill{background:#1f6feb;color:#fff;font-size:11px;font-weight:700;border-radius:999px;
-  padding:1px 8px;letter-spacing:0;text-transform:none}
-#attn-pill.zero{background:#21262d;color:#8b949e}
-.navbtn{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;
-  color:#e6edf3;font:inherit;font-size:14px;padding:8px 10px;border-radius:8px;cursor:pointer}
-.navbtn:hover{background:#161b22}
-.navbtn.sel{background:#1c2330;box-shadow:inset 2px 0 0 #1f6feb}
-.navbtn .nic{width:20px;text-align:center;color:#8b949e}
-.brow{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:0;
-  color:#e6edf3;font:inherit;font-size:13.5px;padding:6px 10px 6px 8px;border-radius:8px;cursor:pointer}
-.brow:hover{background:#161b22}
-.brow.sel{background:#1c2330;box-shadow:inset 2px 0 0 #1f6feb}
-.bdot{width:8px;height:8px;border-radius:50%;background:#1f6feb;flex:0 0 8px;visibility:hidden}
-.brow.has-unseen .bdot{visibility:visible}
-.bname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bkind{font-size:10px;color:#6e7681;letter-spacing:.5px;text-transform:uppercase}
-/* ---- buddy homepage ---- */
-.bp-wrap{max-width:880px;margin:0 auto;padding:6px 4px}
-.bp-crumb{font-size:12.5px;color:#8b949e;margin-bottom:10px}
-.bp-crumb b{color:#e6edf3;font-weight:600}
-.bp-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.bp-name{font-size:32px;font-weight:700;margin:0;outline:none;border-bottom:2px dashed transparent;
-  padding-bottom:2px;min-width:120px}
-.bp-name:hover{border-bottom-color:#30363d}
-.bp-name:focus{border-bottom-color:#1f6feb;background:#0f1a2e}
-.bp-tagline{color:#8b949e;font-size:15px;margin:8px 0 0}
-.bp-sec{margin-top:30px}
-.bp-sec>h3{font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:#8b949e;margin:0 0 12px}
-.bp-mission{font-size:15.5px;line-height:1.7;background:#161b22;border:1px solid #30363d;
-  border-radius:12px;padding:16px 18px;margin:0}
-.art-row{display:flex;align-items:center;gap:14px;padding:11px 14px;border:1px solid #21262d;
-  border-radius:12px;margin-bottom:10px;text-decoration:none;color:inherit;background:#0d1117}
-.art-row:hover{border-color:#1f6feb;background:#11161d}
-.art-ic{width:38px;height:38px;border-radius:10px;background:#161b22;border:1px solid #30363d;
-  display:flex;align-items:center;justify-content:center;flex:0 0 38px;color:#8b949e}
-.art-label{font-weight:650;font-size:14.5px}
-.art-sub{font-size:12.5px;color:#8b949e;margin-top:2px}
-.art-go{margin-left:auto;color:#6e7681;font-size:18px}
-.attn{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:13px 15px;
-  margin-bottom:10px;display:flex;gap:12px;align-items:flex-start}
-.attn.unseen{border-color:#1f6feb;background:#0d1a30}
-.attn .adot{width:9px;height:9px;border-radius:50%;background:#1f6feb;margin-top:6px;flex:0 0 9px;visibility:hidden}
-.attn.unseen .adot{visibility:visible}
-.attn-body{flex:1;min-width:0}
-.attn-text{font-size:14.5px;line-height:1.5}
-.attn-date{font-size:12px;color:#8b949e;margin-top:5px}
-.seenbtn{flex:0 0 auto;background:#21262d;border:1px solid #30363d;color:#e6edf3;font:inherit;
-  font-size:12.5px;padding:6px 12px;border-radius:999px;cursor:pointer}
-.seenbtn:hover{border-color:#1f6feb}
-.attn.seen{opacity:.55}
-.attn.seen .seenbtn{visibility:hidden}
-.attn-all{margin-top:6px}
-.notes{width:100%;min-height:120px;background:#0d1117;border:1px solid #30363d;border-radius:12px;
-  color:#e6edf3;font:inherit;font-size:14.5px;line-height:1.6;padding:13px 15px;resize:vertical}
-.notes:focus{outline:none;border-color:#1f6feb}
-.fineprint{font-size:12.5px;color:#6e7681;margin-top:8px;line-height:1.5}
-.bp-empty{color:#8b949e;font-size:14px}
-.bp-tree-wrap{border:1px solid #21262d;border-radius:12px;padding:18px 8px;background:#0d1117;overflow:hidden}
-.linkbtn{background:none;border:0;color:#1f6feb;font:inherit;font-size:12.5px;cursor:pointer;padding:0}
-.linkbtn:hover{text-decoration:underline}
-@media (max-width:900px){
-  .app{flex-direction:column}
-  #sidebar{width:auto;flex:none;position:static;height:auto;max-height:46vh;border-right:0;border-bottom:1px solid #21262d}
-  #main{padding:24px 18px 64px}
-}
-@media (prefers-color-scheme:light){
-  #sidebar{background:#f6f8fa;border-right-color:#d0d7de}
-  .navbtn,.brow{color:#1f2328}
-  .navbtn:hover,.brow:hover{background:#eaeef2}
-  .navbtn.sel,.brow.sel{background:#ddf4ff}
-  .brand .eyebrow,.nav-sec>h3,.bkind,.bp-crumb,.bp-tagline,.attn-date,.art-sub,.fineprint,.bp-empty{color:#57606a}
-  .bp-crumb b{color:#1f2328}
-  .bp-mission{background:#f6f8fa;border-color:#d0d7de}
-  .art-row{background:#fff;border-color:#d0d7de}
-  .art-row:hover{background:#f6f8fa}
-  .art-ic{background:#f6f8fa;border-color:#d0d7de;color:#57606a}
-  .attn{background:#f6f8fa;border-color:#d0d7de}
-  .attn.unseen{background:#ddf4ff;border-color:#1f6feb}
-  .notes{background:#fff;border-color:#d0d7de;color:#1f2328}
-  .seenbtn{background:#eaeef2;border-color:#d0d7de;color:#1f2328}
-  .bp-name:focus{background:#ddf4ff}
-}
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 36px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .fact { min-width: 0; padding: 23px 24px 24px 0; }
+    .fact + .fact { border-left: 1px solid var(--line); padding-left: 24px; }
+    .fact-label { color: var(--muted); font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; }
+    .fact-value { margin-top: 7px; font-weight: 650; line-height: 1.35; overflow-wrap: anywhere; }
 
-</style>
+    .page-section { scroll-margin-top: 126px; padding: 54px 0 0; }
+    .collapsible-header {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 180px minmax(0, 1fr) auto;
+      gap: 34px;
+      align-items: start;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+      text-align: left;
+    }
+    .collapsible-header h2 { margin: 0; font-size: 14px; letter-spacing: -.01em; }
+    .collapsible-header p { margin: 0; max-width: 680px; color: var(--muted); font-size: 17px; }
+    .collapsible-chevron { color: var(--muted); font-size: 18px; line-height: 1; transition: transform .15s ease; }
+    .collapsible-header[aria-expanded="true"] .collapsible-chevron { transform: rotate(90deg); }
+    .collapsible-header:focus-visible { outline: 2px solid var(--accent); outline-offset: 7px; border-radius: 2px; }
+    .collapsible-body[hidden] { display: none; }
+    .overview-section { scroll-margin-top: 126px; padding-top: 22px; }
+    .overview-section .collapsible-header { padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+    .overview-section .collapsible-body .overview-grid { margin-top: 0; border-top: 0; }
+    .section-heading { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 34px; }
+    .section-heading h2 { margin: 0; font-size: 14px; letter-spacing: -.01em; }
+    .section-heading p { margin: 0; max-width: 680px; color: var(--muted); font-size: 17px; }
+
+    .focus-list { margin: 28px 0 0 214px; border-top: 1px solid var(--line); }
+    .focus-item {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      gap: 16px;
+      padding: 21px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .focus-number { color: var(--accent); font-family: "IBM Plex Mono", monospace; font-size: 11px; padding-top: 3px; }
+    .focus-item h3 { margin: 0 0 5px; font-size: 16px; }
+    .focus-item p { margin: 0; color: var(--muted); }
+
+    .next-card {
+      margin: 30px 0 0 214px;
+      display: grid;
+      grid-template-columns: 7px minmax(0,1fr);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .next-accent { background: var(--accent); }
+    .next-body { padding: 26px 28px; }
+    .next-body span { color: var(--muted); font-family: "IBM Plex Mono", monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .07em; }
+    .next-body p { margin: 8px 0 0; font-size: 18px; font-weight: 600; line-height: 1.45; }
+
+    .related-wrap { margin: 24px 0 0 214px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .related-btn {
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: transparent;
+      padding: 8px 11px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .related-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .none { color: var(--muted); font-size: 13px; }
+
+    .directory-home { padding-top: 34px; }
+    .directory-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .directory-summary { color: var(--muted); font-size: 13px; }
+    .view-switch {
+      display: inline-grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+    }
+    .view-btn {
+      min-width: 92px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      padding: 8px 12px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 650;
+    }
+    .view-btn[aria-pressed="true"] { background: var(--sidebar); color: #f2f7f3; }
+    .view-btn:focus-visible, .tree-node:focus-visible, .outline-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .directory-workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 62px;
+      gap: 16px;
+      align-items: start;
+      margin-top: 18px;
+    }
+    .directory-viewport {
+      min-width: 0;
+      max-height: clamp(420px, 68vh, 760px);
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: var(--line-strong) transparent;
+    }
+    .directory-panel {
+      padding-top: 8px;
+      transform-origin: top left;
+    }
+    .directory-panel[hidden] { display: none; }
+    .zoom-dock {
+      position: sticky;
+      top: 142px;
+      z-index: 7;
+      width: 62px;
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+      padding: 10px 6px 8px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+      box-shadow: 0 8px 24px rgba(27, 41, 33, .08);
+    }
+    .zoom-label {
+      color: var(--muted);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .zoom-slider {
+      width: 24px;
+      height: 112px;
+      margin: 0;
+      writing-mode: vertical-lr;
+      direction: rtl;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .zoom-value {
+      min-width: 46px;
+      color: var(--ink);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      font-weight: 500;
+      text-align: center;
+    }
+    .zoom-reset {
+      width: 46px;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      background: transparent;
+      padding: 5px 3px;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 10px;
+      font-weight: 500;
+    }
+    .zoom-reset:hover { border-color: var(--accent); color: var(--accent); }
+    .zoom-slider:focus-visible, .zoom-reset:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .org-chart { padding: 6px 0 10px; }
+    .org-chart ul {
+      position: relative;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 22px 12px;
+      margin: 0;
+      padding: 28px 0 0;
+      list-style: none;
+    }
+    .org-chart > ul { padding-top: 0; }
+    .org-chart li {
+      position: relative;
+      flex: 0 1 190px;
+      min-width: 150px;
+      list-style: none;
+    }
+    .org-chart > ul > li, .org-chart li.org-branch-expanded { flex: 1 0 100%; }
+    .org-chart li > ul::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 8%;
+      right: 8%;
+      border-top: 1px solid var(--line-strong);
+    }
+    .org-chart li > ul::after {
+      content: "";
+      position: absolute;
+      top: -22px;
+      left: 50%;
+      height: 22px;
+      border-left: 1px solid var(--line-strong);
+    }
+    .org-chart li > ul > li:not(.org-drop-slot)::before {
+      content: "";
+      position: absolute;
+      top: -28px;
+      left: 50%;
+      height: 28px;
+      border-left: 1px solid var(--line-strong);
+    }
+    .org-node {
+      position: relative;
+      width: min(210px, 100%);
+      min-height: 78px;
+      margin: 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--surface);
+      box-shadow: 0 7px 18px rgba(27, 41, 33, .06);
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    .org-node[draggable="true"] { cursor: grab; }
+    .org-node.is-dragging { opacity: .45; cursor: grabbing; }
+    .org-node.is-drop-target { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent); }
+    .org-toggle {
+      width: 100%;
+      min-height: 48px;
+      display: grid;
+      grid-template-columns: 9px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 9px;
+      border: 0;
+      background: transparent;
+      padding: 11px 11px 7px;
+      cursor: pointer;
+      text-align: left;
+    }
+    .org-toggle:hover .org-node-name { color: var(--accent); }
+    .org-node-label { min-width: 0; display: grid; }
+    .org-node-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 650; font-size: 13px; }
+    .org-node-canonical { color: var(--muted); font-size: 9px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .org-detail-cue { color: var(--muted); font-size: 13px; }
+    .org-node-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 8px 8px 11px; }
+    .org-child-count { color: var(--muted); font-family: "IBM Plex Mono", monospace; font-size: 9px; }
+    .org-node-actions { display: flex; align-items: center; gap: 5px; }
+    .org-expand, .org-goto {
+      border: 0;
+      border-radius: 6px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .org-expand { background: transparent; color: var(--muted); }
+    .org-expand:hover { background: var(--bg); color: var(--ink); }
+    .org-goto { background: var(--accent-soft); color: var(--accent); }
+    .org-goto:hover { filter: brightness(.97); }
+    .org-toggle:focus-visible, .org-expand:focus-visible, .org-goto:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .org-drop-slot {
+      flex: 0 0 10px;
+      min-width: 10px;
+      min-height: 78px;
+      border-radius: 6px;
+      transition: background .15s ease, box-shadow .15s ease;
+    }
+    .org-chart.is-dragging .org-drop-slot { background: color-mix(in srgb, var(--line-strong) 30%, transparent); }
+    .org-drop-slot.is-drop-target { background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+    .move-status {
+      min-height: 22px;
+      margin: 14px 0 0;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 650;
+    }
+    .hierarchy-tree, .hierarchy-tree ul { margin: 0; padding: 0; list-style: none; }
+    .hierarchy-tree ul {
+      position: relative;
+      margin-left: 25px;
+      padding-left: 26px;
+    }
+    .hierarchy-tree ul::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 15px 0;
+      border-left: 1px solid var(--line-strong);
+    }
+    .hierarchy-tree li { position: relative; padding: 7px 0; }
+    .hierarchy-tree ul > li::before {
+      content: "";
+      position: absolute;
+      left: -26px;
+      top: 27px;
+      width: 26px;
+      border-top: 1px solid var(--line-strong);
+    }
+    .tree-row { display: flex; align-items: center; gap: 9px; }
+    .tree-node {
+      min-width: 210px;
+      max-width: min(430px, 100%);
+      display: grid;
+      grid-template-columns: 9px minmax(0,1fr) auto;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--surface);
+      padding: 11px 12px;
+      cursor: pointer;
+      text-align: left;
+    }
+    .tree-node:hover { border-color: var(--line-strong); box-shadow: 0 5px 18px rgba(27, 41, 33, .07); }
+    .tree-node-label { min-width: 0; display: grid; }
+    .tree-node-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 650; }
+    .tree-node-canonical { color: var(--muted); font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tree-node-stage { color: var(--muted); font-family: "IBM Plex Mono", monospace; font-size: 9px; }
+    .child-count { color: var(--muted); font-family: "IBM Plex Mono", monospace; font-size: 10px; }
+    .outline-list { border-top: 1px solid var(--line-strong); }
+    .outline-row {
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(190px, 1fr) minmax(150px, .72fr) auto;
+      gap: 20px;
+      align-items: center;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      background: transparent;
+      padding: 14px 10px 14px calc(10px + var(--depth, 0) * 24px);
+      cursor: pointer;
+      text-align: left;
+    }
+    .outline-row:hover { background: var(--surface); }
+    .outline-name { display: flex; align-items: center; gap: 10px; min-width: 0; font-weight: 650; }
+    .outline-name-text { min-width: 0; display: grid; }
+    .outline-name-text > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .outline-canonical { color: var(--muted); font-size: 10px; font-weight: 500; }
+    .canonical-title { margin-top: 8px; color: var(--muted); font-family: "IBM Plex Mono", monospace; font-size: 11px; }
+    .outline-parent { color: var(--muted); font-size: 12px; }
+    .outline-stage { color: var(--muted); font-family: "IBM Plex Mono", monospace; font-size: 10px; text-align: right; }
+    .directory-note { margin: 20px 0 0; color: var(--muted); font-size: 13px; }
+
+    body.detail-open { overflow: hidden; }
+    .detail-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) min(520px, 94vw);
+    }
+    .detail-layer[hidden] { display: none; }
+    .detail-backdrop {
+      grid-column: 1 / -1;
+      grid-row: 1;
+      border: 0;
+      background: rgba(6, 12, 8, .5);
+      cursor: default;
+    }
+    .detail-panel {
+      position: relative;
+      grid-column: 2;
+      grid-row: 1;
+      min-width: 0;
+      height: 100%;
+      overflow-y: auto;
+      background: var(--surface);
+      border-left: 1px solid var(--line);
+      box-shadow: -18px 0 48px rgba(0,0,0,.2);
+      padding: 26px clamp(22px, 4vw, 40px) 42px;
+    }
+    .detail-top { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .detail-kicker { color: var(--muted); font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: .07em; text-transform: uppercase; }
+    .detail-close {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: transparent;
+      cursor: pointer;
+      font-size: 22px;
+      line-height: 1;
+    }
+    .detail-close:hover { background: var(--bg); }
+    .detail-title { margin: 22px 0 0; font-size: clamp(30px, 5vw, 44px); line-height: 1.05; letter-spacing: -.04em; }
+    .detail-canonical { margin-top: 6px; color: var(--muted); font-family: "IBM Plex Mono", monospace; font-size: 11px; }
+    .detail-summary { margin: 18px 0 0; color: var(--muted); font-size: 17px; line-height: 1.55; }
+    .detail-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+    .detail-primary, .detail-link {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: transparent;
+      padding: 9px 12px;
+      color: inherit;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .brief-link { color: var(--accent); font-weight: 700; text-underline-offset: 3px; }
+    .brief-link:hover { text-decoration-thickness: 2px; }
+    .detail-primary { border-color: var(--accent); background: var(--accent); color: #fff; }
+    .detail-link:hover { border-color: var(--accent); color: var(--accent); }
+    .detail-block { padding-top: 28px; margin-top: 28px; border-top: 1px solid var(--line); }
+    .detail-block h3 { margin: 0 0 13px; font-size: 13px; }
+    .detail-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 22px; }
+    .detail-fact { padding: 12px 0; border-bottom: 1px solid var(--line); }
+    .detail-fact-label { color: var(--muted); font-family: "IBM Plex Mono", monospace; font-size: 9px; letter-spacing: .05em; text-transform: uppercase; }
+    .detail-fact-value { margin-top: 4px; font-size: 13px; font-weight: 650; overflow-wrap: anywhere; }
+    .detail-copy { margin: 0; color: var(--muted); font-size: 14px; }
+    .detail-next { margin: 0; font-size: 16px; font-weight: 650; line-height: 1.5; }
+    .detail-relations { display: flex; flex-wrap: wrap; gap: 7px; }
+    .detail-empty { color: var(--muted); font-size: 13px; }
+    .detail-close:focus-visible, .detail-primary:focus-visible, .detail-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .scrim { display: none; }
+
+    @media (max-width: 820px) {
+      .app { display: block; }
+      .sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: min(88vw, 330px);
+        display: none;
+        box-shadow: 18px 0 40px rgba(0,0,0,.3);
+      }
+      body.menu-open .sidebar { display: flex; }
+      .scrim {
+        position: fixed;
+        inset: 0;
+        display: none;
+        border: 0;
+        background: rgba(0,0,0,.45);
+        z-index: 15;
+      }
+      body.menu-open .scrim { display: block; }
+      .menu-btn { display: grid; place-items: center; flex: 0 0 auto; }
+      .topbar { padding: 0 16px; justify-content: flex-start; }
+      .crumb { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .updated { display: none; }
+      .content { padding: 34px 20px 64px; }
+      .buddy-header { grid-template-columns: 1fr; gap: 24px; align-items: start; }
+      .status-stamp { width: 100%; box-shadow: none; border: 1px solid var(--line); border-top: 3px solid var(--accent); }
+      .section-tabs { overflow: visible; flex-wrap: wrap; top: 62px; }
+      .overview-grid { grid-template-columns: 1fr; }
+      .fact { padding: 19px 0; }
+      .fact + .fact { border-left: 0; border-top: 1px solid var(--line); padding-left: 0; }
+      .section-heading { grid-template-columns: 1fr; gap: 9px; }
+      .collapsible-header { grid-template-columns: minmax(0, 1fr) auto; gap: 9px; }
+      .collapsible-header p { grid-column: 1; }
+      .collapsible-chevron { grid-column: 2; grid-row: 1; }
+      .focus-list, .next-card, .related-wrap { margin-left: 0; }
+      .directory-toolbar { align-items: flex-start; flex-direction: column; }
+      .view-switch { width: 100%; }
+      .view-btn { min-width: 0; padding-inline: 7px; font-size: 12px; }
+      .directory-workspace { grid-template-columns: minmax(0, 1fr) 52px; gap: 8px; }
+      .directory-viewport { max-height: none; overflow: visible; }
+      .zoom-dock { top: 132px; width: 52px; padding-inline: 3px; }
+      .zoom-slider { height: 92px; }
+      .zoom-value, .zoom-reset { min-width: 42px; width: 42px; }
+      .org-chart ul {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 12px 0 0 17px;
+      }
+      .org-chart > ul { padding: 0; }
+      .org-chart li, .org-chart > ul > li, .org-chart li.org-branch-expanded { min-width: 0; width: 100%; }
+      .org-chart li > ul { margin: 10px 0 0 10px; border-left: 1px solid var(--line-strong); }
+      .org-chart li > ul::before, .org-chart li > ul::after, .org-chart li > ul > li:not(.org-drop-slot)::before { display: none; }
+      .org-node { width: 100%; margin: 0; }
+      .org-drop-slot { min-height: 10px; width: 100%; }
+      .hierarchy-tree ul { margin-left: 10px; padding-left: 17px; }
+      .hierarchy-tree ul > li::before { left: -17px; width: 17px; }
+      .tree-node { min-width: 0; width: 100%; max-width: 100%; }
+      .tree-node-stage { display: none; }
+      .child-count { display: none; }
+      .outline-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        padding-left: calc(6px + var(--depth, 0) * 13px);
+      }
+      .outline-parent { display: none; }
+      .detail-layer { grid-template-columns: 1fr; }
+      .detail-panel { grid-column: 1; width: 100%; border-left: 0; }
+      .detail-facts { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .sidebar, .scrim { transition: none; }
+    }
+  </style>
 </head>
 <body>
-<div class="app">
-<aside id="sidebar">
-  <div class="brand"><div class="eyebrow">Project Buddy &middot; macro view</div><h1>The Buddy Tree</h1><div class="bcount">39 buddies &middot; one family</div></div>
-  <div class="nav-sec"><h3>Views</h3><div id="view-nav"></div></div>
-  <div class="nav-sec"><h3>Buddies <span id="attn-pill" class="zero">0</span></h3><div id="buddy-nav"></div></div>
-</aside>
-<main id="main">
-<div id="view-tree" class="view">
-    <div class="chart">
-      <div style="text-align:center">
-        <div class="node root">
-          <div class="name">Project Buddy</div>
-          <div class="desc">The macro view &mdash; status &amp; next action items for every buddy.<br>Every buddy inherits its tools, knowledge base &amp; dashboard behavior from here.</div>
+  <div class="app">
+    <aside class="sidebar" aria-label="Buddy directory">
+      <div class="sidebar-head">
+        <div class="sidebar-label"><strong>All buddies</strong><span class="count" id="buddyCount">0</span></div>
+        <label class="search-wrap">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.4-3.4"></path></svg>
+          <input id="buddySearch" type="search" placeholder="Find a buddy" autocomplete="off" aria-label="Find a buddy" />
+        </label>
+      </div>
+      <nav class="buddy-nav" id="buddyNav"></nav>
+    </aside>
+
+    <button class="scrim" id="scrim" aria-label="Close buddy list"></button>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="menu-btn" id="menuButton" type="button" aria-label="Open buddy list" aria-expanded="false">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+        </button>
+        <div class="crumb">Buddy directory <span aria-hidden="true">/</span> <strong id="crumbName"></strong></div>
+        <div class="updated" id="directoryMeta">One registry</div>
+      </header>
+      <article class="content" id="buddyPage" aria-live="polite"></article>
+    </main>
+  </div>
+
+  <script>
+    /*
+      BUDDY REGISTRY
+      ---------------
+      This single array is the source of truth for the sidebar and every home page.
+      To add a buddy, copy one clearly-delimited object below, give it a unique id,
+      and fill in its home-page content. Add an optional alias when a preferred display
+      name is wanted. No markup or navigation changes are needed.
+    */
+    const buddies = [
+      // ── Project Buddy ──────────────────────────────────────────────────────
+      {
+        id: "project-buddy", name: "Project Buddy", alias: "Dave's projects", group: "Core", parent: "Buddy Suite",
+        stage: "Active", color: "#ef6a43",
+        summary: "The front door for turning ideas into real, organized projects — and the directory for the entire Buddy family.",
+        owns: "Project intake, idea status, launch packages, hierarchy, and the project dashboard.",
+        source: "Product brief + tool spec", updated: "Today",
+        focus: [
+          ["Capture", "Give every promising idea a durable home instead of leaving it buried in a chat."],
+          ["Launch", "Create the standard package: thread, brief, repository, review ask, and memory updates."],
+          ["See the whole system", "Keep the Buddy hierarchy visible and make every Buddy home reachable from one place."]
+        ],
+        next: "Keep this registry as the single source: each new entry automatically joins the sidebar and gets a complete home page.",
+        related: ["buddy-suite", "scaffold-buddy", "document-buddy"]
+      },
+
+      // ── Buddy Suite ────────────────────────────────────────────────────────
+      {
+        id: "buddy-suite", name: "Buddy Suite", group: "Core", parent: "—",
+        stage: "Brief review", color: "#ef6a43",
+        summary: "The umbrella for the Buddy family: shared product language, design system, positioning, and business model.",
+        owns: "Brand, cross-product conventions, monetization, and the way buddies work together.",
+        source: "Product brief", updated: "Today",
+        focus: [["Coherence", "Make separate buddies feel like one thoughtful family."],["Business", "Define how the suite can sustain itself without diluting the products."],["Shared language", "Standardize the concepts users should only have to learn once."]],
+        next: "Review the suite brief and settle the working name before expanding the shared system.",
+        related: ["project-buddy", "scaffold-buddy"]
+      },
+
+      // ── Scaffold Buddy ─────────────────────────────────────────────────────
+      {
+        id: "scaffold-buddy", name: "Scaffold Buddy", group: "Core", parent: "Project Buddy",
+        stage: "Brief review", color: "#ef6a43",
+        summary: "Designs and versions the repeatable skeleton that every new Buddy starts from.",
+        owns: "README, durable knowledge, decisions, curation rules, and kickoff structure.",
+        source: "Product brief", updated: "Today",
+        focus: [["A strong start", "Stamp every new project with useful structure on day one."],["Durable knowledge", "Separate lasting facts and decisions from the conversational thread."],["Evolution", "Improve the scaffold once and let future buddies inherit the lesson."]],
+        next: "Review the brief, then define the first versioned template.",
+        related: ["project-buddy", "document-buddy"]
+      },
+
+      // ── Feedback Buddy ─────────────────────────────────────────────────────
+      {
+        id: "feedback-buddy", name: "Feedback Buddy", group: "Core", parent: "Project Buddy",
+        stage: "Brief review", color: "#ef6a43",
+        summary: "Captures product feedback, finds the right destination, and tracks what was filed, fixed, or shipped.",
+        owns: "Feature requests, bug reports, missing integrations, praise, routing, and ship watch.",
+        source: "Product brief", updated: "Today",
+        focus: [["Capture anywhere", "Turn a moment of friction into a clean report without derailing the current task."],["Route intelligently", "Find the real feedback channel for the organization involved."],["Close the loop", "Deduplicate reports and notice when a requested change actually ships."]],
+        next: "Review the brief, then choose the first filing channels beyond Muse.",
+        related: ["project-buddy", "relationship-buddy"]
+      },
+
+      // ── Document Buddy ─────────────────────────────────────────────────────
+      {
+        id: "document-buddy", name: "Document Buddy", group: "Core", parent: "Project Buddy",
+        stage: "Brief review", color: "#ef6a43",
+        summary: "Adds the missing organizational layer around working documents and answers what is being worked on.",
+        owns: "Document grouping, status, metadata, and useful rollups across projects.",
+        source: "Product brief", updated: "Today",
+        focus: [["Organize", "Make active documents easier to find than a flat drive listing."],["Understand", "Keep enough context to know why a document matters."],["Report", "Produce a crisp view of current work without manual archaeology."]],
+        next: "Review the brief and decide which document metadata is truly essential.",
+        related: ["project-buddy", "scaffold-buddy"]
+      },
+
+      // ── Property Buddy ─────────────────────────────────────────────────────
+      {
+        id: "property-buddy", name: "Property Buddy", group: "Home & family", parent: "Project Buddy",
+        stage: "Brief review", color: "#3b8c67",
+        summary: "The shared shape for keeping each property’s records, maintenance, contractors, history, and future plans together.",
+        owns: "Property records, repair history, receipts, contractors, maintenance, reminders, and wishlist items.",
+        source: "Product brief", updated: "Today",
+        focus: [["One history", "Keep the whole life of a property in one understandable timeline."],["Maintain", "Know what needs attention and when."],["Roll up", "Let property-specific buddies share a common knowledge base."]],
+        next: "Review the generic property model against the Lenwood and Cabin cases.",
+        related: ["lenwood-buddy", "cabin-buddy", "housing-buddy"]
+      },
+
+      // ── Lenwood Buddy ──────────────────────────────────────────────────────
+      {
+        id: "lenwood-buddy", name: "Lenwood Buddy", group: "Home & family", parent: "Property Buddy",
+        stage: "Active", color: "#3b8c67",
+        summary: "The home for Lenwood records, service visits, ideas, financial context, and decisions about the property’s future.",
+        owns: "Property timeline, service log, documents, ideas, options, and decision history.",
+        source: "Buddy page + product brief", updated: "Today",
+        focus: [["Service history", "Log visits and work so the property’s story is not scattered across messages."],["Ideas", "Collect possible futures without forcing a premature decision."],["Shared understanding", "Keep the relevant people aligned around the same facts."]],
+        next: "Confirm the two recent service crews and continue building the property timeline.",
+        related: ["property-buddy", "family-buddy"]
+      },
+
+      // ── Cabin Buddy ────────────────────────────────────────────────────────
+      {
+        id: "cabin-buddy", name: "Cabin Buddy", group: "Home & family", parent: "Property Buddy",
+        stage: "Active", color: "#3b8c67",
+        summary: "The property companion for the cabin: maintenance, equipment, contractors, recurring care, and household knowledge.",
+        owns: "Cabin maintenance, equipment, service history, routines, and property-specific knowledge.",
+        source: "Existing thread + knowledge base", updated: "Today",
+        focus: [["Maintenance", "Track recurring care and repairs across the whole property."],["Equipment", "Keep useful details for tools, systems, and household equipment close at hand."],["Children", "Roll up focused companions such as Hot Tub Buddy without flattening their expertise."]],
+        next: "Keep the maintenance log current and connect focused child buddies into the rollup.",
+        related: ["property-buddy", "hot-tub-buddy", "party-buddy", "tech-buddy"]
+      },
+
+      // ── Party Buddy ────────────────────────────────────────────────────────
+      {
+        id: "party-buddy", name: "Party Buddy", group: "Home & family", parent: "Cabin Buddy",
+        stage: "Brief review", color: "#3b8c67",
+        summary: "Plans and tracks hosted gatherings — guest lists, food/drink plans, setup checklists, dates. The cabin is the venue.",
+        owns: "Hosted gatherings at the cabin: dates, guest lists, food and drink, setup, references, and the details that make people feel welcome.",
+        source: "Product brief", updated: "Today",
+        focus: [
+          ["First gathering", "Soup party — everyone brings a different soup; foil muffin pans hold the little tasting samples so you can taste them all, with bread, crackers, and a few toppings for the coziest gathering of friends."],
+          ["Host plan", "Keep the date, guest list, food and drink, setup, and cleanup in one practical plan."],
+          ["Saved references", "A picture and a Facebook post link are waiting to be attached later."]
+        ],
+        next: "Choose a date and guest list, then attach the saved picture and Facebook post link.",
+        related: ["cabin-buddy", "family-buddy"]
+      },
+
+      // ── Hot Tub Buddy ──────────────────────────────────────────────────────
+      {
+        id: "hot-tub-buddy", name: "Hot Tub Buddy", group: "Home & family", parent: "Cabin Buddy",
+        stage: "Brief review", color: "#3b8c67",
+        summary: "A focused care companion for the hot tub, combining treatments, usage, supplies, and the equipment knowledge base.",
+        owns: "Treatment schedule, treatment and usage log, chemistry guidance, filters, supplies, and reorders.",
+        source: "Product brief + active reminders", updated: "Today",
+        focus: [["Water care", "Make the right treatment cadence obvious."],["History", "Keep treatments and use together so patterns are visible."],["Supplies", "Know the right parts and confirm compatibility before ordering."]],
+        next: "Establish the last treatment date and confirm the sanitizer setup.",
+        related: ["cabin-buddy", "reminder-buddy"]
+      },
+
+      // ── Family Buddy ───────────────────────────────────────────────────────
+      {
+        id: "family-buddy", name: "Family Buddy", group: "Home & family", parent: "Project Buddy",
+        stage: "New", color: "#3b8c67",
+        summary: "Family projects — shared with the household, not just Dave.",
+        owns: "Shared family projects, household coordination, and rollups from family-focused buddies.",
+        source: "Direction set", updated: "Today",
+        focus: [["Shared", "Shape work around what the household needs together."],["Clear ownership", "Keep family projects separate from individual personal operations."],["Connected", "Provide a natural parent for focused household companions."]],
+        next: "Run the full new-buddy drill and define the first shared use cases.",
+        related: ["pet-buddy", "lenwood-buddy", "relationship-buddy"]
+      },
+
+      // ── Jessica Buddy ──────────────────────────────────────────────────────
+      {
+        id: "jessica-buddy", name: "Jessica Buddy", group: "Home & family", parent: "Family Buddy",
+        stage: "Brief review", color: "#3b8c67",
+        summary: "A living dossier for Sawyer’s aunt Jessica, keeping the details that make family follow-through thoughtful and timely.",
+        owns: "Key facts, important dates, notes, reminders, and gift ideas for Jessica.",
+        source: "Product brief", updated: "Today",
+        brief: "https://docs.google.com/document/d/1u0sPo4bFl11BBl_j8wTfcA0U0KH0pzjhQDE9j_Ey8Fg/edit",
+        focus: [["Know", "Keep useful facts and family context together."],["Remember", "Hold important dates and timely reminders."],["Be thoughtful", "Collect notes and gift ideas for future occasions."]],
+        next: "Review the brief and begin the dossier with confirmed details as they come up.",
+        related: ["family-buddy", "sawyer-buddy"]
+      },
+
+      // ── Amanda Buddy ───────────────────────────────────────────────────────
+      {
+        id: "amanda-buddy", name: "Amanda Buddy", group: "Home & family", parent: "Family Buddy",
+        stage: "Brief review", color: "#3b8c67",
+        summary: "A living dossier for Amanda, Quentin’s girlfriend and fiancée, built for useful family context and considerate follow-through.",
+        owns: "Key facts, important dates, notes, reminders, and gift ideas for Amanda.",
+        source: "Product brief", updated: "Today",
+        brief: "https://docs.google.com/document/d/19zf1xyyTehPRpoOeyEIJG84OntfsplxEmUTe5Qb3nlo/edit",
+        focus: [["Know", "Keep useful facts and family context together."],["Remember", "Hold important dates and timely reminders."],["Be thoughtful", "Collect notes and gift ideas for future occasions."]],
+        next: "Review the brief and begin the dossier with confirmed details as they come up.",
+        related: ["family-buddy", "quentin-buddy"]
+      },
+
+      // ── Quentin Buddy ──────────────────────────────────────────────────────
+      {
+        id: "quentin-buddy", name: "Quentin Buddy", group: "Home & family", parent: "Family Buddy",
+        stage: "Brief review", color: "#3b8c67",
+        summary: "A living dossier for Dave’s son Quentin, keeping family knowledge, milestones, and thoughtful follow-through in one place.",
+        owns: "Key facts, important dates, notes, reminders, and gift ideas for Quentin.",
+        source: "Product brief", updated: "Today",
+        brief: "https://docs.google.com/document/d/157C3sNyJcRIgzNevCbwuWx7V1F4YPYZRwjw1TOCUaNA/edit",
+        focus: [["Know", "Keep useful facts and family context together."],["Remember", "Hold important dates and timely reminders."],["Be thoughtful", "Collect notes and gift ideas for future occasions."]],
+        next: "Review the brief and begin the dossier with confirmed details as they come up.",
+        related: ["family-buddy", "amanda-buddy"]
+      },
+
+      // ── Pops Buddy ─────────────────────────────────────────────────────────
+      {
+        id: "pops-buddy", name: "Pops Buddy", group: "Home & family", parent: "Family Buddy",
+        stage: "Brief review", color: "#3b8c67",
+        summary: "A living dossier for Pops, keeping useful family knowledge and considerate follow-through organized over time.",
+        owns: "Key facts, important dates, notes, reminders, and gift ideas for Pops.",
+        source: "Product brief", updated: "Today",
+        brief: "https://docs.google.com/document/d/160SLTRiRiIiYqwdzx9pgXf-7Wiq8zoEtZpAtq43qoxE/edit",
+        focus: [["Know", "Keep useful facts and family context together."],["Remember", "Hold important dates and timely reminders."],["Be thoughtful", "Collect notes and gift ideas for future occasions."]],
+        next: "Review the brief and begin the dossier with confirmed details as they come up.",
+        related: ["family-buddy"]
+      },
+
+      // ── Emile Buddy ────────────────────────────────────────────────────────
+      {
+        id: "emile-buddy", name: "Emile Buddy", group: "Home & family", parent: "Family Buddy",
+        stage: "Brief review", color: "#3b8c67",
+        summary: "A living dossier for Dave’s middle brother Emile, keeping family context, milestones, and thoughtful follow-through together.",
+        owns: "Key facts, important dates, notes, reminders, and gift ideas for Emile.",
+        source: "Product brief", updated: "Today",
+        brief: "https://docs.google.com/document/d/19I51Rb1nbHZQT9zDZ6JDW8M5zI2WejrSSb-hfYrq0zA/edit",
+        focus: [["Know", "Keep useful facts and family context together."],["Remember", "Hold important dates and timely reminders."],["Be thoughtful", "Collect notes and gift ideas for future occasions."]],
+        next: "Review the brief and begin the dossier with confirmed details as they come up.",
+        related: ["family-buddy"]
+      },
+
+      // ── Nancy Buddy ────────────────────────────────────────────────────────
+      {
+        id: "nancy-buddy", name: "Nancy Buddy", group: "Home & family", parent: "Family Buddy",
+        stage: "Brief review", color: "#3b8c67",
+        summary: "A living dossier for Nan, keeping useful family knowledge, dates, notes, and thoughtful ideas easy to revisit.",
+        owns: "Key facts, important dates, notes, reminders, and gift ideas for Nan.",
+        source: "Product brief", updated: "Today",
+        brief: "https://docs.google.com/document/d/1cYab49CDpdfPlD5xzL0EXKm11XAObvBhi0yPw_2Pskk/edit",
+        focus: [["Know", "Keep useful facts and family context together."],["Remember", "Hold important dates and timely reminders."],["Be thoughtful", "Collect notes and gift ideas for future occasions."]],
+        next: "Review the brief and begin the dossier with confirmed details as they come up.",
+        related: ["family-buddy", "party-buddy"]
+      },
+
+      // ── Sawyer Buddy ───────────────────────────────────────────────────────
+      {
+        id: "sawyer-buddy", name: "Sawyer Buddy", group: "Home & family", parent: "Family Buddy",
+        stage: "Brief review", color: "#3b8c67",
+        summary: "A living dossier for Dave’s son Sawyer, keeping family knowledge, milestones, and thoughtful follow-through in one place.",
+        owns: "Key facts, important dates, notes, reminders, and gift ideas for Sawyer.",
+        source: "Product brief", updated: "Today",
+        brief: "https://docs.google.com/document/d/16VYGF2gZDYNu5pKPXne8B2qOc35pxWmW0Ddej2z2WH0/edit",
+        focus: [["Know", "Keep useful facts and family context together."],["Remember", "Hold important dates and timely reminders."],["Be thoughtful", "Collect notes and gift ideas for future occasions."]],
+        next: "Review the brief and begin the dossier with confirmed details as they come up.",
+        related: ["family-buddy", "jessica-buddy"]
+      },
+
+      // ── Pet Buddy ──────────────────────────────────────────────────────────
+      {
+        id: "pet-buddy", name: "Pet Buddy", group: "Home & family", parent: "Family Buddy",
+        stage: "Brief review", color: "#3b8c67",
+        summary: "Keeps each pet’s health and care history complete and easy to hand to the right person when needed.",
+        owns: "Pet profiles, medications, veterinary visits, vaccinations, and care history.",
+        source: "Product brief", updated: "Today",
+        focus: [["Profiles", "One clear record for each pet."],["Health timeline", "Keep visits, vaccinations, and medication changes in sequence."],["Care handoff", "Make the current care picture easy to share within the household."]],
+        next: "Review the brief and define the minimum useful pet profile.",
+        related: ["family-buddy", "reminder-buddy"]
+      },
+
+      // ── Finance Buddy ──────────────────────────────────────────────────────
+      {
+        id: "finance-buddy", name: "Finance Buddy", group: "Money", parent: "Project Buddy",
+        stage: "Container", color: "#b07a19",
+        summary: "The parent for money products, providing a shared view across spending, planning, and investing.",
+        owns: "Finance-wide knowledge and rollups from Money Buddy and Investment Buddy.",
+        source: "Hierarchy defined", updated: "Today",
+        focus: [["One picture", "Join day-to-day money and long-term investing without confusing their jobs."],["Shared context", "Let child buddies inherit the financial context they need."],["Boundaries", "Keep research, spending decisions, and investment decisions clearly separated."]],
+        next: "Define the smallest useful parent dashboard across its two child buddies.",
+        related: ["money-buddy", "investment-buddy"]
+      },
+
+      // ── Money Buddy ────────────────────────────────────────────────────────
+      {
+        id: "money-buddy", name: "Money Buddy", group: "Money", parent: "Finance Buddy",
+        stage: "Building", color: "#b07a19",
+        summary: "A crafted personal finance companion for understanding spending, planning the month, and making everyday money feel manageable.",
+        owns: "Accounts, transactions, budgets, bills, planned purchases, and month-start funding.",
+        source: "Working product", updated: "Yesterday",
+        focus: [["Clarity", "Make the transaction stream understandable instead of merely complete."],["Planning", "Turn budgets and upcoming bills into a useful month-start number."],["Craft", "Use personality and careful interaction design as a genuine product advantage."]],
+        next: "Review the first-run overhaul, then complete the next onboarding and disclosure decisions.",
+        related: ["finance-buddy", "investment-buddy"]
+      },
+
+      // ── Investment Buddy ───────────────────────────────────────────────────
+      {
+        id: "investment-buddy", name: "Investment Buddy", group: "Money", parent: "Finance Buddy",
+        stage: "Building", color: "#b07a19",
+        summary: "Organizes investment ideas, research, watchlists, holdings, signals, and news without making the final decision for you.",
+        owns: "Ideas, company research, holdings, watchlist, underperformance signals, news, and audio briefings.",
+        source: "PRD + implementation", updated: "Yesterday",
+        focus: [["Research", "Make company investigation fast and repeatable."],["Signals", "Surface what deserves attention without pretending a signal is a decision."],["Listen", "Turn the most important findings into a useful audio summary."]],
+        next: "Continue the ideas and watchlist build, then validate the first signal workflow.",
+        related: ["finance-buddy", "money-buddy", "briefing-buddy"]
+      },
+
+      // ── Personal Buddy ─────────────────────────────────────────────────────
+      {
+        id: "personal-buddy", name: "Personal Buddy", group: "Personal", parent: "Project Buddy",
+        stage: "Brief review", color: "#4f7ea3",
+        summary: "The personal-ops home for things that need research, sorting out, or a real decision when there is not time to solve them immediately.",
+        owns: "Unresolved personal questions, parked research, decisions, and follow-up reminders.",
+        source: "Product brief", updated: "Today",
+        focus: [["Capture", "Save a real problem without losing the context that makes it solvable."],["Figure it out", "Turn vague friction into options and a decision path."],["Follow through", "Bring the right issue back when there is time and context to act."]],
+        next: "Review the brief and test the model against the first parked calendar problem.",
+        related: ["career-buddy", "travel-buddy", "relationship-buddy"]
+      },
+
+      // ── Reminder Buddy ─────────────────────────────────────────────────────
+      {
+        id: "reminder-buddy", name: "Reminder Buddy", group: "Personal", parent: "Personal Buddy",
+        stage: "Brief review", color: "#4f7ea3",
+        summary: "A dependable reminder companion built to make sure commitments and follow-ups do not fall through the cracks.",
+        owns: "Fast capture, reminders, follow-up, open-item review, and task-system migration questions.",
+        source: "Product brief", updated: "Yesterday",
+        focus: [["Capture fast", "Record an obligation with almost no friction."],["Follow up", "Notice what is still open rather than stopping at the first notification."],["Earn trust", "Be persistent enough to help without becoming noise."]],
+        next: "Decide whether it is a standalone product, a shared Buddy capability, or both.",
+        related: ["personal-buddy", "project-buddy"]
+      },
+
+      // ── Dream Buddy ────────────────────────────────────────────────────────
+      {
+        id: "dream-buddy", name: "Dream Buddy", group: "Personal", parent: "Personal Buddy",
+        stage: "Build ready", color: "#4f7ea3",
+        summary: "A voice-first dream journal that captures dreams before they evaporate and finds patterns across time.",
+        owns: "Fast capture, dream organization, recurring motifs, pattern review, and sleep-context connections.",
+        source: "Approved brief + PRD", updated: "Today",
+        focus: [["Catch it", "Make the first waking moments enough to preserve a dream."],["Organize gently", "Add structure without flattening the strange details that matter."],["See patterns", "Reveal recurring people, places, emotions, and themes over time."]],
+        next: "Begin the first build from the approved PRD.",
+        related: ["personal-buddy", "zen-buddy"]
+      },
+
+      // ── Travel Buddy ───────────────────────────────────────────────────────
+      {
+        id: "travel-buddy", name: "Travel Buddy", group: "Personal", parent: "Personal Buddy",
+        stage: "Brief review", color: "#4f7ea3",
+        summary: "A planning companion for trips, itineraries, logistics, and the details that make travel run smoothly.",
+        owns: "Trip planning, itinerary structure, travel logistics, and pre-trip coordination.",
+        source: "Product brief", updated: "Today",
+        focus: [["Plan", "Turn a destination or purpose into a coherent trip."],["Coordinate", "Keep bookings, timing, and transfers understandable."],["Travel well", "Surface the practical details at the moment they matter."]],
+        next: "Review the brief and sharpen the direction beyond the initial working interpretation.",
+        related: ["personal-buddy", "reminder-buddy"]
+      },
+
+      // ── Relationship Buddy ─────────────────────────────────────────────────
+      {
+        id: "relationship-buddy", name: "Relationship Buddy", group: "Personal", parent: "Personal Buddy",
+        stage: "Brief review", color: "#4f7ea3",
+        summary: "A companion for tending the relationships that matter through memory, attention, and timely follow-through.",
+        owns: "People notes, milestones, stay-in-touch rhythms, and relationship follow-up.",
+        source: "Product brief", updated: "Today",
+        focus: [["Remember", "Keep the context that makes a future conversation more thoughtful."],["Reach out", "Make good intentions more likely to turn into contact."],["Respect", "Help with attention and follow-through without mechanizing relationships."]],
+        next: "Review the brief and define the boundary between useful memory and over-structuring.",
+        related: ["personal-buddy", "family-buddy", "feedback-buddy"]
+      },
+
+      // ── Career Buddy ───────────────────────────────────────────────────────
+      {
+        id: "career-buddy", name: "Career Buddy", group: "Personal", parent: "Personal Buddy",
+        stage: "Brief review", color: "#4f7ea3",
+        summary: "A long-view companion for career goals, skill growth, and staying ready for the next chapter.",
+        owns: "Career direction, growth plans, skill development, and future readiness.",
+        source: "Product brief", updated: "Today",
+        focus: [["Direction", "Turn broad career ambition into a visible path."],["Growth", "Connect desired roles to concrete skills and experiences."],["Readiness", "Keep the materials and story needed for future opportunities current."]],
+        next: "Review the brief and clarify where Career Buddy ends and Job Buddy begins.",
+        related: ["personal-buddy", "job-buddy", "school-buddy"]
+      },
+
+      // ── School Buddy ───────────────────────────────────────────────────────
+      {
+        id: "school-buddy", name: "School Buddy", group: "Personal", parent: "Personal Buddy",
+        stage: "Direction set", color: "#4f7ea3",
+        summary: "A curiosity-led learning companion that starts with one question: What do you want to learn?",
+        owns: "Learning goals, generated plans, study paths, progress, and useful source material.",
+        source: "Updated product brief", updated: "Today",
+        focus: [["Start with curiosity", "Let the learner’s real question define the path."],["Build a plan", "Turn an open-ended subject into an achievable sequence."],["Keep momentum", "Make the next useful learning step obvious."]],
+        next: "Review the updated brief and define the first end-to-end learning-plan experience.",
+        related: ["personal-buddy", "career-buddy", "wisdom-buddy"]
+      },
+
+      // ── Zen Buddy ──────────────────────────────────────────────────────────
+      {
+        id: "zen-buddy", name: "Zen Buddy", group: "Personal", parent: "Personal Buddy",
+        stage: "Brief review", color: "#4f7ea3",
+        summary: "A practice-oriented companion for meditation, spirituality, breathwork, and becoming more grounded over time.",
+        owns: "Practice sessions, routines, breathwork, reminders, and reflective progress.",
+        source: "Product brief", updated: "Today",
+        focus: [["Practice", "Center doing rather than collecting content."],["Rhythm", "Attach sessions to routines that can actually last."],["Reflect", "Notice changes in experience without turning calm into a score chase."]],
+        next: "Review the brief and choose the first practice loop.",
+        related: ["personal-buddy", "dream-buddy", "wisdom-buddy"]
+      },
+
+      // ── Work Buddy ─────────────────────────────────────────────────────────
+      {
+        id: "work-buddy", name: "Work Buddy", group: "Work & making", parent: "Project Buddy",
+        stage: "Brief review", color: "#7c6d55",
+        summary: "A companion for succeeding at the job you have: people context, meeting preparation, commitments, and better time estimates.",
+        owns: "Work relationships, meeting briefs, commitments, check-in cadence, estimates, actuals, and calibration.",
+        source: "Buddy page + product brief", updated: "Today",
+        focus: [["Prepare", "Bring the right context and open loops into each important conversation."],["Commit", "Capture the work agreed to in conversations with others."],["Calibrate", "Compare estimates with actual time so future promises get better."]],
+        next: "Use the first real task as the opening estimate-versus-actual calibration point.",
+        related: ["project-buddy", "career-buddy", "job-buddy"]
+      },
+
+      // ── Job Buddy ──────────────────────────────────────────────────────────
+      {
+        id: "job-buddy", name: "Job Buddy", group: "Work & making", parent: "Career Buddy",
+        stage: "Brief review", color: "#7c6d55",
+        summary: "A proactive job-search companion that learns what fits, finds opportunities, and prepares tailored materials for approval.",
+        owns: "Opportunity discovery, master profile, tailored resumes, recruiter tracking, triage, and drafts.",
+        source: "Product brief", updated: "Yesterday",
+        focus: [["Discover", "Find credible roles worth attention instead of producing a noisy feed."],["Tailor", "Adapt the story and materials to each opportunity."],["Approve", "Keep every external response under explicit human sign-off."]],
+        next: "Resolve which opportunity sources are reliably reachable for the first version.",
+        related: ["career-buddy", "work-buddy"]
+      },
+
+      // ── Tech Buddy ─────────────────────────────────────────────────────────
+      {
+        id: "tech-buddy", name: "Tech Buddy", group: "Work & making", parent: "Project Buddy",
+        stage: "Brief review", color: "#7c6d55",
+        summary: "A personal technology inventory and patient gadget tutor for the devices, tools, and systems you already own.",
+        owns: "Device inventory, purchase records, warranties, relevant updates, and step-by-step guidance.",
+        source: "Product brief", updated: "Today",
+        focus: [["Know what you own", "Keep model, location, purchase, and warranty context together."],["Use it better", "Turn manuals and technical friction into guided steps."],["Stay current", "Surface only the updates and deals relevant to the actual inventory."]],
+        next: "Review the brief and test the experience on the first radio-programming mission.",
+        related: ["cabin-buddy", "car-buddy"]
+      },
+
+      // ── Car Buddy ──────────────────────────────────────────────────────────
+      {
+        id: "car-buddy", name: "Car Buddy", group: "Work & making", parent: "Project Buddy",
+        stage: "PRD ready", color: "#7c6d55",
+        summary: "A garage-first service and ownership record for every car, replacing a generic database with an experience built for the job.",
+        owns: "Vehicle profiles, service history, due service, parts, mileage, providers, and location.",
+        source: "Product brief + PRD", updated: "Oct 7",
+        focus: [["History", "Know exactly what was done, when, at what mileage, and by whom."],["Due next", "Translate service intervals into a clear upcoming list."],["Garage ready", "Make logging work comfortable on a phone with dirty hands nearby."]],
+        next: "Begin the first build from the approved data and interaction model.",
+        related: ["tech-buddy", "reminder-buddy"]
+      },
+
+      // ── Housing Buddy ──────────────────────────────────────────────────────
+      {
+        id: "housing-buddy", name: "Housing Buddy", group: "Work & making", parent: "Project Buddy",
+        stage: "PRD review", color: "#7c6d55",
+        summary: "A know-your-market real-estate tool for understanding a home’s value and finding places that fit real requirements.",
+        owns: "Valuation, estimate history, requirements-based search, area context, and market watch.",
+        source: "Approved brief + PRD", updated: "Yesterday",
+        focus: [["Value", "Combine available estimates with enough history to be useful."],["Search by life", "Start with requirements instead of a pile of listings."],["Know the area", "Put the property in a fuller neighborhood and market context."]],
+        next: "Review the PRD and decide whether the proposed data stack is worth its cost and constraints.",
+        related: ["property-buddy"]
+      },
+
+      // ── TV Buddy ───────────────────────────────────────────────────────────
+      {
+        id: "tv-buddy", name: "TV Buddy", group: "Work & making", parent: "Project Buddy",
+        stage: "PRD ready", color: "#7c6d55",
+        summary: "Ends the nightly what-should-we-watch dead air with a mood-matched pick that is ready to play quickly.",
+        owns: "Mood input, source availability, fast recommendations, and a household viewing ledger.",
+        source: "Product brief + PRD", updated: "Oct 7",
+        focus: [["Mood first", "Ask how the night should feel before asking for genres."],["Two minutes", "Optimize for getting to play, not browsing more."],["Use your sources", "Recommend from the services and library actually available."]],
+        next: "Prototype the Mood Dial and validate whether it reaches a confident pick fast enough.",
+        related: ["family-buddy"]
+      },
+
+      // ── Briefing Buddy ─────────────────────────────────────────────────────
+      {
+        id: "briefing-buddy", name: "Briefing Buddy", group: "Work & making", parent: "Project Buddy",
+        stage: "Brief review", color: "#7c6d55",
+        summary: "A personalized news companion for designing, reading, and listening to briefings built around the topics that matter.",
+        owns: "Topics, briefing design, news gathering, local coverage, summaries, and listen mode.",
+        source: "Product brief", updated: "Yesterday",
+        focus: [["Personalize", "Treat topics and briefing design as the real product."],["Gather well", "Use a dependable research layer shared with adjacent products."],["Listen", "Make the same briefing useful when eyes are busy."]],
+        next: "Choose the product boundary and define how deep personalization should go in v1.",
+        related: ["investment-buddy", "project-buddy"]
+      },
+
+      // ── Wisdom Buddy ───────────────────────────────────────────────────────
+      {
+        id: "wisdom-buddy", name: "Wisdom Buddy", group: "Work & making", parent: "Project Buddy",
+        stage: "Pilot design", color: "#7c6d55",
+        summary: "A curated wisdom practice built around a useful library and a feedback loop strong enough to keep the habit alive.",
+        owns: "Wisdom library, curation, delivery, recipient feedback, and pilot learning.",
+        source: "Product brief + PRD", updated: "Oct 7",
+        focus: [["Curate", "Preserve the small pieces of wisdom worth returning to."],["Deliver", "Put the right nugget in front of the right person at a useful moment."],["Learn", "Make recipient engagement — not automation — the central pilot question."]],
+        next: "Run the eight-week pilot only when the feedback loop is ready to test.",
+        related: ["school-buddy", "zen-buddy"]
+      },
+
+      // ── Birthday Buddy ─────────────────────────────────────────────────────
+      {
+        id: "birthday-buddy", name: "Birthday Buddy", group: "Work & making", parent: "Project Buddy",
+        stage: "PRD ready", color: "#7c6d55",
+        summary: "Helps create warm, witty birthday messages with a little wisdom and makes them ready to send or post with one final human tap.",
+        owns: "Birthday reminders, saying library, matching, personalization, generation, and copy-ready output.",
+        source: "Product brief + PRD", updated: "Yesterday",
+        focus: [["Remember", "Bring important birthdays forward in time to do something thoughtful."],["Match", "Choose a line that fits the person instead of sending a generic greeting."],["Personalize", "Keep generation useful while preserving final human approval."]],
+        next: "Correct the brief’s library count and review the locked v1 decisions before building.",
+        related: ["relationship-buddy", "family-buddy"]
+      }
+    ];
+
+    const groupOrder = ["Core", "Home & family", "Money", "Personal", "Work & making"];
+    const nav = document.getElementById("buddyNav");
+    const page = document.getElementById("buddyPage");
+    const search = document.getElementById("buddySearch");
+    const count = document.getElementById("buddyCount");
+    const directoryMeta = document.getElementById("directoryMeta");
+    const crumbName = document.getElementById("crumbName");
+    const menuButton = document.getElementById("menuButton");
+    const scrim = document.getElementById("scrim");
+    let activeId = "project-buddy";
+    let directoryView = "org";
+    let directoryZoom = 100;
+    const expandedOrg = new Set([...hierarchyRoots().map(buddy => buddy.id), "project-buddy"]);
+    let draggedBuddyId = null;
+    let dragJustEnded = false;
+    let moveStatusTimer = null;
+    let detailReturnFocus = null;
+
+    function stageShort(stage) {
+      const map = {"Brief review":"brief", "Build ready":"ready", "Direction set":"set", "Pilot design":"pilot", "PRD review":"prd", "PRD ready":"prd", "Hierarchy defined":"set"};
+      return map[stage] || stage.toLowerCase().split(" ")[0];
+    }
+
+    function displayName(buddy) {
+      return buddy.alias || buddy.name;
+    }
+
+    function canonicalNameMarkup(buddy, className) {
+      return buddy.alias ? `<span class="${className}">${buddy.name}</span>` : "";
+    }
+
+    function sourceMarkup(buddy) {
+      return buddy.brief
+        ? `<a class="brief-link" href="${buddy.brief}" target="_blank" rel="noopener noreferrer">${buddy.source}</a>`
+        : buddy.source;
+    }
+
+    function buddyDepth(buddy) {
+      let depth = 0;
+      let current = buddy;
+      const seen = new Set();
+      while (current && current.parent !== "—" && !seen.has(current.id)) {
+        seen.add(current.id);
+        const parent = buddies.find(candidate => candidate.name === current.parent);
+        if (!parent) break;
+        depth += 1;
+        current = parent;
+      }
+      return depth;
+    }
+
+    function renderNav(filter = "") {
+      const term = filter.trim().toLowerCase();
+      const visible = buddies.filter(b => !term || [b.name, b.alias || "", b.group, b.parent, b.stage].join(" ").toLowerCase().includes(term));
+      count.textContent = buddies.length;
+      directoryMeta.textContent = `${buddies.length} buddies · One registry`;
+      nav.innerHTML = "";
+      if (!visible.length) {
+        nav.innerHTML = '<div class="empty-filter">No buddy matches that search.</div>';
+        return;
+      }
+      groupOrder.forEach(group => {
+        const entries = visible.filter(b => b.group === group);
+        if (!entries.length) return;
+        const title = document.createElement("div");
+        title.className = "nav-group-title";
+        title.textContent = group;
+        nav.appendChild(title);
+        entries.forEach(buddy => {
+          const button = document.createElement("button");
+          button.className = "buddy-link";
+          button.type = "button";
+          button.dataset.id = buddy.id;
+          button.style.setProperty("--nav-depth", buddyDepth(buddy));
+          if (buddy.id === activeId) button.setAttribute("aria-current", "page");
+          button.setAttribute("aria-label", buddy.alias ? `Open ${buddy.alias}, ${buddy.name}` : `Open ${buddy.name}`);
+          button.innerHTML = `<span class="dot" style="--dot:${buddy.color}"></span><span class="buddy-label"><span class="buddy-name">${displayName(buddy)}</span>${canonicalNameMarkup(buddy, "buddy-canonical")}</span><span class="buddy-stage-mini">${stageShort(buddy.stage)}</span>`;
+          button.addEventListener("click", () => selectBuddy(buddy.id, true));
+          nav.appendChild(button);
+        });
+      });
+    }
+
+    function relatedButtons(ids) {
+      if (!ids || !ids.length) return '<span class="none">No connected buddies yet.</span>';
+      return ids.map(id => {
+        const buddy = buddies.find(b => b.id === id);
+        return buddy ? `<button class="related-btn" type="button" data-related="${buddy.id}">${displayName(buddy)}</button>` : "";
+      }).join("");
+    }
+
+    function childrenOf(buddy) {
+      return buddies.filter(candidate => candidate.parent === buddy.name);
+    }
+
+    function hierarchyRoots() {
+      return buddies.filter(buddy => buddy.parent === "—" || !buddies.some(candidate => candidate.name === buddy.parent));
+    }
+
+    function treeBranch(buddy) {
+      const children = childrenOf(buddy);
+      return `
+        <li role="treeitem"${children.length ? ' aria-expanded="true"' : ""}>
+          <div class="tree-row">
+            <button class="tree-node" type="button" data-preview-id="${buddy.id}" aria-label="${buddy.alias ? `View details for ${buddy.alias}, ${buddy.name}` : `View details for ${buddy.name}`}">
+              <span class="dot" style="--dot:${buddy.color}"></span>
+              <span class="tree-node-label"><span class="tree-node-name">${displayName(buddy)}</span>${canonicalNameMarkup(buddy, "tree-node-canonical")}</span>
+              <span class="tree-node-stage">${stageShort(buddy.stage)}</span>
+            </button>
+            ${children.length ? `<span class="child-count">${children.length} ${children.length === 1 ? "child" : "children"}</span>` : ""}
+          </div>
+          ${children.length ? `<ul role="group">${children.map(treeBranch).join("")}</ul>` : ""}
+        </li>`;
+    }
+
+    function flattenHierarchy() {
+      const rows = [];
+      function visit(buddy, depth) {
+        rows.push({buddy, depth});
+        childrenOf(buddy).forEach(child => visit(child, depth + 1));
+      }
+      hierarchyRoots().forEach(root => visit(root, 0));
+      return rows;
+    }
+
+    function hierarchyDepth() {
+      return flattenHierarchy().reduce((deepest, row) => Math.max(deepest, row.depth + 1), 1);
+    }
+
+    function orgDropSlot(parentId, beforeId) {
+      return `<li class="org-drop-slot" role="none" data-drop-parent="${parentId}" data-drop-before="${beforeId || ""}" aria-hidden="true"></li>`;
+    }
+
+    function orgBranch(buddy) {
+      const children = childrenOf(buddy);
+      const isExpanded = children.length > 0 && expandedOrg.has(buddy.id);
+      const childMarkup = children.map(child => `${orgDropSlot(buddy.id, child.id)}${orgBranch(child)}`).join("") + orgDropSlot(buddy.id, "");
+      return `
+        <li role="treeitem" class="${isExpanded ? "org-branch-expanded" : ""}"${children.length ? ` aria-expanded="${isExpanded}"` : ""}>
+          <div class="org-node" data-org-node="${buddy.id}" ${buddy.parent === "—" ? "" : `draggable="true"`}>
+            <button class="org-toggle" type="button" data-preview-id="${buddy.id}" aria-label="View details for ${displayName(buddy)}">
+              <span class="dot" style="--dot:${buddy.color}"></span>
+              <span class="org-node-label"><span class="org-node-name">${displayName(buddy)}</span>${canonicalNameMarkup(buddy, "org-node-canonical")}</span>
+              <span class="org-detail-cue" aria-hidden="true">•••</span>
+            </button>
+            <div class="org-node-footer">
+              <span class="org-child-count">${children.length ? `${children.length} ${children.length === 1 ? "child" : "children"}` : stageShort(buddy.stage)}</span>
+              <span class="org-node-actions">
+                ${children.length ? `<button class="org-expand" type="button" data-org-toggle="${buddy.id}" aria-expanded="${isExpanded}" aria-label="${isExpanded ? "Collapse" : "Expand"} children of ${displayName(buddy)}">${isExpanded ? "Collapse" : "Expand"}</button>` : ""}
+                <button class="org-goto" type="button" data-buddy-id="${buddy.id}" aria-label="Go to ${displayName(buddy)} home page">Go to</button>
+              </span>
+            </div>
+          </div>
+          ${isExpanded ? `<ul role="group">${childMarkup}</ul>` : ""}
+        </li>`;
+    }
+
+    function isDescendantOf(candidateId, ancestorId) {
+      let current = buddies.find(buddy => buddy.id === candidateId);
+      while (current && current.parent !== "—") {
+        const parent = buddies.find(buddy => buddy.name === current.parent);
+        if (!parent) return false;
+        if (parent.id === ancestorId) return true;
+        current = parent;
+      }
+      return false;
+    }
+
+    function canMoveUnder(sourceId, parentId) {
+      const source = buddies.find(buddy => buddy.id === sourceId);
+      const parent = buddies.find(buddy => buddy.id === parentId);
+      return Boolean(source && parent && source.parent !== "—" && source.id !== parent.id && !isDescendantOf(parent.id, source.id));
+    }
+
+    function announceMove(message) {
+      const status = document.getElementById("moveStatus");
+      if (!status) return;
+      status.textContent = message;
+      clearTimeout(moveStatusTimer);
+      moveStatusTimer = setTimeout(() => { if (status.isConnected) status.textContent = ""; }, 3200);
+    }
+
+    function moveBuddy(sourceId, parentId, beforeId) {
+      if (!canMoveUnder(sourceId, parentId) || sourceId === beforeId) return false;
+      const sourceIndex = buddies.findIndex(buddy => buddy.id === sourceId);
+      const source = buddies[sourceIndex];
+      const parent = buddies.find(buddy => buddy.id === parentId);
+      buddies.splice(sourceIndex, 1);
+      source.parent = parent.name;
+
+      const siblings = childrenOf(parent).filter(buddy => buddy.id !== sourceId);
+      let insertIndex;
+      const beforeSibling = beforeId && siblings.find(buddy => buddy.id === beforeId);
+      if (beforeSibling) {
+        insertIndex = buddies.findIndex(buddy => buddy.id === beforeSibling.id);
+      } else if (siblings.length) {
+        insertIndex = buddies.findIndex(buddy => buddy.id === siblings[siblings.length - 1].id) + 1;
+      } else {
+        insertIndex = buddies.findIndex(buddy => buddy.id === parent.id) + 1;
+      }
+      buddies.splice(Math.max(0, insertIndex), 0, source);
+      expandedOrg.add(parent.id);
+      renderNav(search.value);
+      renderOrgPanel();
+      announceMove(`${displayName(source)} moved under ${displayName(parent)}.`);
+      return true;
+    }
+
+    function clearOrgDragState() {
+      page.querySelectorAll(".is-dragging, .is-drop-target").forEach(element => element.classList.remove("is-dragging", "is-drop-target"));
+      const chart = page.querySelector(".org-chart");
+      if (chart) chart.classList.remove("is-dragging");
+    }
+
+    function renderOrgPanel() {
+      const panel = document.getElementById("orgPanel");
+      if (!panel) return;
+      panel.innerHTML = `<div class="org-chart" role="tree" aria-label="Interactive buddy organization chart"><ul>${hierarchyRoots().map(orgBranch).join("")}</ul></div>`;
+      panel.querySelectorAll("[data-org-toggle]").forEach(button => {
+        button.addEventListener("click", () => {
+          if (dragJustEnded) return;
+          const id = button.dataset.orgToggle;
+          expandedOrg.has(id) ? expandedOrg.delete(id) : expandedOrg.add(id);
+          renderOrgPanel();
+          const nextButton = panel.querySelector(`[data-org-toggle="${id}"]`);
+          if (nextButton) nextButton.focus();
+        });
+      });
+      panel.querySelectorAll("[data-buddy-id]").forEach(button => {
+        button.addEventListener("click", event => {
+          event.stopPropagation();
+          selectBuddy(button.dataset.buddyId, true);
+        });
+      });
+      bindPreviewLinks(panel);
+      panel.querySelectorAll(".org-node").forEach(node => {
+        node.addEventListener("dragstart", event => {
+          draggedBuddyId = node.dataset.orgNode;
+          node.classList.add("is-dragging");
+          panel.querySelector(".org-chart").classList.add("is-dragging");
+          event.dataTransfer.effectAllowed = "move";
+          event.dataTransfer.setData("text/plain", draggedBuddyId);
+        });
+        node.addEventListener("dragover", event => {
+          const targetId = node.dataset.orgNode;
+          if (!canMoveUnder(draggedBuddyId, targetId)) return;
+          event.preventDefault();
+          event.stopPropagation();
+          event.dataTransfer.dropEffect = "move";
+          node.classList.add("is-drop-target");
+        });
+        node.addEventListener("dragleave", () => node.classList.remove("is-drop-target"));
+        node.addEventListener("drop", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          const sourceId = draggedBuddyId || event.dataTransfer.getData("text/plain");
+          const targetId = node.dataset.orgNode;
+          clearOrgDragState();
+          moveBuddy(sourceId, targetId, "");
+        });
+        node.addEventListener("dragend", () => {
+          clearOrgDragState();
+          draggedBuddyId = null;
+          dragJustEnded = true;
+          setTimeout(() => { dragJustEnded = false; }, 0);
+        });
+      });
+      panel.querySelectorAll(".org-drop-slot").forEach(slot => {
+        slot.addEventListener("dragover", event => {
+          const parentId = slot.dataset.dropParent;
+          if (!canMoveUnder(draggedBuddyId, parentId)) return;
+          event.preventDefault();
+          event.stopPropagation();
+          event.dataTransfer.dropEffect = "move";
+          slot.classList.add("is-drop-target");
+        });
+        slot.addEventListener("dragleave", () => slot.classList.remove("is-drop-target"));
+        slot.addEventListener("drop", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          const sourceId = draggedBuddyId || event.dataTransfer.getData("text/plain");
+          const parentId = slot.dataset.dropParent;
+          const beforeId = slot.dataset.dropBefore;
+          clearOrgDragState();
+          moveBuddy(sourceId, parentId, beforeId);
+        });
+      });
+    }
+
+    function relationButton(buddy, label) {
+      return buddy ? `<button class="detail-link" type="button" data-preview-id="${buddy.id}">${label || displayName(buddy)}</button>` : "";
+    }
+
+    function openBuddyDetail(id, trigger) {
+      const buddy = buddies.find(item => item.id === id);
+      const layer = document.getElementById("buddyDetailLayer");
+      const body = document.getElementById("buddyDetailBody");
+      if (!buddy || !layer || !body) return;
+      const parent = buddies.find(item => item.name === buddy.parent);
+      const children = childrenOf(buddy);
+      const connected = (buddy.related || []).map(relatedId => buddies.find(item => item.id === relatedId)).filter(Boolean);
+      detailReturnFocus = trigger || detailReturnFocus;
+      body.innerHTML = `
+        <div class="detail-top">
+          <div class="detail-kicker"><span class="dot" style="--dot:${buddy.color};display:inline-block;margin-right:7px;"></span>${buddy.stage}</div>
+          <button class="detail-close" id="detailClose" type="button" aria-label="Close details">×</button>
         </div>
-      </div>
-      <div class="root-stub"></div>
+        <h2 class="detail-title" id="detailTitle">${displayName(buddy)}</h2>
+        ${buddy.alias ? `<div class="detail-canonical">${buddy.name}</div>` : ""}
+        <p class="detail-summary">${buddy.summary}</p>
+        <div class="detail-actions">
+          <button class="detail-primary" type="button" data-detail-goto="${buddy.id}">Go to full page</button>
+          ${buddy.brief ? `<a class="detail-link" href="${buddy.brief}" target="_blank" rel="noopener noreferrer">Open brief</a>` : ""}
+        </div>
+        <section class="detail-block" aria-labelledby="detailFactsHeading">
+          <h3 id="detailFactsHeading">Key facts</h3>
+          <div class="detail-facts">
+            <div class="detail-fact"><div class="detail-fact-label">Owns</div><div class="detail-fact-value">${buddy.owns}</div></div>
+            <div class="detail-fact"><div class="detail-fact-label">Source</div><div class="detail-fact-value">${sourceMarkup(buddy)}</div></div>
+            <div class="detail-fact"><div class="detail-fact-label">Last shaped</div><div class="detail-fact-value">${buddy.updated}</div></div>
+            <div class="detail-fact"><div class="detail-fact-label">Focus areas</div><div class="detail-fact-value">${buddy.focus.map(item => item[0]).join(" · ")}</div></div>
+          </div>
+        </section>
+        <section class="detail-block" aria-labelledby="detailNextHeading">
+          <h3 id="detailNextHeading">Next move</h3>
+          <p class="detail-next">${buddy.next}</p>
+        </section>
+        <section class="detail-block" aria-labelledby="detailHierarchyHeading">
+          <h3 id="detailHierarchyHeading">Place in the hierarchy</h3>
+          <div class="detail-relations">
+            ${parent ? relationButton(parent, `Parent · ${displayName(parent)}`) : '<span class="detail-empty">Top level</span>'}
+            ${children.map(child => relationButton(child, `Child · ${displayName(child)}`)).join("")}
+          </div>
+        </section>
+        <section class="detail-block" aria-labelledby="detailConnectedHeading">
+          <h3 id="detailConnectedHeading">Connected buddies</h3>
+          <div class="detail-relations">${connected.length ? connected.map(item => relationButton(item)).join("") : '<span class="detail-empty">No connected buddies yet.</span>'}</div>
+        </section>`;
+      layer.hidden = false;
+      document.body.classList.add("detail-open");
+      document.getElementById("detailClose").addEventListener("click", closeBuddyDetail);
+      body.querySelector("[data-detail-goto]").addEventListener("click", event => selectBuddy(event.currentTarget.dataset.detailGoto, true));
+      bindPreviewLinks(body);
+      document.getElementById("detailTitle").focus?.();
+      document.getElementById("detailClose").focus();
+    }
 
-      <div class="tree">
-        <ul>
-          <li>
-            <div class="node personal">
-              <div class="name">Personal Buddy</div>
-              <div class="desc">Personal-ops &mdash; the &ldquo;figure it out later&rdquo; list with teeth.</div>
-              <div class="tag">family</div>
-            </div>
-            <ul>
-              <li><div class="node personal">
-                <div class="name">Travel Buddy</div>
-                <div class="desc">Trip planning, itineraries, logistics.</div>
-                <div class="tag">child</div>
-              </div></li>
-              <li><div class="node personal">
-                <div class="name">Relationship Buddy</div>
-                <div class="desc">Stay-in-touch nudges, notes, milestones.</div>
-                <div class="tag">child</div>
-              </div></li>
-              <li><div class="node personal">
-                <div class="name">Career Buddy</div>
-                <div class="desc">Career goals, skill growth, job-search readiness.</div>
-                <div class="tag">child</div>
-              </div></li>
-            </ul>
-          </li>
+    function closeBuddyDetail() {
+      const layer = document.getElementById("buddyDetailLayer");
+      if (!layer || layer.hidden) return;
+      layer.hidden = true;
+      document.body.classList.remove("detail-open");
+      if (detailReturnFocus && detailReturnFocus.isConnected) detailReturnFocus.focus();
+      detailReturnFocus = null;
+    }
 
-          <li>
-            <div class="node family">
-              <div class="name">Family Buddy</div>
-              <div class="desc">Family projects &mdash; shared with the household, not just Dave.</div>
-              <div class="tag">family &middot; new</div>
-            </div>
-            <ul>
-              <li><div class="node family">
-                <div class="name">Pet Buddy</div>
-                <div class="desc">Per-pet profiles, meds, vet visits, vaccinations.</div>
-                <div class="tag">child</div>
-              </div></li>
-              <li><div class="node family">
-                <div class="name">Quentin Buddy</div>
-                <div class="desc">Living dossier for Dave&rsquo;s son Quentin.</div>
-                <div class="tag">child</div>
-              </div></li>
-              <li><div class="node family">
-                <div class="name">Sawyer Buddy</div>
-                <div class="desc">Living dossier for Dave&rsquo;s son Sawyer.</div>
-                <div class="tag">child</div>
-              </div></li>
-              <li><div class="node family">
-                <div class="name">Amanda Buddy</div>
-                <div class="desc">Living dossier for Amanda.</div>
-                <div class="tag">child</div>
-              </div></li>
-              <li><div class="node family">
-                <div class="name">Emile Buddy</div>
-                <div class="desc">Living dossier for Dave&rsquo;s middle brother.</div>
-                <div class="tag">child</div>
-              </div></li>
-              <li><div class="node family">
-                <div class="name">Nancy Buddy</div>
-                <div class="desc">Living dossier for Nan.</div>
-                <div class="tag">child</div>
-              </div></li>
-              <li><div class="node family">
-                <div class="name">Jessica Buddy</div>
-                <div class="desc">Living dossier for Sawyer&rsquo;s aunt.</div>
-                <div class="tag">child</div>
-              </div></li>
-              <li><div class="node family">
-                <div class="name">Pops Buddy</div>
-                <div class="desc">Living dossier for Pops.</div>
-                <div class="tag">child</div>
-              </div></li>
-            </ul>
-          </li>
+    function bindPreviewLinks(scope = page) {
+      scope.querySelectorAll("[data-preview-id]").forEach(button => {
+        button.addEventListener("click", event => {
+          event.stopPropagation();
+          openBuddyDetail(button.dataset.previewId, button);
+        });
+      });
+    }
 
-          <li>
-            <div class="node property">
-              <div class="name">Property Buddy</div>
-              <div class="desc">One shape for every property &mdash; deeds, repairs, maintenance, history.</div>
-              <div class="tag">family</div>
+    function bindDirectoryLinks() {
+      page.querySelectorAll("[data-buddy-id]").forEach(button => {
+        button.addEventListener("click", () => selectBuddy(button.dataset.buddyId, true));
+      });
+      bindPreviewLinks(page);
+    }
+
+    function applyDirectoryZoom(value) {
+      directoryZoom = Math.min(160, Math.max(60, Number(value) || 100));
+      const factor = directoryZoom / 100;
+      page.querySelectorAll(".directory-panel").forEach(panel => {
+        panel.style.zoom = String(factor);
+        panel.style.width = `${100 / factor}%`;
+      });
+      const slider = document.getElementById("zoomSlider");
+      const output = document.getElementById("zoomValue");
+      if (slider) slider.value = String(directoryZoom);
+      if (output) output.textContent = `${directoryZoom}%`;
+    }
+
+    function bindZoomControls() {
+      const slider = document.getElementById("zoomSlider");
+      const reset = document.getElementById("zoomReset");
+      if (!slider || !reset) return;
+      slider.addEventListener("input", event => applyDirectoryZoom(event.currentTarget.value));
+      reset.addEventListener("click", () => {
+        applyDirectoryZoom(100);
+        slider.focus();
+      });
+      applyDirectoryZoom(directoryZoom);
+    }
+
+    function setDirectoryView(view) {
+      directoryView = ["org", "tree", "outline"].includes(view) ? view : "org";
+      page.querySelectorAll("[data-directory-view]").forEach(button => {
+        button.setAttribute("aria-pressed", String(button.dataset.directoryView === directoryView));
+      });
+      const orgPanel = document.getElementById("orgPanel");
+      const treePanel = document.getElementById("treePanel");
+      const outlinePanel = document.getElementById("outlinePanel");
+      if (orgPanel) orgPanel.hidden = directoryView !== "org";
+      if (treePanel) treePanel.hidden = directoryView !== "tree";
+      if (outlinePanel) outlinePanel.hidden = directoryView !== "outline";
+      applyDirectoryZoom(directoryZoom);
+    }
+
+    function renderProjectHome(buddy) {
+      const outlineRows = flattenHierarchy();
+      page.innerHTML = `
+        <header class="buddy-header">
+          <div>
+            <div class="eyebrow"><span class="dot" style="--dot:${buddy.color}"></span><span>Buddy system map</span></div>
+            <h1>${displayName(buddy)}</h1>
+            ${canonicalNameMarkup(buddy, "canonical-title")}
+            <p class="summary">${buddy.summary}</p>
+          </div>
+          <div class="status-stamp"><span>Current stage</span><strong>${buddy.stage}</strong></div>
+        </header>
+
+        <section class="directory-home" aria-labelledby="directoryHeading">
+          <div class="directory-toolbar">
+            <div>
+              <h2 id="directoryHeading" style="margin:0 0 4px;font-size:18px;">Buddy hierarchy</h2>
+              <div class="directory-summary">${buddies.length} buddies · ${hierarchyDepth()} levels · generated from one registry</div>
             </div>
-            <ul>
-              <li>
-                <div class="node property">
-                  <div class="name">Cabin Buddy</div>
-                  <div class="desc">Fiddletown cabin ops.</div>
-                  <div class="tag">child</div>
-                </div>
-                <ul>
-                  <li><div class="node property">
-                    <div class="name">Hot Tub Buddy</div>
-                    <div class="desc">Sundance Optima 880 &mdash; treatment schedule, log, chemistry KB.</div>
-                    <div class="tag">grandchild</div>
-                  </div></li>
-                  <li><div class="node property">
-                    <div class="name">Party Buddy</div>
-                    <div class="desc">Plans and tracks hosted gatherings — guest lists, food, setup.</div>
-                    <div class="tag">grandchild</div>
-                  </div></li>
+            <div class="view-switch" role="group" aria-label="Hierarchy view">
+              <button class="view-btn" type="button" data-directory-view="org" aria-pressed="true">Org chart</button>
+              <button class="view-btn" type="button" data-directory-view="tree" aria-pressed="false">Tree</button>
+              <button class="view-btn" type="button" data-directory-view="outline" aria-pressed="false">Outline</button>
+            </div>
+          </div>
+
+          <div class="directory-workspace">
+            <div class="directory-viewport" id="directoryViewport">
+              <div class="directory-panel" id="orgPanel"></div>
+
+              <div class="directory-panel" id="treePanel" hidden>
+                <ul class="hierarchy-tree" role="tree" aria-label="Buddy hierarchy tree">
+                  ${hierarchyRoots().map(treeBranch).join("")}
                 </ul>
-              </li>
-              <li><div class="node property">
-                <div class="name">Lenwood Buddy</div>
-                <div class="desc">Ideas for the future of 6929 Lenwood Way, San Jose.</div>
-                <div class="tag">child</div>
-              </div></li>
-            </ul>
-          </li>
+              </div>
 
-          <li>
-            <div class="node finance">
-              <div class="name">Finance Buddy</div>
-              <div class="desc">Parent container for all money projects.</div>
-              <div class="tag">family</div>
+              <div class="directory-panel" id="outlinePanel" hidden>
+                <div class="outline-list" role="list" aria-label="Buddy hierarchy outline">
+                  ${outlineRows.map(({buddy: rowBuddy, depth}) => `
+                    <button class="outline-row" type="button" role="listitem" data-preview-id="${rowBuddy.id}" style="--depth:${depth}" aria-label="${rowBuddy.alias ? `View details for ${rowBuddy.alias}, ${rowBuddy.name}` : `View details for ${rowBuddy.name}`}">
+                      <span class="outline-name"><span class="dot" style="--dot:${rowBuddy.color}"></span><span class="outline-name-text"><span>${displayName(rowBuddy)}</span>${canonicalNameMarkup(rowBuddy, "outline-canonical")}</span></span>
+                      <span class="outline-parent">${rowBuddy.parent === "—" ? "Top level" : `Child of ${rowBuddy.parent}`}</span>
+                      <span class="outline-stage">${stageShort(rowBuddy.stage)}</span>
+                    </button>`).join("")}
+                </div>
+              </div>
             </div>
-            <ul>
-              <li><div class="node finance">
-                <div class="name">Money Buddy</div>
-                <div class="desc">The expense tracker app &mdash; craftsmanship as the moat.</div>
-                <div class="tag">child</div>
-              </div></li>
-              <li><div class="node finance">
-                <div class="name">Investment Buddy</div>
-                <div class="desc">Investment ideas, research, signals podcast, dog detection.</div>
-                <div class="tag">child</div>
-              </div></li>
-            </ul>
-          </li>
+            <aside class="zoom-dock" aria-label="Hierarchy zoom controls">
+              <span class="zoom-label">Zoom</span>
+              <input class="zoom-slider" id="zoomSlider" type="range" min="60" max="160" step="1" value="${directoryZoom}" orient="vertical" aria-label="Zoom level" aria-orientation="vertical" aria-describedby="zoomValue" />
+              <output class="zoom-value" id="zoomValue" for="zoomSlider" aria-live="polite">${directoryZoom}%</output>
+              <button class="zoom-reset" id="zoomReset" type="button" aria-label="Reset zoom to 100 percent" title="Reset zoom to 100%">100%</button>
+            </aside>
+          </div>
+          <div class="move-status" id="moveStatus" role="status" aria-live="polite"></div>
+          <p class="directory-note">Select any tile or row for a quick detail view without leaving the chart. In Org chart, use Expand or Collapse to reveal children, Go to for the full Buddy home page, or drag a tile onto another tile—or between siblings—to reorganize the hierarchy.</p>
+        </section>
 
-          <li>
-            <div class="node work">
-              <div class="name">Work Buddy</div>
-              <div class="desc">Succeed at the job &mdash; dossiers, meeting briefs, estimate calibration.</div>
-              <div class="tag">direct child</div>
+        <div class="detail-layer" id="buddyDetailLayer" hidden>
+          <button class="detail-backdrop" id="detailBackdrop" type="button" aria-label="Close buddy details"></button>
+          <aside class="detail-panel" id="buddyDetailBody" role="dialog" aria-modal="true" aria-labelledby="detailTitle"></aside>
+        </div>`;
+
+      page.querySelectorAll("[data-directory-view]").forEach(button => {
+        button.addEventListener("click", () => setDirectoryView(button.dataset.directoryView));
+      });
+      document.getElementById("detailBackdrop").addEventListener("click", closeBuddyDetail);
+      bindDirectoryLinks();
+      renderOrgPanel();
+      setDirectoryView(directoryView);
+      bindZoomControls();
+    }
+
+    function bindCollapsibleSections() {
+      page.querySelectorAll("[data-collapse-target]").forEach(button => {
+        button.addEventListener("click", () => {
+          const body = document.getElementById(button.dataset.collapseTarget);
+          if (!body) return;
+          const isOpen = button.getAttribute("aria-expanded") === "true";
+          button.setAttribute("aria-expanded", String(!isOpen));
+          body.hidden = isOpen;
+        });
+      });
+    }
+
+    function renderPage(buddy) {
+      document.title = `${displayName(buddy)} · Project Buddy`;
+      crumbName.textContent = displayName(buddy);
+      if (buddy.id === "project-buddy") {
+        renderProjectHome(buddy);
+        window.scrollTo({top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
+        return;
+      }
+      page.innerHTML = `
+        <header class="buddy-header">
+          <div>
+            <div class="eyebrow"><span class="dot" style="--dot:${buddy.color}"></span><span>${buddy.parent === "—" ? "Top-level buddy" : `Child of ${buddy.parent}`}</span></div>
+            <h1>${displayName(buddy)}</h1>
+            ${canonicalNameMarkup(buddy, "canonical-title")}
+            <p class="summary">${buddy.summary}</p>
+          </div>
+          <div class="status-stamp"><span>Current stage</span><strong>${buddy.stage}</strong></div>
+        </header>
+
+        <nav class="section-tabs" aria-label="On this page">
+          <a href="#overview">Overview</a>
+          <a href="#focus">What it owns</a>
+          <a href="#next">Next</a>
+          <a href="#related">Connected</a>
+        </nav>
+
+        <section id="overview" class="overview-section">
+          <button class="collapsible-header" type="button" data-collapse-target="overviewBody" aria-expanded="true">
+            <h2>Overview</h2><p>Parent, source, and the last time this Buddy was shaped.</p><span class="collapsible-chevron" aria-hidden="true">›</span>
+          </button>
+          <div class="collapsible-body" id="overviewBody">
+            <div class="overview-grid" aria-label="Buddy overview">
+              <div class="fact"><div class="fact-label">Parent</div><div class="fact-value">${buddy.parent}</div></div>
+              <div class="fact"><div class="fact-label">Source</div><div class="fact-value">${sourceMarkup(buddy)}</div></div>
+              <div class="fact"><div class="fact-label">Last shaped</div><div class="fact-value">${buddy.updated}</div></div>
             </div>
-          </li>
-        </ul>
-      </div>
-    </div>
+          </div>
+        </section>
 
-    <section class="standalones">
-      <h2>Direct children of Project Buddy</h2>
-      <p class="sub">Standalone buddies &mdash; parent is Project Buddy itself. Two meta-projects are tagged.</p>
-      <div class="grid">
-        <div class="node standalone"><div class="name">Car Buddy</div><div class="desc">Per-car service tracking &mdash; MGA coupe + ML500.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">TV Buddy</div><div class="desc">Mood-matched pick playing in under 2 minutes.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">News Buddy</div><div class="desc">Personalized news companion, listen mode.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">Wisdom Buddy</div><div class="desc">Daily wisdom nuggets to Quentin and Sawyer.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">Birthday Buddy</div><div class="desc">Witty birthday sayings with a little wisdom.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">Job Buddy</div><div class="desc">Job search &mdash; discovery, master profile, recruiter triage.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">Reminder Buddy</div><div class="desc">Fire-and-forget nudges.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">Housing Buddy</div><div class="desc">Know-your-market real estate &mdash; valuation + search.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">Zen Buddy</div><div class="desc">Meditation, breathwork, practice.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">School Buddy</div><div class="desc">Learning companion &mdash; &ldquo;what do you want to learn?&rdquo;</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">Document Buddy</div><div class="desc">Google Docs layer &mdash; folders, meta, what-are-we-working-on.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">Tech Buddy</div><div class="desc">Tech inventory + gadget tutor.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">Dream Buddy</div><div class="desc">Dream journal — capture on waking, spot patterns.</div><div class="tag">direct</div></div>
-        <div class="node standalone"><div class="name">Feedback Buddy</div><div class="desc">Feedback to outside parties — capture, route, file.</div><div class="tag">direct</div></div>
-        <div class="node meta"><div class="name">Scaffold Buddy</div><div class="desc">The skeleton every buddy project is born with.</div><div class="tag">meta</div></div>
-        <div class="node meta"><div class="name">Buddy Suite</div><div class="desc">Shared brand, monetization, marketing across buddies.</div><div class="tag">meta</div></div>
-      </div>
-    </section>
-  </div>
+        <section id="focus" class="page-section">
+          <button class="collapsible-header" type="button" data-collapse-target="focusBody" aria-expanded="true">
+            <h2>What it owns</h2><p>${buddy.owns}</p><span class="collapsible-chevron" aria-hidden="true">›</span>
+          </button>
+          <div class="collapsible-body" id="focusBody">
+            <div class="focus-list">
+              ${buddy.focus.map((item, index) => `<div class="focus-item"><div class="focus-number">0${index + 1}</div><div><h3>${item[0]}</h3><p>${item[1]}</p></div></div>`).join("")}
+            </div>
+          </div>
+        </section>
 
-  <!-- ============ PROJECTS VIEW ============ -->
-  <div id="view-projects" class="view">
-    <section class="projects-view" style="margin-top:24px">
-      <h2>Projects by Buddy</h2>
-      <p class="sub">Every buddy, in hierarchy order, with its current status.</p>
-      <div class="proj-list">
-        <div class="proj-row d0"><span class="pname">Project Buddy</span><span class="pdesc">The macro view — status &amp; next actions for every buddy</span><span class="status st-spec">Spec review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Personal Buddy</span><span class="pdesc">Personal-ops, the "figure it out later" list with teeth</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Travel Buddy</span><span class="pdesc">Trip planning, itineraries, logistics</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Relationship Buddy</span><span class="pdesc">Stay-in-touch nudges, notes, milestones</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Career Buddy</span><span class="pdesc">Career goals, skill growth, job-search readiness</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Family Buddy</span><span class="pdesc">Family projects — shared with the household, not just Dave</span><span class="status st-new">New</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Pet Buddy</span><span class="pdesc">Per-pet profiles, meds, vet visits, vaccinations</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Quentin Buddy</span><span class="pdesc">Living dossier for Dave's son Quentin</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Sawyer Buddy</span><span class="pdesc">Living dossier for Dave's son Sawyer</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Amanda Buddy</span><span class="pdesc">Living dossier for Amanda</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Emile Buddy</span><span class="pdesc">Living dossier for Dave's middle brother</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Nancy Buddy</span><span class="pdesc">Living dossier for Nan</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Jessica Buddy</span><span class="pdesc">Living dossier for Sawyer's aunt</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Pops Buddy</span><span class="pdesc">Living dossier for Pops</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Property Buddy</span><span class="pdesc">One shape for every property — deeds, repairs, maintenance</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Cabin Buddy</span><span class="pdesc">Fiddletown cabin ops</span><span class="status st-active">Active</span></div>
-        <div class="proj-row d3"><span class="dot">└</span><span class="pname">Hot Tub Buddy</span><span class="pdesc">Sundance Optima 880 — treatment schedule, log, chemistry KB</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d3"><span class="dot">└</span><span class="pname">Party Buddy</span><span class="pdesc">Plans and tracks hosted gatherings — guest lists, food/drink, setup checklists</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Lenwood Buddy</span><span class="pdesc">Ideas for the future of 6929 Lenwood Way, San Jose</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Finance Buddy</span><span class="pdesc">Parent container for all money projects</span><span class="status st-new">New</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Money Buddy</span><span class="pdesc">The expense tracker app — craftsmanship as the moat</span><span class="status st-live">Live · pre-alpha</span></div>
-        <div class="proj-row d2"><span class="dot">└</span><span class="pname">Investment Buddy</span><span class="pdesc">Investment ideas, research, signals podcast, dog detection</span><span class="status st-live">Live · M2 shipped</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Work Buddy</span><span class="pdesc">Succeed at the job — dossiers, briefs, estimate calibration</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Car Buddy</span><span class="pdesc">Per-car service tracking — MGA coupe + ML500</span><span class="status st-prd">PRD review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">TV Buddy</span><span class="pdesc">Mood-matched pick playing in under 2 minutes</span><span class="status st-prd">PRD review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">News Buddy</span><span class="pdesc">Personalized news companion, listen mode</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Wisdom Buddy</span><span class="pdesc">Daily wisdom nuggets to Quentin and Sawyer</span><span class="status st-pilot">Pilot</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Birthday Buddy</span><span class="pdesc">Witty birthday sayings with a little wisdom</span><span class="status st-prd">PRD review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Job Buddy</span><span class="pdesc">Job search — discovery, master profile, recruiter triage</span><span class="status st-prd">PRD review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Reminder Buddy</span><span class="pdesc">Fire-and-forget nudges</span><span class="status st-idea">Idea</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Housing Buddy</span><span class="pdesc">Know-your-market real estate — valuation + search</span><span class="status st-prd">PRD review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Zen Buddy</span><span class="pdesc">Meditation, breathwork, practice</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">School Buddy</span><span class="pdesc">Learning companion — "what do you want to learn?"</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Document Buddy</span><span class="pdesc">Google Docs layer — folders, meta, what-are-we-working-on</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Tech Buddy</span><span class="pdesc">Tech inventory + gadget tutor</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Dream Buddy</span><span class="pdesc">Dream journal — capture on waking, spot patterns over time</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Feedback Buddy</span><span class="pdesc">Feedback to outside parties — capture, route, file, ship-watch</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Scaffold Buddy</span><span class="pdesc">The skeleton every buddy project is born with</span><span class="status st-brief">Brief review</span></div>
-        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Buddy Suite</span><span class="pdesc">Shared brand, monetization, marketing across buddies</span><span class="status st-brief">Brief review</span></div>
-      </div>
-    </section>
-  </div>
+        <section id="next" class="page-section">
+          <button class="collapsible-header" type="button" data-collapse-target="nextBody" aria-expanded="true">
+            <h2>Next move</h2><p>The clearest current step, kept deliberately singular.</p><span class="collapsible-chevron" aria-hidden="true">›</span>
+          </button>
+          <div class="collapsible-body" id="nextBody">
+            <div class="next-card"><div class="next-accent"></div><div class="next-body"><span>Recommended next</span><p>${buddy.next}</p></div></div>
+          </div>
+        </section>
 
-  <!-- ============ MANIFEST VIEW ============ -->
-  <div id="view-manifest" class="view">
-    <section class="projects-view" style="margin-top:24px">
-      <h2>New-Project Manifest</h2>
-      <p class="sub">What every new buddy automatically gets when it's born.</p>
-      <div class="proj-list">
-        <div class="proj-row d0"><span class="pname">1 · Side thread</span><span class="pdesc">The project's conversational home — all discussion, decisions, and reviews live here.</span></div>
-        <div class="proj-row d0"><span class="pname">2 · Product brief</span><span class="pdesc">Canonical description in Zuki Docs (Google Doc): the idea, the problem, revenue potential, room for growth, v1 scope, open questions.</span></div>
-        <div class="proj-row d0"><span class="pname">3 · GitHub repo</span><span class="pdesc">Private repo holding the code — and eventually the knowledge base (KNOWLEDGE.md, DECISIONS.md).</span></div>
-        <div class="proj-row d0"><span class="pname">4 · INIT summary</span><span class="pdesc">First message in the thread: the brief's executive summary (the mission statement), plus links to brief, repo, related docs, parent and children.</span></div>
-        <div class="proj-row d0"><span class="pname">5 · Review ask</span><span class="pdesc">Quick-reply widget asking Dave to review the brief — looks good, edits, or defer.</span></div>
-        <div class="proj-row d0"><span class="pname">6 · Quick-links entry</span><span class="pdesc">One-tap link to the brief, appended to quick-links.md.</span></div>
-        <div class="proj-row d0"><span class="pname">7 · Memory entry</span><span class="pdesc">MEMORY.md bullet: what the project is, key links, current status.</span></div>
-        <div class="proj-row d0"><span class="pname">8 · Awaiting-reply entry</span><span class="pdesc">The brief review tracked in the registry until Dave answers.</span></div>
-      </div>
-      <p class="sub" style="margin-top:20px">Decided, not yet automatic: a dashboard entry here, and a per-buddy home page view in the sidebar.</p>
-    </section>
-  </div>
+        <section id="related" class="page-section">
+          <button class="collapsible-header" type="button" data-collapse-target="relatedBody" aria-expanded="true">
+            <h2>Connected buddies</h2><p>Move sideways without going back to the full directory.</p><span class="collapsible-chevron" aria-hidden="true">›</span>
+          </button>
+          <div class="collapsible-body" id="relatedBody">
+            <div class="related-wrap">${relatedButtons(buddy.related)}</div>
+          </div>
+        </section>
+      `;
+      bindCollapsibleSections();
+      page.querySelectorAll("[data-related]").forEach(btn => btn.addEventListener("click", () => selectBuddy(btn.dataset.related, true)));
+      window.scrollTo({top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
+    }
 
-  
-<section id="view-buddy" class="view"><div id="buddy-home"></div></section>
-</main>
-</div>
-<script>
-const BUDDIES = [{"attention": [{"date": "2026-10-09", "id": "project-buddy-dashboard-v2", "text": "Dashboard v2 ready for review \u2014 Tree, Projects, and Manifest tabs are live."}, {"date": "2026-10-09", "id": "project-buddy-family-drill", "text": "Open: run the full new-buddy drill (brief, repo, thread) for Family Buddy?"}], "brief": "https://docs.google.com/document/d/1yBcOP8Usbw6CaIj_Ufn7pLVX6AaKVjP1AP7ZvkM_O6c/edit", "docs": [], "id": "project-buddy", "kind": "root", "mission": "Project Buddy is the one place for all of Dave's ideas and projects \u2014 fast capture, an idea bank with statuses (New \u2192 Considering \u2192 Active \u2192 Parked \u2192 Done/Dropped), promote-to-project with next actions, and lightweight review nudges. This dashboard is its macro view: the status and next action items for every buddy.", "name": "Project Buddy", "parent": null, "repo": null, "status": "Spec review", "statusClass": "st-spec", "tagline": "The macro view \u2014 status & next actions for every buddy"}, {"attention": [{"date": "2026-10-09", "id": "personal-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Working title (Dave: \"we'll think of a good name, we can change it later\")."}], "brief": "https://docs.google.com/document/d/1jJ_xZDQeogti-GRPLNnY8e-IgsBa93-QhdG1EhLIEJs/edit", "docs": [], "id": "personal-buddy", "kind": "personal", "mission": "Personal Buddy is your personal-ops 'figure it out later' list with teeth \u2014 the things you need to research, decide, or sort out but don't have time for right now, captured with reminders so nothing evaporates. It's distinct from Reminder Buddy (fire-and-forget nudges) and School Buddy (learning paths). Seed item: the calendar visibility problem \u2014 a multi-day 'in San Jose' indicator on both family and work calendars, without showing you as busy and without duplicate events.", "name": "Personal Buddy", "parent": "project-buddy", "repo": "personal-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Personal-ops \u2014 the \u201cfigure it out later\u201d list with teeth"}, {"attention": [{"date": "2026-10-09", "id": "travel-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Note: brief is a working interpretation from the name alone; Dave corrects the direction at review."}], "brief": "https://docs.google.com/document/d/1VWXXml-y3uL-mlps-jmDmDYJcLSG1gY_F_ehdRaDRJs/edit", "docs": [], "id": "travel-buddy", "kind": "personal", "mission": "Travel Buddy handles trip planning \u2014 itineraries and logistics. A name-only idea for now; you correct the direction when you review the brief.", "name": "Travel Buddy", "parent": "personal-buddy", "repo": "travel-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Trip planning, itineraries, logistics"}, {"attention": [{"date": "2026-10-09", "id": "relationship-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer?"}], "brief": "https://docs.google.com/document/d/1BdS9TfXY0Mceg7dQ68EvPK38Qo5wqAQrSC_AkS5uX_I/edit", "docs": [], "id": "relationship-buddy", "kind": "personal", "mission": "Relationship Buddy is your companion for maintaining healthy relationships \u2014 the people who matter, stay-in-touch nudges, notes, and milestones. Its job is keeping the important people from going quiet.", "name": "Relationship Buddy", "parent": "personal-buddy", "repo": "relationship-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Stay-in-touch nudges, notes, milestones"}, {"attention": [{"date": "2026-10-09", "id": "career-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Note: brief is a working interpretation; Dave corrects the direction at review."}], "brief": "https://docs.google.com/document/d/1_h_HG7va6gxGAvDnNl4K3GAxrfZNI2dvJuSvcPGqclE/edit", "docs": [], "id": "career-buddy", "kind": "personal", "mission": "Career Buddy works your career goals, skill growth, and job-search readiness \u2014 distinct from Job Buddy, which is about finding and changing jobs. A name-only idea for now; you correct the direction when you review the brief.", "name": "Career Buddy", "parent": "personal-buddy", "repo": "career-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Career goals, skill growth, job-search readiness"}, {"attention": [], "brief": null, "docs": [], "id": "family-buddy", "kind": "family", "mission": "Family Buddy is for family projects \u2014 shared with the household (Quentin, Sawyer, Amanda), not just Dave. Pet Buddy is its first child.", "name": "Family Buddy", "parent": "project-buddy", "repo": null, "status": "New", "statusClass": "st-new", "tagline": "Family projects \u2014 shared with the household"}, {"attention": [{"date": "2026-10-09", "id": "pet-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Open: which pets/profiles first, medication reminder depth, vet-visit integration."}], "brief": "https://docs.google.com/document/d/1nJzmN-A3TBk23RH-f8bKbc3BxuPbLDiWRk3AaGJb6uo/edit", "docs": [], "id": "pet-buddy", "kind": "family", "mission": "Pet Buddy is the pet health-and-care tracker \u2014 per-pet profiles with medications, vet and hospital visit history, and vaccinations.", "name": "Pet Buddy", "parent": "family-buddy", "repo": "pet-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Per-pet profiles, meds, vet visits"}, {"attention": [{"date": "2026-10-09", "id": "property-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Open: one app vs. separate instances, who gets access, how deeds are secured, which property goes first."}], "brief": "https://docs.google.com/document/d/1fwbtQXG1sjfWKSxW1JdS8sOgGVSkRq74hY8KM_SsNTA/edit", "docs": [], "id": "property-buddy", "kind": "property", "mission": "Property Buddy is the generic behind Lenwood Buddy and Cabin Buddy \u2014 one buddy for maintaining information and records per property: deeds, repairs, receipts, contractors, maintenance plus reminders, history, and wishlist. Each property is an instance sharing the same shape. Distinct from Car Buddy (cars) and Housing Buddy (finding housing).", "name": "Property Buddy", "parent": "project-buddy", "repo": "property-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "One shape for every property"}, {"attention": [], "brief": null, "docs": [], "id": "cabin-buddy", "kind": "property", "mission": "Cabin Buddy runs the Fiddletown cabin \u2014 property ops, maintenance, and the running log of what keeps the place going. Hot Tub Buddy is its first child; where the weekly hot-tub treatment rhythm lives is still an open question in the Hot Tub Buddy brief Dave is reviewing.", "name": "Cabin Buddy", "parent": "property-buddy", "repo": null, "status": "Active", "statusClass": "st-active", "tagline": "Fiddletown cabin ops"}, {"attention": [], "brief": "https://docs.google.com/document/d/1BDcst37j2FftKqzY-Tz-ecQLtYc5OnR3kmY6xmn80Sg/edit", "docs": [], "id": "hot-tub-buddy", "kind": "property", "mission": "Hot Tub Buddy runs the 2025 Sundance Optima (880 series) at the Fiddletown cabin \u2014 treatment schedule plus reminders, a treatment and usage log, and a research knowledge base (chemistry targets, filters 6540-488S / 6540-501S / 6540-502S, supply sources, best prices). Reorders happen on request, with your approval before anything is purchased. The mission: the tub is always safe, clean, and ready to soak.", "name": "Hot Tub Buddy", "parent": "cabin-buddy", "repo": "hot-tub-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Sundance Optima 880 \u2014 treatments & chemistry"}, {"attention": [{"date": "2026-10-09", "id": "party-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Seed item: the soup party."}], "brief": "https://docs.google.com/document/d/1Y44Cs9JD9uj2O2UIdKXd28F0mdhyXT7nevVIoMOc5AU/edit", "docs": [], "id": "party-buddy", "kind": "property", "mission": "Party Buddy plans and tracks the gatherings you host \u2014 guest lists, food and drink plans, setup checklists, and dates. Seed event: the soup party \u2014 everyone brings a different soup, tasting samples served from foil muffin pans, bread, crackers, and toppings on the side, with a photo and the Facebook post attached. Over time it becomes your repeatable playbook for hosting.", "name": "Party Buddy", "parent": "cabin-buddy", "repo": "party-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Plans and tracks hosted gatherings"}, {"attention": [{"date": "2026-10-08", "id": "lenwood-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer?"}], "brief": "https://docs.google.com/document/d/1t4s5skvUo8vTQ1cknWxuEobTQp6aMwMD68NNUl-xUY4/edit", "docs": [], "id": "lenwood-buddy", "kind": "property", "mission": "Lenwood Buddy is the shared repository for ideas on what to do with Lenwood \u2014 6929 Lenwood Way, San Jose, the house Quentin, Amanda, and Sawyer rent. Document sharing plus idea capture for the property's future, with room to grow into voting, financials, and decision tracking.", "name": "Lenwood Buddy", "parent": "property-buddy", "repo": "lenwood-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Ideas for the future of the San Jose house"}, {"attention": [], "brief": null, "docs": [], "id": "finance-buddy", "kind": "finance", "mission": "Finance Buddy is the parent container for all money projects \u2014 Money Buddy (the expense tracker) and Investment Buddy (the investing module) live here.", "name": "Finance Buddy", "parent": "project-buddy", "repo": null, "status": "New", "statusClass": "st-new", "tagline": "Parent container for money projects"}, {"attention": [], "brief": null, "docs": [], "id": "money-buddy", "kind": "finance", "mission": "Money Buddy is the expense tracker app \u2014 craftsmanship as the differentiator. A handcrafted, delightful personal finance app from someone who cares about UX; the fun animated backgrounds aren't scope creep, they're the moat. Currently pre-alpha with Jeremy as the first tester.", "name": "Money Buddy", "parent": "finance-buddy", "repo": null, "status": "Live \u00b7 pre-alpha", "statusClass": "st-live", "tagline": "The expense tracker app"}, {"attention": [], "brief": "https://docs.google.com/document/d/1yoDxAIOzriF6O_3Ve7O6UnAPjnwm29e9vSswfSFrLRc/edit", "docs": [], "id": "investment-buddy", "kind": "finance", "mission": "Investment Buddy (the Investing module) \u2014 investment ideas list, easy company research, holdings-vs-watchlist separation, automated 'dog' detection for underperformers, and signals compiled into a generated podcast. AAPL gets first-class treatment. Research and signal aggregation only \u2014 buy/sell decisions stay Dave's.", "name": "Investment Buddy", "parent": "finance-buddy", "repo": null, "status": "Live \u00b7 M2 shipped", "statusClass": "st-live", "tagline": "Investment ideas, research, signals podcast"}, {"attention": [{"date": "2026-10-09", "id": "work-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer?"}, {"date": "2026-10-09", "id": "work-buddy-est-loop", "text": "Brief updated: new 'The estimation loop' section added after 'How it works' \u2014 worth a re-read before reviewing."}], "brief": "https://docs.google.com/document/d/10HnvQ2-ECTHyc-cwzv_klOcqnQvqfgxNvOAE7bZT9NQ/edit", "docs": [], "id": "work-buddy", "kind": "work", "mission": "Work Buddy is your companion for succeeding at your job \u2014 Apple / Worldwide Sales Finance today, any job later. It keeps per-person dossiers, auto-generates meeting briefs ('here's what you need to discuss with X'), runs check-in cadences for key people, and absorbs scattered work reminders. Its newest edge is the estimation loop: it captures tasks you agree to, logs your rough estimate, tracks how long they actually take, and calibrates your future estimates. Apple-confidentiality is a design constraint throughout.", "name": "Work Buddy", "parent": "project-buddy", "repo": "work-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Dossiers, meeting briefs, estimate calibration"}, {"attention": [], "brief": "https://docs.google.com/document/d/1eW7k87_ixHIw9M7ClxiUYd0GGXY9HcCdqvPeBOXrNME/edit", "docs": [{"label": "Car Buddy \u2014 PRD Draft v1", "url": "https://docs.google.com/document/d/1Suf40x1f0MeoMVa429tSZKZDrRuAhXgYyuqKi0bE5lw/edit"}], "id": "car-buddy", "kind": "standalone", "mission": "Car Buddy replaces the Airtable car-service database \u2014 per-car service tracking, due-service reminders, parts installed, service history (date, mileage, who did it), mileage log, and car locations for the 1959 MGA coupe and 2002 ML500. An iPhone-first web app for garage use.", "name": "Car Buddy", "parent": "project-buddy", "repo": null, "status": "PRD review", "statusClass": "st-prd", "tagline": "Per-car service tracking"}, {"attention": [], "brief": "https://docs.google.com/document/d/1SGspHdx-BlRJ_yRsnVpLS4sa5Ow-Q8mAPjueErdnqP4/edit", "docs": [], "id": "tv-buddy", "kind": "standalone", "mission": "TV Buddy kills the nightly 'what do we watch?' dead air \u2014 a mood-matched pick playing in under 2 minutes. The Mood Dial leads; Duel, Nightly Three, Roulette, and Chat Concierge are parked for now.", "name": "TV Buddy", "parent": "project-buddy", "repo": null, "status": "PRD review", "statusClass": "st-prd", "tagline": "Mood-matched pick in under 2 minutes"}, {"attention": [], "brief": "https://docs.google.com/document/d/11Zz2wGbuIKCqS7OSPOnjIAbz5VsmLQPvxS-OfRicSN0/edit", "docs": [], "id": "news-buddy", "kind": "standalone", "mission": "News Buddy (Briefing Buddy) is the personalized news companion \u2014 productized daily briefings, with topics as the personalization axis (AI/tech, markets, product design, engineering, motorsport, live music, Amador County local news), plus a listen mode.", "name": "News Buddy", "parent": "project-buddy", "repo": null, "status": "Brief review", "statusClass": "st-brief", "tagline": "Personalized news companion"}, {"attention": [], "brief": "https://docs.google.com/document/d/1Z1bdz-YNeRjODYTyPdTnj1FeewnCqxpEwJV2-SS5HUs/edit", "docs": [{"label": "Wisdom sheet (canonical)", "url": "https://docs.google.com/spreadsheets/d/1-UgKViOrfsWtmEufznVl18l8fTpzob6UKFAFaawS4uA/edit"}], "id": "wisdom-buddy", "kind": "standalone", "mission": "Wisdom Buddy revives the Wisdom Library \u2014 wisdom nuggets (mainly from Instagram) curated in the canonical Wisdom sheet and sent daily by text to Quentin and Sawyer. Currently an 8-week pilot with a decision gate; the central question is engagement (the feedback loop), not the automation.", "name": "Wisdom Buddy", "parent": "project-buddy", "repo": null, "status": "Pilot", "statusClass": "st-pilot", "tagline": "Daily wisdom nuggets to the kids"}, {"attention": [], "brief": "https://docs.google.com/document/d/1e5gJIQ02gxBeJr-mP7K6C0PnNcZ0iq36DZOxzAL0Lik/edit", "docs": [{"label": "Birthday Buddy \u2014 PRD Draft v1", "url": "https://docs.google.com/document/d/1z7WwImdL3ub3DoCiwQ02rrLR6gwsV5NxLSnBBvp5yVg/edit"}], "id": "birthday-buddy", "kind": "standalone", "mission": "Birthday Buddy is your buddy for witty birthday sayings with a little wisdom \u2014 reminders, a library of lines, match-and-personalize, a generator, and copy-ready posting. Nothing posts without your tap.", "name": "Birthday Buddy", "parent": "project-buddy", "repo": null, "status": "PRD review", "statusClass": "st-prd", "tagline": "Witty birthday sayings"}, {"attention": [{"date": "2026-10-08", "id": "job-buddy-prd", "text": "Start the Job Buddy PRD? (Side note: the Luis De Luna reply draft is still sitting in Gmail Drafts \u2014 needs Dave to hit send.)"}], "brief": "https://docs.google.com/document/d/19u8usL6X22ke5feSB-TE3VV0fYqK-U_U5f46eLZNkGM/edit", "docs": [], "id": "job-buddy", "kind": "standalone", "mission": "Job Buddy is the job-search and career buddy \u2014 proactive opportunity discovery, a 'tell it once' master profile (tailored resumes + website variants per opportunity), a daily hunting dashboard, a pull center that learns, and recruiter-email triage. Standing rule: nothing goes out to recruiters without Dave's sign-off.", "name": "Job Buddy", "parent": "project-buddy", "repo": null, "status": "PRD review", "statusClass": "st-prd", "tagline": "Job search \u2014 discovery, profile, triage"}, {"attention": [{"date": "2026-10-08", "id": "reminder-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Big open question: standalone app vs merged into existing buddies vs assistant-native capture inbox."}], "brief": null, "docs": [], "id": "reminder-buddy", "kind": "standalone", "mission": "Reminder Buddy is the fire-and-forget nudge buddy \u2014 the possible future home for the OmniFocus migration. Big open question: standalone app vs merged into existing buddies vs assistant-native capture inbox.", "name": "Reminder Buddy", "parent": "project-buddy", "repo": null, "status": "Brief review", "statusClass": "st-brief", "tagline": "Fire-and-forget nudges"}, {"attention": [{"date": "2026-10-08", "id": "housing-buddy-prd", "text": "PRD Draft v1 ready for review \u2014 valuation-led, homeowners first, Sacramento metro (RentCast + free sources ~$75\u2013200/mo)."}], "brief": "https://docs.google.com/document/d/1XrG_FERFrw-mfCIO-jVsTEBWTo4oie2UvxRoJl9iAdo/edit", "docs": [{"label": "Housing Buddy \u2014 PRD Draft v1", "url": "https://docs.google.com/document/d/1yzuFUxmnnSID4MSfI2JXyrREdWxLcx0QrQkDbCj5wEs/edit"}], "id": "housing-buddy", "kind": "standalone", "mission": "Housing Buddy is the know-your-market real estate tool \u2014 (1) Valuation: what your home is worth, aggregated estimates plus historical trends; (2) Search: requirements-based home search with a 360\u00b0 area view and a constantly-updated dashboard.", "name": "Housing Buddy", "parent": "project-buddy", "repo": null, "status": "PRD review", "statusClass": "st-prd", "tagline": "Know-your-market real estate"}, {"attention": [{"date": "2026-10-09", "id": "zen-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Open: guided vs. timer, what style, solo or family, how close it sits to Wisdom Buddy."}], "brief": "https://docs.google.com/document/d/1KGQfzCvsN3ERTsahhIqxZPRrexjgKOREGKD_P_bRLH8/edit", "docs": [], "id": "zen-buddy", "kind": "standalone", "mission": "Zen Buddy is your companion for meditation, spirituality, and becoming more zen \u2014 practice-oriented (sessions, breathwork, reminders tied to routine), not a content library. Possible tie-ins: sleep quality and Wisdom Buddy's spiritual readings.", "name": "Zen Buddy", "parent": "project-buddy", "repo": "zen-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Meditation, breathwork, practice"}, {"attention": [{"date": "2026-10-09", "id": "school-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer?"}, {"date": "2026-10-09", "id": "school-buddy-direction", "text": "Brief updated: curiosity-driven direction decided and folded in \u2014 'What do you want to learn?' now leads."}], "brief": "https://docs.google.com/document/d/1UOJPkZQaHlZja1P5PkVdcGxYeufX494X1gugXc-jS1m8/edit", "docs": [], "id": "school-buddy", "kind": "standalone", "mission": "School Buddy is your learning companion \u2014 it helps you learn anything. Its opening move: ask you 'What do you want to learn?' and then generate a learning plan for it. Curiosity-driven, not curriculum-driven.", "name": "School Buddy", "parent": "project-buddy", "repo": "school-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Learning companion"}, {"attention": [{"date": "2026-10-09", "id": "document-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? This was Project Buddy's first real end-to-end run."}], "brief": "https://docs.google.com/document/d/13ASNd4D68Tx8sIP0J1JDvGHYEAQspNZsGTxh_m_5sbk/edit", "docs": [], "id": "document-buddy", "kind": "standalone", "mission": "Document Buddy is the in-between layer for Google Docs that Drive's weak organization UX never gave you \u2014 it organizes folders, tracks per-doc meta info, and answers 'what are we working on?' with a formatted list in chat. This was Project Buddy's first real end-to-end run: thread, brief, repo, review ask, all from the tool.", "name": "Document Buddy", "parent": "project-buddy", "repo": "document-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "The Google Docs layer"}, {"attention": [{"date": "2026-10-09", "id": "tech-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer?"}], "brief": "https://docs.google.com/document/d/19YGpL1uHzU94CV1Yp_qyibZtlqVd8cejjvufn1SEM3g/edit", "docs": [], "id": "tech-buddy", "kind": "standalone", "mission": "Tech Buddy is your personal tech inventory plus gadget tutor \u2014 it tracks everything you own across both homes (what it is, where you bought it, warranty info), watches for relevant news, deals, and firmware updates, and walks you through using your tools step by step. Seed mission: programming the new Fiddletown Radio handhelds.", "name": "Tech Buddy", "parent": "project-buddy", "repo": "tech-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Tech inventory + gadget tutor"}, {"attention": [{"date": "2026-10-09", "id": "scaffold-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Next step after review: v1 template (stamp README.md, KNOWLEDGE.md, DECISIONS.md)."}], "brief": "https://docs.google.com/document/d/1rfrWpNABG-FbiHhbmOyYwVMZk1pwJekm6rNoPsMrh6k/edit", "docs": [], "id": "scaffold-buddy", "kind": "meta", "mission": "Scaffold Buddy is the meta-project that designs, versions, and evolves the skeleton every buddy project is born with \u2014 README.md, KNOWLEDGE.md (the persistent knowledge base), DECISIONS.md \u2014 plus the curation rule (threads stay conversational; durable items get written to the KB) and the kickoff-script stamping step. It's distinct from the Project Buddy tool (the launcher) and the Project Buddy product (the idea bank).", "name": "Scaffold Buddy", "parent": "project-buddy", "repo": "scaffold-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "The skeleton every buddy is born with"}, {"attention": [{"date": "2026-10-09", "id": "buddy-suite-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Open: working title confirmation and the domain decision (buddy.com is taken)."}], "brief": "https://docs.google.com/document/d/1LbFR4bTkRMsul84cM762-tvbpmAencxC0-Vu7fIZ-60/edit", "docs": [], "id": "buddy-suite", "kind": "meta", "mission": "Buddy Suite is the meta-project coordinating the whole buddy family \u2014 the shared brand and design language, the monetization plan, and the marketing strategy across all buddies. Working title; you confirm the suite name.", "name": "Buddy Suite", "parent": "project-buddy", "repo": "buddy-suite", "status": "Brief review", "statusClass": "st-brief", "tagline": "Brand, monetization, marketing"}, {"attention": [{"date": "2026-10-09", "id": "dream-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer?"}], "brief": "https://docs.google.com/document/d/1j3XiCfqIziUeDsGG185fda7maoQ23SsJkUpbXYOn40o/edit", "docs": [], "id": "dream-buddy", "kind": "standalone", "mission": "Dream Buddy is your dream journal buddy \u2014 capture dreams on waking, voice-first before they evaporate, keep them organized, and spot patterns over time. Its natural tie-in is your sleep tracking: sleep is the #1 health priority, and the Apple Watch data gives this buddy something to correlate against.", "name": "Dream Buddy", "parent": "project-buddy", "repo": null, "status": "Brief review", "statusClass": "st-brief", "tagline": "Dream journal buddy"}, {"attention": [{"date": "2026-10-09", "id": "feedback-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer?"}], "brief": "https://docs.google.com/document/d/1ZzDPRGNRuW8_ulpQE2Me8csFwmgAS9K9YlllHhOG9AM/edit", "docs": [], "id": "feedback-buddy", "kind": "standalone", "mission": "Feedback Buddy manages the feedback you want to send to outside parties \u2014 fast capture from any thread, smart routing (Muse-team feedback files direct through the feature-request channel; other companies get researched for the right recipient), a draft-approve-file loop, a history of filed/open/shipped reports, ship-watch notifications, and dedup against already-filed reports. Scope is organizations and companies only \u2014 feedback to individual humans is Relationship Buddy / coaching territory.", "name": "Feedback Buddy", "parent": "project-buddy", "repo": "feedback-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Feedback to outside parties"}, {"id": "quentin-buddy", "name": "Quentin Buddy", "parent": "family-buddy", "kind": "family", "tagline": "Living dossier for Dave's son Quentin", "mission": "Quentin Buddy is the one place for everything Dave needs to remember, track, and do regarding Quentin: key facts, important dates, notes, reminders, and gift ideas. Unlike Relationship Buddy (broad relationship maintenance across all relationships), this goes deep on one person. Key facts: lives in the San Jose house with Amanda; rent $1,000/mo \u2192 $2,000/mo via 90-day notice effective Jan 7, 2027; standing weekly check-in with Dave; recipient of the Wisdom Buddy daily texts.", "status": "Brief review", "statusClass": "st-brief", "brief": "https://docs.google.com/document/d/157C3sNyJcRIgzNevCbwuWx7V1F4YPYZRwjw1TOCUaNA/edit", "repo": "quentin-buddy", "docs": [], "attention": [{"id": "quentin-buddy-brief", "date": "2026-10-09", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Open: older (31) vs younger (28) not established."}]}, {"id": "sawyer-buddy", "name": "Sawyer Buddy", "parent": "family-buddy", "kind": "family", "tagline": "Living dossier for Dave's son Sawyer", "mission": "Sawyer Buddy is the one place for everything Dave needs to remember, track, and do regarding Sawyer: key facts, important dates, notes, reminders, and gift ideas. Key facts: lives in the San Jose house paying $1,000/mo rent (unchanged); authorized cardholder on Dave's Apple Card; recurring check-in on Dave's calendar; controls the Lenwood watering/irrigation system via a phone app. Older (31) vs younger (28) not established.", "status": "Brief review", "statusClass": "st-brief", "brief": "https://docs.google.com/document/d/16VYGF2gZDYNu5pKPXne8B2qOc35pxWmW0Ddej2z2WH0/edit", "repo": "sawyer-buddy", "docs": [], "attention": [{"id": "sawyer-buddy-brief", "date": "2026-10-09", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Open: older (31) vs younger (28) not established."}]}, {"id": "amanda-buddy", "name": "Amanda Buddy", "parent": "family-buddy", "kind": "family", "tagline": "Living dossier for Amanda", "mission": "Amanda Buddy is the one place for everything Dave needs to remember, track, and do regarding Amanda: key facts, important dates, notes, reminders, and gift ideas. Key facts: Quentin's girlfriend/fianc\u00e9e; lives with Quentin in the San Jose house; part of the $1,000\u2192$2,000/mo rent notice (90-day, effective Jan 7, 2027); her surname isn't established yet; first direct social moment with Dave on record: happy hour on 2026-10-08.", "status": "Brief review", "statusClass": "st-brief", "brief": "https://docs.google.com/document/d/19zf1xyyTehPRpoOeyEIJG84OntfsplxEmUTe5Qb3nlo/edit", "repo": "amanda-buddy", "docs": [], "attention": [{"id": "amanda-buddy-brief", "date": "2026-10-09", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Open: surname unknown."}]}, {"id": "emile-buddy", "name": "Emile Buddy", "parent": "family-buddy", "kind": "family", "tagline": "Living dossier for Dave's middle brother", "mission": "Emile Buddy is the one place for everything Dave needs to remember, track, and do regarding Emile: key facts, important dates, notes, reminders, and gift ideas. Key active thread: the Morgan Hill house sale (18231 Llagas Creek Dr) \u2014 Emile is a co-seller and his bouncing email inbox is blocking the DocuSign envelopes.", "status": "Brief review", "statusClass": "st-brief", "brief": "https://docs.google.com/document/d/19I51Rb1nbHZQT9zDZ6JDW8M5zI2WejrSSb-hfYrq0zA/edit", "repo": "emile-buddy", "docs": [], "attention": [{"id": "emile-buddy-brief", "date": "2026-10-09", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Key active thread: Morgan Hill sale coordination."}]}, {"id": "nancy-buddy", "name": "Nancy Buddy", "parent": "family-buddy", "kind": "family", "tagline": "Living dossier for Nan", "mission": "Nancy Buddy is the one place for everything Dave needs to remember, track, and do regarding Nan: key facts, important dates, notes, reminders, and gift ideas. Key facts (only what's known \u2014 her relationship to Dave is unstated): Dave calls her 'Nan'; $1,200/mo grocery stipend (under review); normally prepares his meals; logs expenses in the shared tracker; Dave runs product ideas past her.", "status": "Brief review", "statusClass": "st-brief", "brief": "https://docs.google.com/document/d/1cYab49CDpdfPlD5xzL0EXKm11XAObvBhi0yPw_2Pskk/edit", "repo": "nancy-buddy", "docs": [], "attention": [{"id": "nancy-buddy-brief", "date": "2026-10-09", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Open: relationship to Dave unstated."}]}, {"id": "jessica-buddy", "name": "Jessica Buddy", "parent": "family-buddy", "kind": "family", "tagline": "Living dossier for Sawyer's aunt", "mission": "Jessica Buddy is the one place for everything Dave needs to remember, track, and do regarding Jessica: key facts, important dates, notes, reminders, and gift ideas. Key facts: Sawyer's aunt (spelled with a C, not a K); lives in Campbell, CA; Sawyer stayed over at her place the night of 2026-10-08. Which side of the family she's on isn't established.", "status": "Brief review", "statusClass": "st-brief", "brief": "https://docs.google.com/document/d/1u0sPo4bFl11BBl_j8wTfcA0U0KH0pzjhQDE9j_Ey8Fg/edit", "repo": "jessica-buddy", "docs": [], "attention": [{"id": "jessica-buddy-brief", "date": "2026-10-09", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Open: which side of the family unknown."}]}, {"id": "pops-buddy", "name": "Pops Buddy", "parent": "family-buddy", "kind": "family", "tagline": "Living dossier for Pops", "mission": "Pops Buddy is the one place for everything Dave needs to remember, track, and do regarding Pops: key facts, important dates, notes, reminders, and gift ideas. Known today: only the nickname 'Pops' (no given or family name established) and a visit to Dave in San Jose through Friday, September 25, 2026. His relationship to Dave isn't established \u2014 so the dossier is thin, and its first job is simply capturing who Pops is.", "status": "Brief review", "statusClass": "st-brief", "brief": "https://docs.google.com/document/d/160SLTRiRiIiYqwdzx9pgXf-7Wiq8zoEtZpAtq43qoxE/edit", "repo": "pops-buddy", "docs": [], "attention": [{"id": "pops-buddy-brief", "date": "2026-10-09", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Dossier thin \u2014 identity/relationship unknown."}]}];
-const ROOT_ORDER = ["project-buddy", "personal-buddy", "family-buddy", "property-buddy", "finance-buddy", "work-buddy", "car-buddy", "tv-buddy", "news-buddy", "wisdom-buddy", "birthday-buddy", "job-buddy", "reminder-buddy", "housing-buddy", "zen-buddy", "school-buddy", "document-buddy", "dream-buddy", "tech-buddy", "feedback-buddy", "scaffold-buddy", "buddy-suite"];
-const byId = Object.fromEntries(BUDDIES.map(b => [b.id, b]));
-const kidsOf = {};
-BUDDIES.forEach(b => { const p = b.parent || '__root'; (kidsOf[p] = kidsOf[p] || []).push(b); });
-const LS_KEY = 'buddyTree.v3';
-let S = {seen:{}, notes:{}, names:{}, sel:'view:tree'};
-try { Object.assign(S, JSON.parse(localStorage.getItem(LS_KEY) || '{}')); } catch(e) {}
-function save(){ localStorage.setItem(LS_KEY, JSON.stringify(S)); }
-function dispName(b){ return S.names[b.id] || b.name; }
-function unseenItems(b){ return (b.attention || []).filter(a => !S.seen[a.id]); }
-function descUnseen(id){
-  let n = 0;
-  (function walk(x){ const b = byId[x]; if(!b) return; n += unseenItems(b).length;
-    (kidsOf[x] || []).forEach(c => walk(c.id)); })(id);
-  return n;
-}
-function totalUnseen(){ return ROOT_ORDER.reduce((n,id) => n + (byId[id] && byId[id].parent === null ? descUnseen(id) : 0), 0); }
-function crumb(id){
-  const chain = []; let b = byId[id];
-  while (b) { chain.unshift(b); b = b.parent ? byId[b.parent] : null; }
-  return chain.map((c,i) => i < chain.length-1
-    ? '<a href="#" data-goto="'+c.id+'" style="color:#8b949e">'+escHtml(dispName(c))+'</a>'
-    : '<b>'+escHtml(dispName(c))+'</b>').join(' <span style="color:#6e7681">/</span> ');
-}
-function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function renderNav(){
-  const views = [['tree','Tree','▦'],['projects','Projects','☰'],['manifest','Manifest','✓']];
-  document.getElementById('view-nav').innerHTML = views.map(([v,l,ic]) =>
-    '<button class="navbtn'+(S.sel==='view:'+v?' sel':'')+'" data-view="'+v+'"><span class="nic">'+ic+'</span>'+l+'</button>').join('');
-  let h = '';
-  function row(id, depth){
-    const b = byId[id]; if(!b) return;
-    const un = descUnseen(id);
-    const kind = b.kind === 'root' ? 'root' : (b.parent === 'project-buddy' ? 'direct' : b.kind);
-    h += '<button class="brow'+(S.sel==='buddy:'+id?' sel':'')+(un?' has-unseen':'')+'" data-buddy="'+id+'"'
-      + ' style="padding-left:'+(8+depth*16)+'px" title="'+escHtml(b.tagline||'')+'">'
-      + '<span class="bdot"></span><span class="bname">'+escHtml(dispName(b))+'</span>'
-      + '<span class="bkind">'+kind+'</span></button>';
-    (kidsOf[id] || []).forEach(c => row(c.id, depth+1));
-  }
-  ROOT_ORDER.forEach(id => row(id, 0));
-  document.getElementById('buddy-nav').innerHTML = h;
-  const t = totalUnseen();
-  const pill = document.getElementById('attn-pill');
-  pill.textContent = t; pill.classList.toggle('zero', t === 0);
-}
-function artRow(icon, label, sub, url){
-  return '<a class="art-row" href="'+url+'" target="_blank" rel="noopener">'
-    + '<span class="art-ic">'+icon+'</span>'
-    + '<span><span class="art-label">'+escHtml(label)+'</span><div class="art-sub">'+escHtml(sub)+'</div></span>'
-    + '<span class="art-go">→</span></a>';
-}
-function renderBuddy(id){
-  const b = byId[id]; if(!b) return;
-  const items = (b.attention || []).slice().sort((x,y) => (S.seen[x.id]?1:0) - (S.seen[y.id]?1:0));
-  let arts = '';
-  if (b.brief) arts += artRow('<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 1.5h5.5L12.5 4.5v10h-8.5z"/><path d="M9.5 1.5v3h3M6 8.5h4M6 11h4"/></svg>', 'Product Brief', 'The canonical mission & intent — Google Doc', b.brief);
-  if (b.repo) arts += artRow('<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5.5 5.5l-2 2 2 2M10.5 5.5l2 2-2 2"/></svg>', 'GitHub Repo', 'davedellaquila/'+b.repo+' (private)', 'https://github.com/davedellaquila/'+b.repo);
-  (b.docs || []).forEach(d => { arts += artRow('<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6.5 9.5l3-3M7.5 5.5l1.5-1.5a2.5 2.5 0 013.5 3.5L11 9"/><path d="M8.5 10.5L7 12a2.5 2.5 0 01-3.5-3.5L5 7"/></svg>', d.label, 'Related document — Google Doc', d.url); });
-  if (!arts) arts = '<p class="bp-empty">No artifacts yet — the drill adds the brief and repo here when they exist.</p>';
-  let attn = '';
-  if (!items.length) attn = '<p class="bp-empty">Nothing needs your attention right now.</p>';
-  else {
-    attn = items.map(a => {
-      const seen = !!S.seen[a.id];
-      return '<div class="attn'+(seen?' seen':' unseen')+'" data-attn="'+a.id+'"><span class="adot"></span>'
-        + '<div class="attn-body"><div class="attn-text">'+escHtml(a.text)+'</div>'
-        + '<div class="attn-date">Asked '+a.date+'</div></div>'
-        + '<button class="seenbtn" data-seen="'+a.id+'">Mark seen</button></div>';
-    }).join('');
-    const un = items.filter(a => !S.seen[a.id]).length;
-    if (un > 1) attn += '<div class="attn-all"><button class="seenbtn" data-seen-all="'+id+'">Mark all seen</button></div>';
-  }
-  document.getElementById('buddy-home').innerHTML =
-    '<div class="bp-wrap">'
-    + '<div class="bp-crumb">'+crumb(id)+'</div>'
-    + '<div class="bp-top"><h2 class="bp-name" id="bp-name" contenteditable="true" spellcheck="false" data-buddy="'+id+'">'+escHtml(dispName(b))+'</h2>'
-    + '<span class="status '+b.statusClass+'">'+escHtml(b.status)+'</span></div>'
-    + '<p class="bp-tagline">'+escHtml(b.tagline||'')+'</p>'
-    + '<div class="bp-sec"><h3>What it does</h3><p class="bp-mission">'+escHtml(b.mission)+'</p>'
-    + '<p class="fineprint">The mission is the brief’s executive summary — tweak it through the buddy’s chat thread and it updates everywhere.</p></div>'
-    + (id === 'project-buddy'
-        ? '<div class="bp-sec"><h3>The Buddy Tree</h3><div class="bp-tree-wrap"></div>'
-          + '<p class="fineprint"><button class="linkbtn" data-view="tree">Open the tree as its own view →</button></p></div>'
-        : '')
-    + '<div class="bp-sec"><h3>Artifacts</h3>'+arts+'</div>'
-    + '<div class="bp-sec"><h3>Needs your attention</h3>'+attn+'</div>'
-    + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this buddy…">'+escHtml(S.notes[id]||'')+'</textarea>'
-    + '<p class="fineprint">Saved on this device only.</p></div>'
-    + '</div>';
-  const nm = document.getElementById('bp-name');
-  nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
-  nm.addEventListener('blur', () => {
-    const v = nm.textContent.trim();
-    if (v && v !== dispName(b)) { S.names[id] = v; }
-    else { delete S.names[id]; }
-    save(); renderNav();
-  });
-  const nt = document.getElementById('bp-notes');
-  let t = null;
-  nt.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => { S.notes[id] = nt.value; save(); }, 400); });
-  if (id === 'project-buddy') {
-    const tw = document.querySelector('#buddy-home .bp-tree-wrap');
-    const src = document.getElementById('view-tree');
-    if (tw && src) tw.innerHTML = src.innerHTML;
-  }
-}
-function show(sel){
-  S.sel = sel; save();
-  document.querySelectorAll('#main .view').forEach(v => v.classList.remove('active'));
-  if (sel.startsWith('view:')) {
-    document.getElementById('view-' + sel.slice(5)).classList.add('active');
-  } else {
-    document.getElementById('view-buddy').classList.add('active');
-    renderBuddy(sel.slice(6));
-  }
-  renderNav();
-  document.getElementById('main').scrollTop = 0;
-  window.scrollTo(0,0);
-}
-document.addEventListener('click', e => {
-  const vb = e.target.closest('[data-view]');
-  if (vb) { show('view:' + vb.dataset.view); return; }
-  const bb = e.target.closest('[data-buddy]');
-  if (bb) { show('buddy:' + bb.dataset.buddy); return; }
-  const sb = e.target.closest('[data-seen]');
-  if (sb) { S.seen[sb.dataset.seen] = Date.now(); save(); renderBuddy(S.sel.slice(6)); renderNav(); return; }
-  const sa = e.target.closest('[data-seen-all]');
-  if (sa) { (byId[sa.dataset.seenAll].attention || []).forEach(a => S.seen[a.id] = Date.now()); save(); renderBuddy(S.sel.slice(6)); renderNav(); return; }
-  const gt = e.target.closest('[data-goto]');
-  if (gt) { e.preventDefault(); show('buddy:' + gt.dataset.goto); return; }
-});
-show(S.sel || 'view:tree');
+    function selectBuddy(id, updateHash) {
+      const buddy = buddies.find(b => b.id === id) || buddies[0];
+      document.body.classList.remove("detail-open");
+      detailReturnFocus = null;
+      activeId = buddy.id;
+      renderNav(search.value);
+      renderPage(buddy);
+      if (updateHash && location.hash !== `#${buddy.id}`) history.pushState({buddy: buddy.id}, "", `#${buddy.id}`);
+      closeMenu();
+    }
 
-</script>
+    function openMenu() {
+      document.body.classList.add("menu-open");
+      menuButton.setAttribute("aria-expanded", "true");
+      setTimeout(() => search.focus(), 30);
+    }
+    function closeMenu() {
+      document.body.classList.remove("menu-open");
+      menuButton.setAttribute("aria-expanded", "false");
+    }
+
+    search.addEventListener("input", e => renderNav(e.target.value));
+    menuButton.addEventListener("click", () => document.body.classList.contains("menu-open") ? closeMenu() : openMenu());
+    scrim.addEventListener("click", closeMenu);
+    document.addEventListener("keydown", e => {
+      if (e.key !== "Escape") return;
+      if (document.body.classList.contains("detail-open")) closeBuddyDetail();
+      else closeMenu();
+    });
+    window.addEventListener("popstate", () => selectBuddy(location.hash.slice(1), false));
+
+    const initialId = location.hash.slice(1);
+    selectBuddy(buddies.some(b => b.id === initialId) ? initialId : "project-buddy", false);
+  </script>
 </body>
 </html>
