@@ -411,7 +411,7 @@ S.parents = S.parents || {};
 S.zoom = S.zoom || 100;
 buildKids();
 function save(){ localStorage.setItem(LS_KEY, JSON.stringify(S)); }
-function dispName(b){ return S.names[b.id] || b.name; }
+function dispName(b){ let n = S.names[b.id] || b.name; if (S.hideBuddyWord) n = n.replace(/\s+Buddy$/i, ''); return n; }
 function unseenItems(b){ return (b.attention || []).filter(a => !S.seen[a.id]); }
 function descUnseen(id){
   let n = 0;
@@ -542,10 +542,17 @@ function openFieldSettings(){
   if (!m) {
     m = document.createElement('div'); m.id = 'field-settings';
     m.innerHTML = '<h3>Buddy fields</h3><p class="fineprint" style="margin-bottom:12px">Drag to reorder. Uncheck to hide.</p><div id="fset-list"></div>'
+      + '<label style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;cursor:pointer"><input type="checkbox" id="fset-hidebuddy"> Hide \u201cBuddy\u201d from names</label>'
       + '<div style="margin-top:12px;text-align:right"><button class="linkbtn" id="fset-close">Done</button></div>';
     document.body.appendChild(m);
     document.getElementById('fset-close').addEventListener('click', () => m.classList.remove('show'));
+    const hb = document.getElementById('fset-hidebuddy');
+    hb.checked = !!S.hideBuddyWord;
+    hb.addEventListener('change', () => { S.hideBuddyWord = hb.checked; save(); renderNav(); const mm = S.sel.match(/^buddy:(.+)$/); if (mm) renderBuddy(mm[1]); if (S.sel === 'view:tree') renderTree(); });
   }
+  document.addEventListener('keydown', function escClose(e){
+    if (e.key === 'Escape') { const fm = document.getElementById('field-settings'); if (fm) fm.classList.remove('show'); }
+  });
   const list = document.getElementById('fset-list');
   list.innerHTML = getFieldOrder().map(fid => {
     const def = FIELD_DEFS.find(f => f.id === fid);
