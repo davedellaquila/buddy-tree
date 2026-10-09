@@ -77,6 +77,7 @@
   .grip:active { cursor: grabbing; }
   .node .name { font-weight: 700; font-size: 15px; margin-bottom: 5px; }
   .node .desc { font-size: 12px; line-height: 1.45; color: #8b949e; }
+  .kcount { display: inline-block; min-width: 20px; text-align: center; font-size: 11px; font-weight: 700; background: #21262d; border-radius: 999px; padding: 1px 6px; margin-left: 8px; color: #8b949e; vertical-align: 1px; }
   .node .tag {
     display: inline-block; margin-top: 8px; font-size: 10px; font-weight: 600;
     letter-spacing: 0.6px; text-transform: uppercase; padding: 3px 8px; border-radius: 999px;
@@ -204,6 +205,8 @@ body{padding:0}
 #zoombar .zt{position:absolute;top:8px;left:0;right:0;text-align:center;font-size:11px;color:#8b949e;cursor:help}
 #zoomrange{position:absolute;left:50%;top:50%;width:188px;margin:0;padding:0;transform:translate(-50%,-50%) rotate(-90deg);accent-color:#1f6feb;cursor:pointer}
 #zoombar .zv{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:12px;color:#8b949e;font-variant-numeric:tabular-nums}
+#zoomfit{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);background:none;border:1px solid #30363d;border-radius:8px;color:#8b949e;font-size:14px;width:30px;height:26px;cursor:pointer}
+#zoomfit:hover{color:#e6edf3;border-color:#8b949e}
 body.light #zoombar{background:#ffffff;border-color:#d0d7de}
 #sb-resize{position:absolute;top:0;right:-5px;width:11px;height:100%;cursor:ew-resize;z-index:20}
 #sb-resize:hover{background:rgba(31,111,235,.28)}
@@ -235,6 +238,56 @@ body.standalone #main{max-width:880px;margin:0 auto;padding:28px 24px 80px}
   background:#161b22;border:1px solid #30363d;border-radius:12px;font-size:13px;color:#8b949e}
 body.standalone .sa-bar{display:flex}
 .sa-bar .linkbtn{font-size:13px}
+
+/* ============ RESPONSIVE ============ */
+#menu-btn{display:none}
+/* ---- Small: <640px (iPhone) ---- */
+@media (max-width:639px){
+  .app{display:block}
+  #menu-btn{display:block;position:fixed;top:12px;left:12px;z-index:90;background:#161b22;
+    border:1px solid #30363d;border-radius:10px;color:#e6edf3;font-size:18px;
+    width:44px;height:44px;cursor:pointer}
+  #sidebar{position:fixed;left:0;top:0;bottom:0;z-index:95;height:100vh;height:100dvh;
+    transform:translateX(-105%);transition:transform .25s ease;width:300px;flex:none}
+  #sidebar.open{transform:none;box-shadow:8px 0 32px rgba(0,0,0,.5)}
+  #sb-resize{display:none}
+  #main{padding:68px 14px 60px}
+  .tree,.tree ul{display:block;padding:0;margin:0}
+  .tree ul{padding-top:0}
+  .tree li{display:block;padding:0;text-align:left}
+  .tree li::before,.tree li::after,.tree ul ul::before,.root-stub{display:none}
+  .node{display:block;width:auto;margin:0 0 10px}
+  .node.root{width:auto}
+  .standalones .grid{display:block}
+  #treezoom{max-height:none;overflow:visible;cursor:default}
+  #zoombar{display:none}
+  #view-buddy.sheet{position:fixed;left:0;right:0;bottom:0;top:10%;z-index:96;
+    background:#0d1117;border-top:1px solid #30363d;border-radius:18px 18px 0 0;
+    overflow-y:auto;padding:10px 16px 48px;box-shadow:0 -8px 32px rgba(0,0,0,.5)}
+  #view-buddy.sheet::before{content:'';display:block;width:44px;height:5px;border-radius:3px;
+    background:#30363d;margin:2px auto 12px}
+}
+/* ---- Medium: 640-1100px (iPad) ---- */
+@media (min-width:640px) and (max-width:1100px){
+  #sidebar{width:250px;flex:0 0 250px}
+  #view-nav{display:flex;gap:4px;background:#161b22;border:1px solid #30363d;
+    border-radius:12px;padding:4px}
+  #view-nav .navbtn{flex:1}
+  .node{width:172px}
+  #view-buddy.panel{position:fixed;top:0;right:0;bottom:0;width:min(380px,92vw);z-index:60;
+    background:#0d1117;border-left:1px solid #30363d;overflow-y:auto;
+    padding:20px 18px 48px;box-shadow:-8px 0 32px rgba(0,0,0,.5)}
+}
+/* ---- Large: >1100px (desktop) ---- */
+@media (min-width:1101px){
+  #view-buddy.panel{position:fixed;top:0;right:0;bottom:0;width:400px;z-index:60;
+    background:#0d1117;border-left:1px solid #30363d;overflow-y:auto;
+    padding:24px 20px 48px;box-shadow:-8px 0 32px rgba(0,0,0,.5)}
+}
+#view-buddy.panel.active,#view-buddy.sheet.active{display:block}
+#bp-close{display:none}
+#view-buddy.panel #bp-close,#view-buddy.sheet #bp-close{display:inline-block}
+
 .pstrip img{height:150px;border-radius:10px;border:1px solid #30363d;display:block}
 .pstrip img:hover{border-color:#1f6feb}
 .node.drop-target{outline:2px solid #1f6feb;outline-offset:3px}
@@ -315,6 +368,7 @@ body.standalone .sa-bar{display:flex}
 </head>
 <body>
 <div class="app">
+<button id="menu-btn" aria-label="Open menu">☰</button>
 <aside id="sidebar">
 <div id="sb-resize" title="Drag to resize sidebar"></div>
   <div class="brand"><div class="eyebrow">Project Buddy &middot; macro view</div><h1 id="brand-name" title="Click to rename">Buddies</h1><div class="bcount">42 buddies &middot; one family</div></div>
@@ -629,6 +683,9 @@ function artRow(icon, label, sub, url){
     + '<span><span class="art-label">'+escHtml(label)+'</span><div class="art-sub">'+escHtml(sub)+'</div></span>'
     + '<span class="art-go">→</span></a>';
 }
+function closeDetail(){
+  document.getElementById('view-buddy').classList.remove('active', 'panel', 'sheet');
+}
 function renderBuddy(id){
   const b = byId[id]; if(!b) return;
   const items = (b.attention || []).slice().sort((x,y) => (S.seen[x.id]?1:0) - (S.seen[y.id]?1:0));
@@ -670,7 +727,7 @@ function renderBuddy(id){
     + '<div class="bp-topnav"><button class="linkbtn" data-navbtn="back">← Back</button>'
     + '<button class="linkbtn" data-navbtn="prev">‹ Prev</button><button class="linkbtn" data-navbtn="next">Next ›</button>'
     + '<span class="sep">·</span><button class="linkbtn" data-view="tree">All buddies</button>'
-    + '<span class="sep">·</span><button class="linkbtn" id="bp-desktop">💾 Save to desktop</button></div>'
+    + '<span class="sep">·</span><button class="linkbtn" id="bp-close">✕ Close</button><span class="sep">·</span><button class="linkbtn" id="bp-desktop">💾 Save to desktop</button></div>'
     + '<div class="bp-crumb">'+crumb(id)+'</div>'
     + '<div class="bp-top"><span class="bp-icon">'+escHtml(b.icon||'')+'</span><h2 class="bp-name" id="bp-name" contenteditable="true" spellcheck="false" data-buddy="'+id+'">'+escHtml(dispName(b))+'</h2>'
     + '<span class="status '+b.statusClass+'">'+escHtml(b.status)+'</span></div>'
@@ -695,7 +752,7 @@ function renderBuddy(id){
     + '<textarea class="notes" id="bp-ingest" placeholder="Dump what’s in your head about '+escHtml(dispName(b))+'…"></textarea>'
     + '<div style="margin-top:8px"><button class="linkbtn" id="ingest-dump">Dump it →</button> <span class="fineprint" id="ingest-status"></span></div>'
     + '<div id="ingest-feed" style="margin-top:8px"></div></div>'
-    + '<div class="bp-build">Build 20261009.1452</div>'
+    + '<div class="bp-build">Build 20261009.2156</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -793,7 +850,8 @@ function gripHtml(b){
 }
 function orgNode(b, depth){
   const kids = kidsOf[b.id] || [];
-  let s = '<li><div class="node ' + b.kind + '" data-buddy="' + b.id + '">' + gripHtml(b) + '<div class="name">' + iconName(b) + '</div>'
+  const kc = kids.length ? '<span class="kcount">' + kids.length + '</span>' : '';
+  let s = '<li><div class="node ' + b.kind + '" data-buddy="' + b.id + '">' + gripHtml(b) + '<div class="name">' + iconName(b) + kc + '</div>'
     + '<div class="desc">' + escHtml(b.tagline || '') + '</div>'
     + '<div class="tag">' + nodeTag(b, depth) + '</div></div>';
   if (kids.length) s += '<ul>' + kids.map(c => orgNode(c, depth + 1)).join('') + '</ul>';
@@ -858,17 +916,31 @@ function applyZoom(){
   if (r) r.value = S.zoom || 100;
   if (v) v.textContent = (S.zoom || 100) + '%';
 }
+function zoomToFit(){
+  const tz = document.getElementById('treezoom');
+  const chart = tz ? tz.querySelector('.chart') : null;
+  if (!tz || !chart) return;
+  const z = (S.zoom || 100) / 100;
+  const natW = chart.scrollWidth / z, natH = chart.scrollHeight / z;
+  const vw = tz.clientWidth, vh = tz.clientHeight;
+  if (!natW || !natH || !vw || !vh) return;
+  const fit = Math.min(vw / natW, vh / natH) * 100;
+  S.zoom = Math.min(160, Math.max(50, Math.round(fit / 5) * 5));
+  save(); applyZoom();
+  toast('Zoomed to fit (' + S.zoom + '%).');
+}
 (function initZoom(){
   const vt = document.getElementById('view-tree');
   vt.insertAdjacentHTML('afterbegin',
     '<div class="treewrap" id="zoomwrap"><div class="zoombar" id="zoombar"><span class="zt" title="Tip: hold Shift and scroll over the tree to zoom">Zoom</span>'
     + '<input type="range" id="zoomrange" min="50" max="160" step="5" value="100" aria-label="Tree zoom">'
-    + '<span class="zv" id="zoomval">100%</span></div><div id="treezoom"></div></div>');
+    + '<span class="zv" id="zoomval">100%</span><button id="zoomfit" title="Zoom to fit">⛶</button></div><div id="treezoom"></div></div>');
   const tw = document.getElementById('zoomwrap'), tz = document.getElementById('treezoom');
   Array.from(vt.childNodes).forEach(n => { if (n !== tw) tz.appendChild(n); });
   document.getElementById('zoomrange').addEventListener('input', e => {
     S.zoom = parseInt(e.target.value, 10) || 100; save(); applyZoom();
   });
+  document.getElementById('zoomfit').addEventListener('click', zoomToFit);
   applyZoom();
 })();
 (function initBrand(){
@@ -1022,7 +1094,7 @@ function renderPlan(id){
     + '<div class="bp-sec"><h3>Related buddies</h3>'+buds+'</div>'
     + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this plan…">'+escHtml(S.notes[id]||'')+'</textarea>'
     + '<p class="fineprint">Saved on this device only.</p></div>'
-    + '<div class="bp-build">Build 20261009.1452</div>'
+    + '<div class="bp-build">Build 20261009.2156</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
@@ -1038,15 +1110,24 @@ function show(sel, push){
   const h = hashFor(sel);
   try { if (typeof location !== 'undefined' && location.hash !== h) location.hash = h; } catch (e) {}
   document.body.classList.toggle('standalone', isStandalone());
-  document.querySelectorAll('#main .view').forEach(v => v.classList.remove('active'));
-  if (sel.startsWith('view:')) {
-    document.getElementById('view-' + sel.slice(5)).classList.add('active');
-  } else if (sel.startsWith('plan:')) {
-    document.getElementById('view-buddy').classList.add('active');
-    renderPlan(sel.slice(5));
-  } else {
-    document.getElementById('view-buddy').classList.add('active');
+  const vb = document.getElementById('view-buddy');
+  const asOverlay = sel.startsWith('buddy:') && !isStandalone();
+  if (asOverlay) {
+    vb.classList.add('active');
+    vb.classList.toggle('panel', window.innerWidth >= 640);
+    vb.classList.toggle('sheet', window.innerWidth < 640);
     renderBuddy(sel.slice(6));
+  } else {
+    document.querySelectorAll('#main .view').forEach(v => v.classList.remove('active', 'panel', 'sheet'));
+    if (sel.startsWith('view:')) {
+      document.getElementById('view-' + sel.slice(5)).classList.add('active');
+    } else if (sel.startsWith('plan:')) {
+      vb.classList.add('active');
+      renderPlan(sel.slice(5));
+    } else {
+      vb.classList.add('active');
+      renderBuddy(sel.slice(6));
+    }
   }
   renderNav();
   document.getElementById('main').scrollTop = 0;
@@ -1054,6 +1135,20 @@ function show(sel, push){
   setIcon(sel.startsWith('plan:') ? ((planById[sel.slice(5)] || {}).icon)
     : sel.startsWith('buddy:') ? ((byId[sel.slice(6)] || {}).icon) : byId['project-buddy'].icon);
 }
+/* ---------- keyboard nav ---------- */
+document.addEventListener('keydown', e => {
+  if (e.target && e.target.matches && e.target.matches('input, textarea, [contenteditable="true"]')) return;
+  if (e.key === 'Escape') { closeDetail(); return; }
+  if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+  const items = Array.from(document.querySelectorAll('#buddy-nav [data-buddy]'));
+  if (!items.length) return;
+  e.preventDefault();
+  const curId = (S.sel || '').startsWith('buddy:') ? S.sel.slice(6) : null;
+  let idx = items.findIndex(el => el.dataset.buddy === curId);
+  idx = e.key === 'ArrowDown' ? idx + 1 : idx - 1;
+  idx = Math.max(0, Math.min(items.length - 1, idx));
+  show('buddy:' + items[idx].dataset.buddy);
+});
 /* ---------- sidebar resize ---------- */
 (function initSbResize(){
   const sb = document.getElementById('sidebar');
@@ -1306,6 +1401,8 @@ async function loadSharedNotes(id){
   });
 }
 document.addEventListener('click', e => {
+  if (e.target.closest && e.target.closest('#bp-close')) { closeDetail(); return; }
+  if (e.target.closest && e.target.closest('#menu-btn')) { document.getElementById('sidebar').classList.toggle('open'); return; }
   if (e.target.closest && e.target.closest('#bp-desktop')) { const m = S.sel.match(/^buddy:(.+)$/); if (m) saveToDesktop(m[1]); return; }
   if (e.target.closest && e.target.closest('#sa-full')) { try { location.hash = '#/' + S.sel; } catch (e) {} document.body.classList.remove('standalone'); return; }
   if (e.target.closest && e.target.closest('.grip')) { e.preventDefault(); return; }
@@ -1313,6 +1410,8 @@ document.addEventListener('click', e => {
   if (vb) { show('view:' + vb.dataset.view); return; }
   const pb = e.target.closest('[data-plan]');
   if (pb) { e.preventDefault(); show('plan:' + pb.dataset.plan); return; }
+  const sb2 = document.getElementById('sidebar');
+  if (sb2) sb2.classList.remove('open');
   const bb = e.target.closest('[data-buddy]');
   if (bb) { show('buddy:' + bb.dataset.buddy); return; }
   const sb = e.target.closest('[data-seen]');
