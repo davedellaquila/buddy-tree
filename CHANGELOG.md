@@ -6,6 +6,9 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
 ## 2026-10-09
 
 ### Added
+- **Chart viewport polish** — visible border around the chart viewport so its
+  edges are clear; the viewport now fills the available page height instead
+  of clipping. (`f6aa25c`)
 - **Responsive layouts** — three breakpoints: small (<640px) stacks tiles as
   full-width cards with a drawer sidebar (hamburger) and detail as a bottom
   sheet; medium (640–1100px) has a collapsible sidebar, horizontal segmented
