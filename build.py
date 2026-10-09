@@ -942,7 +942,7 @@ function attachPan(el){
   el.addEventListener('pointerdown', e => {
     if (e.pointerType !== 'mouse') return;
     if (e.button !== 0) return;
-    if (e.target.closest && (e.target.closest('.grip') || e.target.closest('input,textarea,button,a'))) return;
+    if (e.target.closest && (e.target.closest('.grip') || e.target.closest('input,textarea,button'))) return;
     pan = { x: e.clientX, y: e.clientY, sl: el.scrollLeft, st: el.scrollTop, moved: false, id: e.pointerId };
     try { el.setPointerCapture(e.pointerId); } catch (err) {}
   });
