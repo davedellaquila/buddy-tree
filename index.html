@@ -799,6 +799,26 @@ function getFieldOrder(){
   if (!S.fieldOrder || !Array.isArray(S.fieldOrder)) S.fieldOrder = FIELD_DEFS.map(f => f.id);
   return S.fieldOrder;
 }
+function applyFieldOrder(){
+  const home = document.getElementById('buddy-home');
+  if (!home) return;
+  const order = getFieldOrder();
+  const sections = {};
+  home.querySelectorAll('.bp-sec[data-field]').forEach(el => { sections[el.dataset.field] = el; });
+  // Remove all and re-append in order
+  Object.values(sections).forEach(el => el.remove());
+  order.forEach(fid => {
+    const el = sections[fid];
+    if (!el) return;
+    if (S.fieldHidden && S.fieldHidden[fid]) el.style.display = 'none';
+    else el.style.display = '';
+    home.appendChild(el);
+  });
+  // Append any sections not in order (safety)
+  Object.entries(sections).forEach(([fid, el]) => {
+    if (!order.includes(fid) && !el.parentNode) home.appendChild(el);
+  });
+}
 function isFieldVisible(fid){
   if (!S.fieldHidden) S.fieldHidden = {};
   return !S.fieldHidden[fid];
@@ -886,13 +906,13 @@ function renderBuddy(id){
   if (!arts) arts = '<p class="bp-empty">No artifacts yet — the drill adds the brief and repo here when they exist.</p>';
   let photos = '';
   const seedStrip = (b.photos || []).map(u => '<a href="'+escHtml(u)+'" target="_blank" rel="noopener"><img src="'+escHtml(u)+'" loading="lazy" alt=""></a>').join('');
-  photos = '<div class="bp-sec"><h3>Photos</h3><div class="pstrip" id="pstrip">' + seedStrip + '</div>'
+  photos = '<div class="bp-sec" data-field="photos"><h3>Photos</h3><div class="pstrip" id="pstrip">' + seedStrip + '</div>'
     + '<div class="pdrop" id="pdrop">Drop photos here or click to choose<br><span style="font-size:12px">JPEG, PNG, GIF, WebP, HEIC — all supported</span></div>'
     + '<p class="fineprint" id="pstat"></p></div>';
   const linkedPlans = PLANS.filter(p => (p.buddies || []).includes(id));
   let planSec = '';
   if (linkedPlans.length) {
-    planSec = '<div class="bp-sec"><h3>Business plans</h3>' + linkedPlans.map(p =>
+    planSec = '<div class="bp-sec" data-field="plans"><h3>Business plans</h3>' + linkedPlans.map(p =>
       '<a class="art-row" href="#" data-plan="'+p.id+'">'
       + '<span class="art-ic">'+escHtml(p.icon||'💼')+'</span>'
       + '<span><span class="art-label">'+escHtml(p.name)+'</span><div class="art-sub">BRD / business plan · '+escHtml(p.status)+'</div></span>'
@@ -928,25 +948,25 @@ function renderBuddy(id){
     + '<div class="bp-top"><span class="bp-icon" id="bp-icon" title="Click to change avatar" style="cursor:pointer">'+escHtml(b.icon||'')+'</span><h2 class="bp-name" id="bp-name" contenteditable="true" spellcheck="false" data-buddy="'+id+'">'+escHtml(dispName(b))+'</h2>'
     + '<span class="status '+b.statusClass+'">'+escHtml(b.status)+'</span></div>'
     + '<p class="bp-tagline">'+escHtml(b.tagline||'')+'</p>'
-    + '<div class="bp-sec"><h3>Ingest<span class="info-tip" data-tip="Brain-dump anything about this buddy — raw and unfiltered. Each dump lands in the buddy’s repo (docs/ingest.md) as a timestamped entry.">ⓘ</span></h3>'
+    + '<div class="bp-sec" data-field="ingest"><h3>Ingest<span class="info-tip" data-tip="Brain-dump anything about this buddy — raw and unfiltered. Each dump lands in the buddy’s repo (docs/ingest.md) as a timestamped entry.">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-ingest" placeholder="Dump what’s in your head about '+escHtml(dispName(b))+'…"></textarea>'
     + '<div style="margin-top:8px"><span class="fineprint" id="ingest-status"></span></div>'
     + '<div id="ingest-feed" style="margin-top:8px"></div></div>'
-    + '<div class="bp-sec"><h3>What it does<span class="info-tip" data-tip="The mission is the brief\u2019s executive summary \u2014 tweak it through the buddy\u2019s chat thread and it updates everywhere.">\u24d8</span></h3><p class="bp-mission">'+escHtml(b.mission)+'</p></div>'
-    + '<div class="bp-sec"><h3>Needs your attention</h3>'+attn+'</div>'
+    + '<div class="bp-sec" data-field="mission"><h3>What it does<span class="info-tip" data-tip="The mission is the brief\u2019s executive summary \u2014 tweak it through the buddy\u2019s chat thread and it updates everywhere.">\u24d8</span></h3><p class="bp-mission">'+escHtml(b.mission)+'</p></div>'
+    + '<div class="bp-sec" data-field="attention"><h3>Needs your attention</h3>'+attn+'</div>'
     + photos
     + (id === 'project-buddy'
-        ? '<div class="bp-sec"><h3>The Buddy Tree</h3><div class="bp-tree-wrap"></div>'
+        ? '<div class="bp-sec" data-field="tree"><h3>The Buddy Tree</h3><div class="bp-tree-wrap"></div>'
           + '<p class="fineprint"><button class="linkbtn" data-view="tree">Open the tree as its own view \u2192</button></p></div>'
         : '')
-    + '<div class="bp-sec"><h3>Artifacts</h3>'+arts+'</div>'
+    + '<div class="bp-sec" data-field="artifacts"><h3>Artifacts</h3>'+arts+'</div>'
     + planSec
-    + '<div class="bp-sec"><h3>Notes<span class="info-tip" data-tip="Saved on this device only.">ⓘ</span></h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this buddy…">'+escHtml(S.notes[id]||'')+'</textarea>'
+    + '<div class="bp-sec" data-field="notes"><h3>Notes<span class="info-tip" data-tip="Saved on this device only.">ⓘ</span></h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this buddy…">'+escHtml(S.notes[id]||'')+'</textarea>'
     + '</div>'
-    + '<div class="bp-sec"><h3>Shared notes<span class="info-tip" data-tip="Saved to the buddy’s repo (docs/notes.md) — visible to everyone with repo access.">ⓘ</span></h3>'
+    + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Saved to the buddy’s repo (docs/notes.md) — visible to everyone with repo access.">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Shared notes…"></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261009.1543</div>'
+    + '<div class="bp-build">Build 20261009.1545</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -991,6 +1011,7 @@ function renderBuddy(id){
   initPhotoDrop(id);
   initPanelResize(); applyPanelWidth();
   refreshTokenUI(id);
+  applyFieldOrder();
   renderJournal();
   if (id === 'project-buddy') {
     const tw = document.querySelector('#buddy-home .bp-tree-wrap');
@@ -1345,7 +1366,7 @@ function renderPlan(id){
     + '<div class="bp-sec"><h3>Related buddies</h3>'+buds+'</div>'
     + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this plan…">'+escHtml(S.notes[id]||'')+'</textarea>'
     + '<p class="fineprint">Saved on this device only.</p></div>'
-    + '<div class="bp-build">Build 20261009.1543</div>'
+    + '<div class="bp-build">Build 20261009.1545</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
