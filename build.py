@@ -1321,6 +1321,7 @@ async function handlePhotoFiles(id, files){
     } catch (err) { toast('Photo failed: ' + (err.message || err)); }
   }
   if (progTile) progTile.remove();
+  const dz = document.getElementById('pdrop'); if (dz) dz.style.background = '';
   loadPhotos(id);
 }
 function renderTokenRow(id){
