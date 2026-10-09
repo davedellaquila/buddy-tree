@@ -139,6 +139,19 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
   display:flex;align-items:center;justify-content:center}
 #bp-resize::after{content:'';width:4px;height:40px;border-radius:2px;background:#30363d}
 #bp-resize:hover::after{background:#1f6feb}
+#sb-gear{position:absolute;top:12px;right:12px;z-index:10;width:32px;height:32px;background:none;border:1px solid #30363d;
+  border-radius:8px;color:#8b949e;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#sb-gear:hover{color:#e6edf3;border-color:#1f6feb}
+#sidebar{position:relative}
+#avatar-picker{position:fixed;z-index:2000;background:#161b22;border:1px solid #30363d;border-radius:12px;
+  padding:16px;width:280px;display:none;box-shadow:0 12px 40px rgba(0,0,0,.6)}
+#avatar-picker.show{display:block}
+#avatar-picker h4{margin:0 0 10px;font-size:13px}
+#avatar-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-bottom:10px}
+#avatar-grid button{background:none;border:1px solid transparent;border-radius:8px;font-size:20px;padding:6px;cursor:pointer}
+#avatar-grid button:hover{border-color:#1f6feb;background:#1c2128}
+#avatar-picker input{width:100%;box-sizing:border-box;background:#0d1117;border:1px solid #30363d;color:#e6edf3;
+  border-radius:8px;padding:8px;font-size:14px;text-align:center}
 .info-tip{position:relative;display:inline-block;margin-left:6px;cursor:help;color:#8b949e;font-size:12px}
 .info-tip:hover{color:#e6edf3}
 .info-tip::after{content:attr(data-tip);position:absolute;bottom:125%;left:50%;transform:translateX(-50%);
@@ -341,6 +354,7 @@ def build():
     js = """const BUDDIES = BUDDIES_JSON;
 const ROOT_ORDER = ORDER_JSON;
 const byId = Object.fromEntries(BUDDIES.map(b => [b.id, b]));
+(function applyIconOverrides(){ try { const o = JSON.parse(localStorage.getItem('buddyState') || '{}').iconOverrides || {}; Object.entries(o).forEach(([id, ic]) => { if (byId[id]) byId[id].icon = ic; }); } catch(e){} })();
 const PLANS = PLANS_JSON;
 const planById = Object.fromEntries(PLANS.map(p => [p.id, p]));
 const kidsOf = {};
@@ -562,7 +576,7 @@ function renderBuddy(id){
     + '<span class="sep">\u00b7</span><button class="linkbtn" data-view="tree">All buddies</button>'
     + '<span class="sep">\u00b7</span><button class="linkbtn" id="bp-close">\u2715 Close</button><span class="sep">\u00b7</span><button class="linkbtn" id="bp-desktop">\U0001f4be Save to desktop</button></div>'
     + '<div class="bp-crumb">'+crumb(id)+'</div>'
-    + '<div class="bp-top"><span class="bp-icon">'+escHtml(b.icon||'')+'</span><h2 class="bp-name" id="bp-name" contenteditable="true" spellcheck="false" data-buddy="'+id+'">'+escHtml(dispName(b))+'</h2>'
+    + '<div class="bp-top"><span class="bp-icon" id="bp-icon" title="Click to change avatar" style="cursor:pointer">'+escHtml(b.icon||'')+'</span><h2 class="bp-name" id="bp-name" contenteditable="true" spellcheck="false" data-buddy="'+id+'">'+escHtml(dispName(b))+'</h2>'
     + '<span class="status '+b.statusClass+'">'+escHtml(b.status)+'</span></div>'
     + '<p class="bp-tagline">'+escHtml(b.tagline||'')+'</p>'
     + '<div class="bp-sec"><h3>Ingest</h3><p class="fineprint">Brain-dump anything about this buddy \u2014 raw and unfiltered. '
@@ -1301,6 +1315,44 @@ function firstSearchMatch(){
   }
   return null;
 }
+const AVATAR_CHOICES = ['\U0001f4cb','\U0001f3e0','\U0001f4bc','\U0001f680','\U0001f4a1','\U0001f3af','\U0001f3ae','\U0001f3b5','\U0001f4f7','\U0001f697','\U0001f3e1','\U0001f9f3','\U0001f4dA','\U0001f4dd','\U0001f6e0','\U0001f9ed','\U0001f464','\U0001f465','\U0001f43e','\U0001f431','\U0001f33a','\U00002600','\U0001f319','\U0001f4ab'];
+function openAvatarPicker(bid, anchorEl){
+  let pk = document.getElementById('avatar-picker');
+  if (!pk) {
+    pk = document.createElement('div'); pk.id = 'avatar-picker';
+    pk.innerHTML = '<h4>Choose avatar</h4><div id="avatar-grid"></div>'
+      + '<input id="avatar-custom" placeholder="Or paste any emoji" maxlength="8">';
+    document.body.appendChild(pk);
+  }
+  const grid = document.getElementById('avatar-grid');
+  grid.innerHTML = AVATAR_CHOICES.map(e => '<button data-emoji="' + e + '">' + e + '</button>').join('');
+  grid.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => { setBuddyIcon(bid, btn.dataset.emoji); pk.classList.remove('show'); });
+  });
+  const inp = document.getElementById('avatar-custom');
+  inp.value = '';
+  inp.onchange = () => { const v = inp.value.trim(); if (v) { setBuddyIcon(bid, v); pk.classList.remove('show'); } };
+  const r = anchorEl.getBoundingClientRect();
+  pk.style.left = Math.min(window.innerWidth - 300, r.left) + 'px';
+  pk.style.top = (r.bottom + 8) + 'px';
+  pk.classList.add('show');
+  const close = e => { if (!pk.contains(e.target) && e.target !== anchorEl) { pk.classList.remove('show'); document.removeEventListener('click', close); } };
+  setTimeout(() => document.addEventListener('click', close), 10);
+}
+function setBuddyIcon(bid, emoji){
+  const b = byId[bid]; if (!b) return;
+  b.icon = emoji;
+  // Persist to buddies.json via journal? For now, device-local + mark dirty
+  if (!S.iconOverrides) S.iconOverrides = {};
+  S.iconOverrides[bid] = emoji; save();
+  const el = document.getElementById('bp-icon'); if (el) el.textContent = emoji;
+  renderNav(); refreshViews();
+  toast('Avatar updated.');
+}
+function initGear(){
+  const g = document.getElementById('sb-gear');
+  if (g && !g.dataset.init) { g.dataset.init = '1'; g.addEventListener('click', () => openFieldSettings()); }
+}
 function initSearch(){
   const bs = document.getElementById('buddy-search');
   if (bs && !bs.dataset.init) {
@@ -1364,6 +1416,7 @@ async function loadSharedNotes(id){
   });
 }
 document.addEventListener('click', e => {
+  if (e.target.closest && e.target.closest('#bp-icon')) { const m = S.sel.match(/^buddy:(.+)$/); if (m) openAvatarPicker(m[1], e.target.closest('#bp-icon')); return; }
   if (e.target.closest && (e.target.closest('#bp-close') || e.target.closest('#bp-close-x'))) { closeDetail(); return; }
   if (e.target.closest && e.target.closest('#menu-btn')) { document.getElementById('sidebar').classList.toggle('open'); return; }
   if (e.target.closest && e.target.closest('#ghtok2-save')) {
@@ -1415,6 +1468,7 @@ refreshViews();
 renderJournal();
 initTokenPill();
 initSearch();
+initGear();
 """
     js = js.replace("BUDDIES_JSON", buddies_js).replace("ORDER_JSON", order_js).replace("PLANS_JSON", plans_js)
     js = js.replace("ICON_DOC", "'" + ICON_DOC.replace("'", "\\'") + "'")
@@ -1436,7 +1490,7 @@ initSearch();
 <body>
 <div class="app">
 <button id="menu-btn" aria-label="Open menu">\u2630</button>
-<aside id="sidebar">
+<aside id="sidebar"><button id="sb-gear" title="Settings">\u2699</button>
 <div id="sb-resize" title="Drag to resize sidebar"></div>
   <div class="brand"><div class="eyebrow">Project Buddy &middot; macro view</div><h1 id="brand-name" title="Click to rename">Buddies</h1><div class="bcount">NBUD buddies &middot; one family</div></div>
   <div class="nav-sec"><h3>Views</h3><div id="view-nav"></div></div>
