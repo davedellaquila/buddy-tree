@@ -1146,12 +1146,15 @@ const navHist = [];
 function locHash(){ try { return (typeof location !== 'undefined' && location.hash) || ''; } catch (e) { return ''; } }
 function isStandalone(){ return /(^|\/)standalone$/.test(locHash().replace(/^#\//, '')); }
 function hashFor(sel){ return '#/' + sel + (isStandalone() ? '/standalone' : ''); }
-const VIEW_KEYS = {'1':'view:tree','2':'view:projects','3':'view:plans','4':'view:manifest'};
 document.addEventListener('keydown', e => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   if (e.target && e.target.closest && e.target.closest('input,textarea,[contenteditable]')) return;
-  const v = VIEW_KEYS[e.key];
-  if (v) { show(v); e.preventDefault(); }
+  if (e.key >= '1' && e.key <= '9') {
+    const idx = parseInt(e.key, 10) - 1;
+    const btns = Array.from(document.querySelectorAll('#sidebar .navbtn[data-view]'));
+    const btn = btns[idx];
+    if (btn && btn.dataset.view) { show('view:' + btn.dataset.view); e.preventDefault(); }
+  }
 });
 function show(sel, push){
   if (push !== false && S.sel && sel !== S.sel) { navHist.push(S.sel); if (navHist.length > 60) navHist.shift(); }
