@@ -806,9 +806,7 @@ function renderBuddy(id){
   });
   loadPhotos(id);
   initPhotoDrop(id);
-  updateTokenGating(id);
-  loadSharedNotes(id);
-  renderIngestFeed(id);
+  refreshTokenUI(id);
   renderJournal();
   if (id === 'project-buddy') {
     const tw = document.querySelector('#buddy-home .bp-tree-wrap');
@@ -1424,18 +1422,28 @@ function initTokenPill(){
     const v = document.getElementById('ghtok-global').value.trim();
     if (!v) return;
     S.ghToken = v; save();
-    updateTokenPill(); updateTokenGating(S.sel.match(/^buddy:(.+)$/)?.[1]);
+    const mm = S.sel.match(/^buddy:(.+)$/); refreshTokenUI(mm ? mm[1] : null);
     const chk = document.getElementById('token-saved-check'); chk.classList.add('show');
     setTimeout(() => { chk.classList.remove('show'); pop.classList.remove('show'); }, 1800);
     toast('✓ Token saved on this device.');
   });
   document.getElementById('ghtok-global-clear').addEventListener('click', () => {
     S.ghToken = ''; save();
-    updateTokenPill(); updateTokenGating(S.sel.match(/^buddy:(.+)$/)?.[1]);
+    const m3 = S.sel.match(/^buddy:(.+)$/); refreshTokenUI(m3 ? m3[1] : null);
     document.getElementById('ghtok-global').value = '';
     toast('Token removed.');
   });
   updateTokenPill();
+}
+function refreshTokenUI(id){
+  updateTokenPill();
+  updateTokenGating(id);
+  if (id && S.sel === 'buddy:' + id) {
+    loadSharedNotes(id);
+    renderIngestFeed(id);
+    const pz = document.getElementById('pstat');
+    if (pz && ghToken()) pz.textContent = 'Ready — drop photos to publish to the repo.';
+  }
 }
 function updateTokenGating(id){
   const has = !!ghToken();
@@ -1487,7 +1495,7 @@ document.addEventListener('click', e => {
     const v = document.getElementById('ghtok2').value.trim();
     if (!v) return;
     S.ghToken = v; save();
-    const m = S.sel.match(/^buddy:(.+)$/); if (m) { updateTokenGating(m[1]); loadSharedNotes(m[1]); renderIngestFeed(m[1]); }
+    const m2 = S.sel.match(/^buddy:(.+)$/); refreshTokenUI(m2 ? m2[1] : null);
     toast('Token saved on this device.');
     return;
   }
