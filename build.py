@@ -265,6 +265,9 @@ body.standalone .sa-bar{display:flex}
   font-size:12.5px;padding:6px 12px;border-radius:999px;cursor:pointer}
 .seenbtn:hover{border-color:#1f6feb}
 .attn.seen{opacity:.55}
+.attn.seen .adot{visibility:visible;background:#1a7f37;width:18px;height:18px;flex:0 0 18px;
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700}
+.attn.seen .adot::after{content:'\\2713'}
 .attn.seen .seenbtn{visibility:hidden}
 .attn-all{margin-top:6px}
 .notes{width:100%;min-height:120px;background:#0d1117;border:1px solid #30363d;border-radius:12px;
