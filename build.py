@@ -101,6 +101,20 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 .tokenwarn{background:#3a2a00;border:2px solid #d29922;color:#f0b429;border-radius:10px;padding:14px 16px;font-size:14px;margin-top:8px;line-height:1.6}
 .tokenwarn a{color:#ffd866;font-weight:bold}
 .tokenwarn b{color:#ffe9a8}
+#token-pill{position:fixed;top:12px;right:12px;z-index:1000;display:flex;align-items:center;gap:6px;
+  padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;border:2px solid;transition:all .2s}
+#token-pill.need{background:#3a2a00;border-color:#d29922;color:#ffd866}
+#token-pill.ok{background:#0d2818;border-color:#2ea043;color:#7ee787}
+#token-pill:hover{transform:scale(1.05)}
+#token-pop{position:fixed;top:52px;right:12px;z-index:1001;background:#161b22;border:1px solid #30363d;border-radius:12px;
+  padding:16px;width:300px;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+#token-pop.show{display:block}
+#token-pop h4{margin:0 0 8px;font-size:14px}
+#token-pop p{margin:0 0 10px;font-size:12px;color:#8b949e;line-height:1.5}
+#token-pop input{width:100%;box-sizing:border-box;background:#0d1117;border:1px solid #30363d;color:#e6edf3;
+  border-radius:8px;padding:8px 10px;font-size:13px;margin-bottom:10px}
+#token-pop .saved-check{display:none;color:#7ee787;font-size:14px;font-weight:600;margin-top:8px}
+#token-pop .saved-check.show{display:block}
 .ghtoken input{flex:1;min-width:180px;background:#0d1117;border:1px solid #30363d;color:#e6edf3;border-radius:8px;padding:7px 10px;font-size:13px}
 .linkbtn{background:none;border:none;color:#1f6feb;cursor:pointer;font-size:13px;padding:2px 4px}
 .linkbtn:hover{text-decoration:underline}
@@ -1014,7 +1028,7 @@ async function handlePhotoFiles(id, files){
   const st = document.getElementById('pstat');
   const list = Array.from(files || []).filter(f => /^image\//.test(f.type) || /\.hei[cf]$/i.test(f.name));
   if (!list.length) { toast('No image files in that drop.'); return; }
-  if (!ghToken()) { toast('Add a GitHub token below to publish photos to the repo.'); renderTokenRow(id); return; }
+  if (!ghToken()) { toast('Add your GitHub token first — click the token pill (top right).'); document.getElementById('token-pop').classList.add('show'); return; }
   let n = 0;
   for (const f of list) {
     try {
@@ -1056,9 +1070,39 @@ function initPhotoDrop(id){
     inp.addEventListener('change', () => handlePhotoFiles(id, inp.files));
     inp.click();
   });
-  if (!ghToken()) renderTokenRow(id);
+  if (!ghToken()) { const tp = document.getElementById('token-pop'); if (tp) tp.classList.add('show'); }
 }
 /* ---------- shared notes ---------- */
+function updateTokenPill(){
+  const has = !!ghToken();
+  const pill = document.getElementById('token-pill');
+  if (!pill) return;
+  pill.className = has ? 'ok' : 'need';
+  document.getElementById('token-pill-icon').textContent = has ? '\u2713' : '\U0001f511';
+  document.getElementById('token-pill-text').textContent = has ? 'GitHub' : 'Token needed';
+}
+function initTokenPill(){
+  const pill = document.getElementById('token-pill'), pop = document.getElementById('token-pop');
+  if (!pill || !pop) return;
+  pill.addEventListener('click', e => { e.stopPropagation(); pop.classList.toggle('show'); });
+  document.addEventListener('click', e => { if (!e.target.closest('#token-pop') && !e.target.closest('#token-pill')) pop.classList.remove('show'); });
+  document.getElementById('ghtok-global-save').addEventListener('click', () => {
+    const v = document.getElementById('ghtok-global').value.trim();
+    if (!v) return;
+    S.ghToken = v; save();
+    updateTokenPill(); updateTokenGating(S.sel.match(/^buddy:(.+)$/)?.[1]);
+    const chk = document.getElementById('token-saved-check'); chk.classList.add('show');
+    setTimeout(() => { chk.classList.remove('show'); pop.classList.remove('show'); }, 1800);
+    toast('\u2713 Token saved on this device.');
+  });
+  document.getElementById('ghtok-global-clear').addEventListener('click', () => {
+    S.ghToken = ''; save();
+    updateTokenPill(); updateTokenGating(S.sel.match(/^buddy:(.+)$/)?.[1]);
+    document.getElementById('ghtok-global').value = '';
+    toast('Token removed.');
+  });
+  updateTokenPill();
+}
 function updateTokenGating(id){
   const has = !!ghToken();
   const banner = document.getElementById('token-banner');
@@ -1153,6 +1197,7 @@ refreshViews();
   });
 })();
 renderJournal();
+initTokenPill();
 """
     js = js.replace("BUDDIES_JSON", buddies_js).replace("ORDER_JSON", order_js).replace("PLANS_JSON", plans_js)
     js = js.replace("ICON_DOC", "'" + ICON_DOC.replace("'", "\\'") + "'")

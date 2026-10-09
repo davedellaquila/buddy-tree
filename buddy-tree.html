@@ -150,6 +150,17 @@
 </style>
 <div class="page">
 
+  <div id="token-pill" class="need" title="GitHub token status — click to manage">
+    <span id="token-pill-icon">🔑</span><span id="token-pill-text">Token needed</span>
+  </div>
+  <div id="token-pop">
+    <h4>GitHub token</h4>
+    <p>One-time setup. A classic token with <b>repo</b> scope unlocks photos, shared notes & ingest across all buddies. Stored on this device only.</p>
+    <input type="password" id="ghtok-global" placeholder="Paste token here" aria-label="GitHub token">
+    <div><button class="linkbtn" id="ghtok-global-save">Save token</button>
+    <button class="linkbtn" id="ghtok-global-clear" style="margin-left:8px">Remove</button></div>
+    <div class="saved-check" id="token-saved-check">✓ Saved — you're connected!</div>
+  </div>
   <header>
     <div class="eyebrow">Project Buddy &middot; macro view</div>
     <h1>Buddies</h1>
