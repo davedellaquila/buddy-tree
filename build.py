@@ -67,6 +67,7 @@ body{padding:0}
 #view-tree #zoomwrap{flex:1;min-height:0;align-items:stretch}
 #treezoom{flex:1;min-width:0;min-height:0;overflow:auto;border:1px solid #30363d;border-left:none;border-right:none;cursor:grab;border-radius:0;background:#0d1117}
 #treezoom.panning{cursor:grabbing}
+#treezoom,#view-projects,#view-manifest{touch-action:pan-x pan-y}
 #treezoom.panning,#treezoom.panning *{user-select:none!important;-webkit-user-select:none!important}
 #treezoom,#treezoom *{user-select:none;-webkit-user-select:none}
 #zoombar{position:absolute;top:14px;left:14px;width:54px;height:248px;background:rgba(22,27,34,.94);border:1px solid #30363d;border-radius:12px;z-index:5;box-shadow:0 4px 16px rgba(0,0,0,.4)}
@@ -657,38 +658,46 @@ function zoomToFit(){
     save();
   });
 })();
-(function initPan(){
-  const tz = document.getElementById('treezoom');
+function attachPan(el){
+  if (!el || el.dataset.panAttached) return;
+  el.dataset.panAttached = '1';
   let pan = null, swallow = false;
-  tz.addEventListener('pointerdown', e => {
-    if (e.pointerType !== 'mouse' || e.button !== 0) return;
-    if (e.target.closest && e.target.closest('.grip')) return;
-    pan = { x: e.clientX, y: e.clientY, sl: tz.scrollLeft, st: tz.scrollTop, moved: false, id: e.pointerId };
+  el.addEventListener('pointerdown', e => {
+    if (e.pointerType !== 'mouse') return;
+    if (e.button !== 0) return;
+    if (e.target.closest && (e.target.closest('.grip') || e.target.closest('input,textarea,button,a'))) return;
+    pan = { x: e.clientX, y: e.clientY, sl: el.scrollLeft, st: el.scrollTop, moved: false, id: e.pointerId };
   });
-  tz.addEventListener('pointermove', e => {
+  el.addEventListener('pointermove', e => {
     if (!pan || e.pointerId !== pan.id) return;
     const dx = e.clientX - pan.x, dy = e.clientY - pan.y;
     if (!pan.moved && Math.abs(dx) + Math.abs(dy) < 5) return;
     pan.moved = true;
-    tz.classList.add('panning');
-    tz.scrollLeft = pan.sl - dx;
-    tz.scrollTop = pan.st - dy;
+    el.classList.add('panning');
+    el.scrollLeft = pan.sl - dx;
+    el.scrollTop = pan.st - dy;
     e.preventDefault();
   });
   function endPan(e){
     if (!pan) return;
     if (e && e.pointerId !== pan.id) return;
-    tz.classList.remove('panning');
+    el.classList.remove('panning');
     if (pan.moved) { swallow = true; setTimeout(() => { swallow = false; }, 80); }
     pan = null;
   }
-  tz.addEventListener('pointerup', endPan);
-  tz.addEventListener('pointercancel', endPan);
+  el.addEventListener('pointerup', endPan);
+  el.addEventListener('pointercancel', endPan);
   window.addEventListener('pointerup', () => endPan(null));
-  tz.addEventListener('click', e => {
+  el.addEventListener('click', e => {
     if (swallow) { e.preventDefault(); e.stopPropagation(); }
   }, true);
-})();
+}
+function initPan(){
+  attachPan(document.getElementById('treezoom'));
+  attachPan(document.getElementById('view-projects'));
+  attachPan(document.getElementById('view-manifest'));
+}
+initPan();
 (function initGripDrag(){
   const tz = document.getElementById('treezoom');
   tz.addEventListener('dragstart', e => {
