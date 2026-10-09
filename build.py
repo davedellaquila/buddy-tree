@@ -1528,8 +1528,13 @@ document.addEventListener('click', e => {
     const mm = S.sel.match(/^buddy:(.+)$/);
     const bid = mm ? mm[1] : null;
     if (!confirm('Delete this photo?')) return;
+    const wrap = pd.closest('.pwrap');
     ghDeleteFile(repo, path, 'Delete photo for ' + (bid || 'buddy'))
-      .then(() => { toast('Photo deleted.'); if (bid) loadPhotos(bid); })
+      .then(() => {
+        toast('Photo deleted.');
+        if (wrap) wrap.remove();
+        if (bid) setTimeout(() => loadPhotos(bid), 1000);
+      })
       .catch(err => toast('Delete failed: ' + (err.message || err)));
     return;
   }
