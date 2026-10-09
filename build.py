@@ -618,8 +618,8 @@ function renderBuddy(id){
   if (!arts) arts = '<p class="bp-empty">No artifacts yet — the drill adds the brief and repo here when they exist.</p>';
   let photos = '';
   const seedStrip = (b.photos || []).map(u => '<a href="'+escHtml(u)+'" target="_blank" rel="noopener"><img src="'+escHtml(u)+'" loading="lazy" alt=""></a>').join('');
-  photos = '<div class="bp-sec" data-field="photos"><h3>Photos</h3><div class="pstrip" id="pstrip">' + seedStrip + '</div>'
-    + '<div class="pdrop" id="pdrop">Drop photos here or click to choose<br><span style="font-size:12px">JPEG, PNG, GIF, WebP, HEIC \u2014 all supported</span></div>'
+  photos = '<div class="bp-sec" data-field="photos"><h3>Photos</h3><div class="prow"><div class="pstrip" id="pstrip">' + seedStrip + '</div>'
+    + '<div class="pdrop" id="pdrop">Drop photos here or click to choose<br><span style="font-size:12px">JPEG, PNG, GIF, WebP, HEIC \\u2014 all supported</span></div></div>'
     + '<p class="fineprint" id="pstat"></p></div>';
   const linkedPlans = PLANS.filter(p => (p.buddies || []).includes(id));
   let planSec = '';
