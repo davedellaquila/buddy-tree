@@ -1631,7 +1631,6 @@ document.addEventListener('click', e => {
       .then(() => {
         toast('Photo deleted.');
         if (wrap) wrap.remove();
-        if (bid) setTimeout(() => loadPhotos(bid), 1000);
       })
       .catch(err => toast('Delete failed: ' + (err.message || err)));
     return;
