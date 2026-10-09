@@ -1,5 +1,11 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>The Buddy Tree — Project Buddy Dashboard</title></head><body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Buddy Tree — Project Buddy dashboard</title>
 <style>
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif;
@@ -133,32 +139,110 @@
   html[data-theme="light"] .proj-row { border-bottom-color: #e5e9ee; }
   html[data-theme="light"] .proj-row .pdesc { color: #57606a; }
   html[data-theme="light"] .d0 { background: #ffffff; border: 1px solid #e5e9ee; }
+
+/* ---- app shell ---- */
+body{padding:0}
+.app{display:flex;min-height:100vh;align-items:stretch}
+#sidebar{width:308px;flex:0 0 308px;background:#0d1117;border-right:1px solid #21262d;
+  padding:22px 14px 32px;position:sticky;top:0;height:100vh;overflow-y:auto}
+#main{flex:1;min-width:0;padding:36px 32px 80px}
+.brand{padding:0 8px 14px}
+.brand .eyebrow{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8b949e}
+.brand h1{font-size:22px;margin:4px 0 0}
+.nav-sec{margin-top:18px}
+.nav-sec>h3{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8b949e;
+  margin:0 8px 8px;display:flex;align-items:center;gap:8px}
+#attn-pill{background:#1f6feb;color:#fff;font-size:11px;font-weight:700;border-radius:999px;
+  padding:1px 8px;letter-spacing:0;text-transform:none}
+#attn-pill.zero{background:#21262d;color:#8b949e}
+.navbtn{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;
+  color:#e6edf3;font:inherit;font-size:14px;padding:8px 10px;border-radius:8px;cursor:pointer}
+.navbtn:hover{background:#161b22}
+.navbtn.sel{background:#1c2330;box-shadow:inset 2px 0 0 #1f6feb}
+.navbtn .nic{width:20px;text-align:center;color:#8b949e}
+.brow{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:0;
+  color:#e6edf3;font:inherit;font-size:13.5px;padding:6px 10px 6px 8px;border-radius:8px;cursor:pointer}
+.brow:hover{background:#161b22}
+.brow.sel{background:#1c2330;box-shadow:inset 2px 0 0 #1f6feb}
+.bdot{width:8px;height:8px;border-radius:50%;background:#1f6feb;flex:0 0 8px;visibility:hidden}
+.brow.has-unseen .bdot{visibility:visible}
+.bname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bkind{font-size:10px;color:#6e7681;letter-spacing:.5px;text-transform:uppercase}
+/* ---- buddy homepage ---- */
+.bp-wrap{max-width:880px;margin:0 auto;padding:6px 4px}
+.bp-crumb{font-size:12.5px;color:#8b949e;margin-bottom:10px}
+.bp-crumb b{color:#e6edf3;font-weight:600}
+.bp-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.bp-name{font-size:32px;font-weight:700;margin:0;outline:none;border-bottom:2px dashed transparent;
+  padding-bottom:2px;min-width:120px}
+.bp-name:hover{border-bottom-color:#30363d}
+.bp-name:focus{border-bottom-color:#1f6feb;background:#0f1a2e}
+.bp-tagline{color:#8b949e;font-size:15px;margin:8px 0 0}
+.bp-sec{margin-top:30px}
+.bp-sec>h3{font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:#8b949e;margin:0 0 12px}
+.bp-mission{font-size:15.5px;line-height:1.7;background:#161b22;border:1px solid #30363d;
+  border-radius:12px;padding:16px 18px;margin:0}
+.art-row{display:flex;align-items:center;gap:14px;padding:11px 14px;border:1px solid #21262d;
+  border-radius:12px;margin-bottom:10px;text-decoration:none;color:inherit;background:#0d1117}
+.art-row:hover{border-color:#1f6feb;background:#11161d}
+.art-ic{width:38px;height:38px;border-radius:10px;background:#161b22;border:1px solid #30363d;
+  display:flex;align-items:center;justify-content:center;flex:0 0 38px;color:#8b949e}
+.art-label{font-weight:650;font-size:14.5px}
+.art-sub{font-size:12.5px;color:#8b949e;margin-top:2px}
+.art-go{margin-left:auto;color:#6e7681;font-size:18px}
+.attn{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:13px 15px;
+  margin-bottom:10px;display:flex;gap:12px;align-items:flex-start}
+.attn.unseen{border-color:#1f6feb;background:#0d1a30}
+.attn .adot{width:9px;height:9px;border-radius:50%;background:#1f6feb;margin-top:6px;flex:0 0 9px;visibility:hidden}
+.attn.unseen .adot{visibility:visible}
+.attn-body{flex:1;min-width:0}
+.attn-text{font-size:14.5px;line-height:1.5}
+.attn-date{font-size:12px;color:#8b949e;margin-top:5px}
+.seenbtn{flex:0 0 auto;background:#21262d;border:1px solid #30363d;color:#e6edf3;font:inherit;
+  font-size:12.5px;padding:6px 12px;border-radius:999px;cursor:pointer}
+.seenbtn:hover{border-color:#1f6feb}
+.attn.seen{opacity:.55}
+.attn.seen .seenbtn{visibility:hidden}
+.attn-all{margin-top:6px}
+.notes{width:100%;min-height:120px;background:#0d1117;border:1px solid #30363d;border-radius:12px;
+  color:#e6edf3;font:inherit;font-size:14.5px;line-height:1.6;padding:13px 15px;resize:vertical}
+.notes:focus{outline:none;border-color:#1f6feb}
+.fineprint{font-size:12.5px;color:#6e7681;margin-top:8px;line-height:1.5}
+.bp-empty{color:#8b949e;font-size:14px}
+@media (max-width:900px){
+  .app{flex-direction:column}
+  #sidebar{width:auto;flex:none;position:static;height:auto;max-height:46vh;border-right:0;border-bottom:1px solid #21262d}
+  #main{padding:24px 18px 64px}
+}
+@media (prefers-color-scheme:light){
+  #sidebar{background:#f6f8fa;border-right-color:#d0d7de}
+  .navbtn,.brow{color:#1f2328}
+  .navbtn:hover,.brow:hover{background:#eaeef2}
+  .navbtn.sel,.brow.sel{background:#ddf4ff}
+  .brand .eyebrow,.nav-sec>h3,.bkind,.bp-crumb,.bp-tagline,.attn-date,.art-sub,.fineprint,.bp-empty{color:#57606a}
+  .bp-crumb b{color:#1f2328}
+  .bp-mission{background:#f6f8fa;border-color:#d0d7de}
+  .art-row{background:#fff;border-color:#d0d7de}
+  .art-row:hover{background:#f6f8fa}
+  .art-ic{background:#f6f8fa;border-color:#d0d7de;color:#57606a}
+  .attn{background:#f6f8fa;border-color:#d0d7de}
+  .attn.unseen{background:#ddf4ff;border-color:#1f6feb}
+  .notes{background:#fff;border-color:#d0d7de;color:#1f2328}
+  .seenbtn{background:#eaeef2;border-color:#d0d7de;color:#1f2328}
+  .bp-name:focus{background:#ddf4ff}
+}
+
 </style>
-<div class="page">
-
-  <header>
-    <div class="eyebrow">Project Buddy &middot; macro view</div>
-    <h1>The Buddy Tree</h1>
-    <p class="sub">29 buddies &middot; one family &middot; Project Buddy is the parent of them all</p>
-    <p class="stamp">Dashboard basis &middot; drawn 2026-10-09</p>
-  </header>
-
-  <div class="tabs">
-    <button id="tab-tree" class="active" onclick="showView('tree')">Tree</button>
-    <button id="tab-projects" onclick="showView('projects')">Projects</button>
-    <button id="tab-manifest" onclick="showView('manifest')">Manifest</button>
-  </div>
-  <script>
-    function showView(which) {
-      ['tree', 'projects', 'manifest'].forEach(function(v) {
-        document.getElementById('view-' + v).classList.toggle('active', which === v);
-        document.getElementById('tab-' + v).classList.toggle('active', which === v);
-      });
-    }
-  </script>
-
-  <!-- ============ TREE VIEW ============ -->
-  <div id="view-tree" class="view active">
+</head>
+<body>
+<div class="app">
+<aside id="sidebar">
+  <div class="brand"><div class="eyebrow">Project Buddy &middot; macro view</div><h1>The Buddy Tree</h1></div>
+  <div class="nav-sec"><h3>Views</h3><div id="view-nav"></div></div>
+  <div class="nav-sec"><h3>Buddies <span id="attn-pill" class="zero">0</span></h3><div id="buddy-nav"></div></div>
+</aside>
+<main id="main">
+<div id="view-tree" class="view">
     <div class="chart">
       <div style="text-align:center">
         <div class="node root">
@@ -229,6 +313,11 @@
                     <div class="desc">Sundance Optima 880 &mdash; treatment schedule, log, chemistry KB.</div>
                     <div class="tag">grandchild</div>
                   </div></li>
+                  <li><div class="node property">
+                    <div class="name">Party Buddy</div>
+                    <div class="desc">Plans and tracks hosted gatherings — guest lists, food, setup.</div>
+                    <div class="tag">grandchild</div>
+                  </div></li>
                 </ul>
               </li>
               <li><div class="node property">
@@ -286,6 +375,8 @@
         <div class="node standalone"><div class="name">School Buddy</div><div class="desc">Learning companion &mdash; &ldquo;what do you want to learn?&rdquo;</div><div class="tag">direct</div></div>
         <div class="node standalone"><div class="name">Document Buddy</div><div class="desc">Google Docs layer &mdash; folders, meta, what-are-we-working-on.</div><div class="tag">direct</div></div>
         <div class="node standalone"><div class="name">Tech Buddy</div><div class="desc">Tech inventory + gadget tutor.</div><div class="tag">direct</div></div>
+        <div class="node standalone"><div class="name">Dream Buddy</div><div class="desc">Dream journal — capture on waking, spot patterns.</div><div class="tag">direct</div></div>
+        <div class="node standalone"><div class="name">Feedback Buddy</div><div class="desc">Feedback to outside parties — capture, route, file.</div><div class="tag">direct</div></div>
         <div class="node meta"><div class="name">Scaffold Buddy</div><div class="desc">The skeleton every buddy project is born with.</div><div class="tag">meta</div></div>
         <div class="node meta"><div class="name">Buddy Suite</div><div class="desc">Shared brand, monetization, marketing across buddies.</div><div class="tag">meta</div></div>
       </div>
@@ -308,6 +399,7 @@
         <div class="proj-row d1"><span class="dot">└</span><span class="pname">Property Buddy</span><span class="pdesc">One shape for every property — deeds, repairs, maintenance</span><span class="status st-brief">Brief review</span></div>
         <div class="proj-row d2"><span class="dot">└</span><span class="pname">Cabin Buddy</span><span class="pdesc">Fiddletown cabin ops</span><span class="status st-active">Active</span></div>
         <div class="proj-row d3"><span class="dot">└</span><span class="pname">Hot Tub Buddy</span><span class="pdesc">Sundance Optima 880 — treatment schedule, log, chemistry KB</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d3"><span class="dot">└</span><span class="pname">Party Buddy</span><span class="pdesc">Plans and tracks hosted gatherings — guest lists, food/drink, setup checklists</span><span class="status st-brief">Brief review</span></div>
         <div class="proj-row d2"><span class="dot">└</span><span class="pname">Lenwood Buddy</span><span class="pdesc">Ideas for the future of 6929 Lenwood Way, San Jose</span><span class="status st-brief">Brief review</span></div>
         <div class="proj-row d1"><span class="dot">└</span><span class="pname">Finance Buddy</span><span class="pdesc">Parent container for all money projects</span><span class="status st-new">New</span></div>
         <div class="proj-row d2"><span class="dot">└</span><span class="pname">Money Buddy</span><span class="pdesc">The expense tracker app — craftsmanship as the moat</span><span class="status st-live">Live · pre-alpha</span></div>
@@ -325,6 +417,8 @@
         <div class="proj-row d1"><span class="dot">└</span><span class="pname">School Buddy</span><span class="pdesc">Learning companion — "what do you want to learn?"</span><span class="status st-brief">Brief review</span></div>
         <div class="proj-row d1"><span class="dot">└</span><span class="pname">Document Buddy</span><span class="pdesc">Google Docs layer — folders, meta, what-are-we-working-on</span><span class="status st-brief">Brief review</span></div>
         <div class="proj-row d1"><span class="dot">└</span><span class="pname">Tech Buddy</span><span class="pdesc">Tech inventory + gadget tutor</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Dream Buddy</span><span class="pdesc">Dream journal — capture on waking, spot patterns over time</span><span class="status st-brief">Brief review</span></div>
+        <div class="proj-row d1"><span class="dot">└</span><span class="pname">Feedback Buddy</span><span class="pdesc">Feedback to outside parties — capture, route, file, ship-watch</span><span class="status st-brief">Brief review</span></div>
         <div class="proj-row d1"><span class="dot">└</span><span class="pname">Scaffold Buddy</span><span class="pdesc">The skeleton every buddy project is born with</span><span class="status st-brief">Brief review</span></div>
         <div class="proj-row d1"><span class="dot">└</span><span class="pname">Buddy Suite</span><span class="pdesc">Shared brand, monetization, marketing across buddies</span><span class="status st-brief">Brief review</span></div>
       </div>
@@ -350,17 +444,137 @@
     </section>
   </div>
 
-  <footer class="legend">
-    <b>How to read this:</b>
-    <span class="swatch" style="background:#d29922"></span>Project Buddy (root &middot; macro view)
-    <span class="swatch" style="background:#a371f7"></span>Personal family
-    <span class="swatch" style="background:#f778ba"></span>Family
-    <span class="swatch" style="background:#3fb950"></span>Property family
-    <span class="swatch" style="background:#39c5cf"></span>Finance family
-    <span class="swatch" style="background:#58a6ff"></span>Work
-    <br>Every buddy inherits from Project Buddy: shared tools &middot; knowledge-base inheritance &middot; dashboard rollup.
-    Children roll their knowledge up; parents push their knowledge down.
-  </footer>
-
+  
+<section id="view-buddy" class="view"><div id="buddy-home"></div></section>
+</main>
 </div>
-</body></html>
+<script>
+const BUDDIES = [{"attention": [{"date": "2026-10-09", "id": "project-buddy-dashboard-v2", "text": "Dashboard v2 ready for review \u2014 Tree, Projects, and Manifest tabs are live."}, {"date": "2026-10-09", "id": "project-buddy-family-drill", "text": "Open: run the full new-buddy drill (brief, repo, thread) for Family Buddy?"}], "brief": "https://docs.google.com/document/d/1yBcOP8Usbw6CaIj_Ufn7pLVX6AaKVjP1AP7ZvkM_O6c/edit", "docs": [], "id": "project-buddy", "kind": "root", "mission": "Project Buddy is the one place for all of Dave's ideas and projects \u2014 fast capture, an idea bank with statuses (New \u2192 Considering \u2192 Active \u2192 Parked \u2192 Done/Dropped), promote-to-project with next actions, and lightweight review nudges. This dashboard is its macro view: the status and next action items for every buddy.", "name": "Project Buddy", "parent": null, "repo": null, "status": "Spec review", "statusClass": "st-spec", "tagline": "The macro view \u2014 status & next actions for every buddy"}, {"attention": [{"date": "2026-10-09", "id": "personal-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Working title (Dave: \"we'll think of a good name, we can change it later\")."}], "brief": "https://docs.google.com/document/d/1jJ_xZDQeogti-GRPLNnY8e-IgsBa93-QhdG1EhLIEJs/edit", "docs": [], "id": "personal-buddy", "kind": "personal", "mission": "Personal Buddy is your personal-ops 'figure it out later' list with teeth \u2014 the things you need to research, decide, or sort out but don't have time for right now, captured with reminders so nothing evaporates. It's distinct from Reminder Buddy (fire-and-forget nudges) and School Buddy (learning paths). Seed item: the calendar visibility problem \u2014 a multi-day 'in San Jose' indicator on both family and work calendars, without showing you as busy and without duplicate events.", "name": "Personal Buddy", "parent": "project-buddy", "repo": "personal-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Personal-ops \u2014 the \u201cfigure it out later\u201d list with teeth"}, {"attention": [{"date": "2026-10-09", "id": "travel-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Note: brief is a working interpretation from the name alone; Dave corrects the direction at review."}], "brief": "https://docs.google.com/document/d/1VWXXml-y3uL-mlps-jmDmDYJcLSG1gY_F_ehdRaDRJs/edit", "docs": [], "id": "travel-buddy", "kind": "personal", "mission": "Travel Buddy handles trip planning \u2014 itineraries and logistics. A name-only idea for now; you correct the direction when you review the brief.", "name": "Travel Buddy", "parent": "personal-buddy", "repo": "travel-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Trip planning, itineraries, logistics"}, {"attention": [{"date": "2026-10-09", "id": "relationship-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer?"}], "brief": "https://docs.google.com/document/d/1BdS9TfXY0Mceg7dQ68EvPK38Qo5wqAQrSC_AkS5uX_I/edit", "docs": [], "id": "relationship-buddy", "kind": "personal", "mission": "Relationship Buddy is your companion for maintaining healthy relationships \u2014 the people who matter, stay-in-touch nudges, notes, and milestones. Its job is keeping the important people from going quiet.", "name": "Relationship Buddy", "parent": "personal-buddy", "repo": "relationship-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Stay-in-touch nudges, notes, milestones"}, {"attention": [{"date": "2026-10-09", "id": "career-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Note: brief is a working interpretation; Dave corrects the direction at review."}], "brief": "https://docs.google.com/document/d/1_h_HG7va6gxGAvDnNl4K3GAxrfZNI2dvJuSvcPGqclE/edit", "docs": [], "id": "career-buddy", "kind": "personal", "mission": "Career Buddy works your career goals, skill growth, and job-search readiness \u2014 distinct from Job Buddy, which is about finding and changing jobs. A name-only idea for now; you correct the direction when you review the brief.", "name": "Career Buddy", "parent": "personal-buddy", "repo": "career-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Career goals, skill growth, job-search readiness"}, {"attention": [], "brief": null, "docs": [], "id": "family-buddy", "kind": "family", "mission": "Family Buddy is for family projects \u2014 shared with the household (Quentin, Sawyer, Amanda), not just Dave. Pet Buddy is its first child.", "name": "Family Buddy", "parent": "project-buddy", "repo": null, "status": "New", "statusClass": "st-new", "tagline": "Family projects \u2014 shared with the household"}, {"attention": [{"date": "2026-10-09", "id": "pet-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Open: which pets/profiles first, medication reminder depth, vet-visit integration."}], "brief": "https://docs.google.com/document/d/1nJzmN-A3TBk23RH-f8bKbc3BxuPbLDiWRk3AaGJb6uo/edit", "docs": [], "id": "pet-buddy", "kind": "family", "mission": "Pet Buddy is the pet health-and-care tracker \u2014 per-pet profiles with medications, vet and hospital visit history, and vaccinations.", "name": "Pet Buddy", "parent": "family-buddy", "repo": "pet-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Per-pet profiles, meds, vet visits"}, {"attention": [{"date": "2026-10-09", "id": "property-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Open: one app vs. separate instances, who gets access, how deeds are secured, which property goes first."}], "brief": "https://docs.google.com/document/d/1fwbtQXG1sjfWKSxW1JdS8sOgGVSkRq74hY8KM_SsNTA/edit", "docs": [], "id": "property-buddy", "kind": "property", "mission": "Property Buddy is the generic behind Lenwood Buddy and Cabin Buddy \u2014 one buddy for maintaining information and records per property: deeds, repairs, receipts, contractors, maintenance plus reminders, history, and wishlist. Each property is an instance sharing the same shape. Distinct from Car Buddy (cars) and Housing Buddy (finding housing).", "name": "Property Buddy", "parent": "project-buddy", "repo": "property-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "One shape for every property"}, {"attention": [], "brief": null, "docs": [], "id": "cabin-buddy", "kind": "property", "mission": "Cabin Buddy runs the Fiddletown cabin \u2014 property ops, maintenance, and the running log of what keeps the place going. Hot Tub Buddy is its first child; the weekly hot-tub treatment rhythm lives here.", "name": "Cabin Buddy", "parent": "property-buddy", "repo": null, "status": "Active", "statusClass": "st-active", "tagline": "Fiddletown cabin ops"}, {"attention": [], "brief": "https://docs.google.com/document/d/1BDcst37j2FftKqzY-Tz-ecQLtYc5OnR3kmY6xmn80Sg/edit", "docs": [], "id": "hot-tub-buddy", "kind": "property", "mission": "Hot Tub Buddy runs the 2025 Sundance Optima (880 series) at the Fiddletown cabin \u2014 treatment schedule plus reminders, a treatment and usage log, and a research knowledge base (chemistry targets, filters 6540-488S / 6540-501S / 6540-502S, supply sources, best prices). Reorders happen on request, with your approval before anything is purchased. The mission: the tub is always safe, clean, and ready to soak.", "name": "Hot Tub Buddy", "parent": "cabin-buddy", "repo": "hot-tub-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Sundance Optima 880 \u2014 treatments & chemistry"}, {"attention": [{"date": "2026-10-09", "id": "party-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Seed item: the soup party."}], "brief": "https://docs.google.com/document/d/1Y44Cs9JD9uj2O2UIdKXd28F0mdhyXT7nevVIoMOc5AU/edit", "docs": [], "id": "party-buddy", "kind": "property", "mission": "Party Buddy plans and tracks the gatherings you host \u2014 guest lists, food and drink plans, setup checklists, and dates. Seed event: the soup party \u2014 everyone brings a different soup, tasting samples served from foil muffin pans, bread, crackers, and toppings on the side, with a photo and the Facebook post attached. Over time it becomes your repeatable playbook for hosting.", "name": "Party Buddy", "parent": "cabin-buddy", "repo": "party-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Plans and tracks hosted gatherings"}, {"attention": [{"date": "2026-10-08", "id": "lenwood-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer?"}], "brief": "https://docs.google.com/document/d/1t4s5skvUo8vTQ1cknWxuEobTQp6aMwMD68NNUl-xUY4/edit", "docs": [], "id": "lenwood-buddy", "kind": "property", "mission": "Lenwood Buddy is the shared repository for ideas on what to do with Lenwood \u2014 6929 Lenwood Way, San Jose, the house Quentin, Amanda, and Sawyer rent. Document sharing plus idea capture for the property's future, with room to grow into voting, financials, and decision tracking.", "name": "Lenwood Buddy", "parent": "property-buddy", "repo": "lenwood-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Ideas for the future of the San Jose house"}, {"attention": [], "brief": null, "docs": [], "id": "finance-buddy", "kind": "finance", "mission": "Finance Buddy is the parent container for all money projects \u2014 Money Buddy (the expense tracker) and Investment Buddy (the investing module) live here.", "name": "Finance Buddy", "parent": "project-buddy", "repo": null, "status": "New", "statusClass": "st-new", "tagline": "Parent container for money projects"}, {"attention": [], "brief": null, "docs": [], "id": "money-buddy", "kind": "finance", "mission": "Money Buddy is the expense tracker app \u2014 craftsmanship as the differentiator. A handcrafted, delightful personal finance app from someone who cares about UX; the fun animated backgrounds aren't scope creep, they're the moat. Currently pre-alpha with Jeremy as the first tester.", "name": "Money Buddy", "parent": "finance-buddy", "repo": null, "status": "Live \u00b7 pre-alpha", "statusClass": "st-live", "tagline": "The expense tracker app"}, {"attention": [], "brief": "https://docs.google.com/document/d/1yoDxAIOzriF6O_3Ve7O6UnAPjnwm29e9vSswfSFrLRc/edit", "docs": [], "id": "investment-buddy", "kind": "finance", "mission": "Investment Buddy (the Investing module) \u2014 investment ideas list, easy company research, holdings-vs-watchlist separation, automated 'dog' detection for underperformers, and signals compiled into a generated podcast. AAPL gets first-class treatment. Research and signal aggregation only \u2014 buy/sell decisions stay Dave's.", "name": "Investment Buddy", "parent": "finance-buddy", "repo": null, "status": "Live \u00b7 M2 shipped", "statusClass": "st-live", "tagline": "Investment ideas, research, signals podcast"}, {"attention": [{"date": "2026-10-09", "id": "work-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer?"}, {"date": "2026-10-09", "id": "work-buddy-est-loop", "text": "Brief updated: new 'The estimation loop' section added after 'How it works' \u2014 worth a re-read before reviewing."}], "brief": "https://docs.google.com/document/d/10HnvQ2-ECTHyc-cwzv_klOcqnQvqfgxNvOAE7bZT9NQ/edit", "docs": [], "id": "work-buddy", "kind": "work", "mission": "Work Buddy is your companion for succeeding at your job \u2014 Apple / Worldwide Sales Finance today, any job later. It keeps per-person dossiers, auto-generates meeting briefs ('here's what you need to discuss with X'), runs check-in cadences for key people, and absorbs scattered work reminders. Its newest edge is the estimation loop: it captures tasks you agree to, logs your rough estimate, tracks how long they actually take, and calibrates your future estimates. Apple-confidentiality is a design constraint throughout.", "name": "Work Buddy", "parent": "project-buddy", "repo": "work-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Dossiers, meeting briefs, estimate calibration"}, {"attention": [], "brief": "https://docs.google.com/document/d/1eW7k87_ixHIw9M7ClxiUYd0GGXY9HcCdqvPeBOXrNME/edit", "docs": [{"label": "Car Buddy \u2014 PRD Draft v1", "url": "https://docs.google.com/document/d/1Suf40x1f0MeoMVa429tSZKZDrRuAhXgYyuqKi0bE5lw/edit"}], "id": "car-buddy", "kind": "standalone", "mission": "Car Buddy replaces the Airtable car-service database \u2014 per-car service tracking, due-service reminders, parts installed, service history (date, mileage, who did it), mileage log, and car locations for the 1959 MGA coupe and 2002 ML500. An iPhone-first web app for garage use.", "name": "Car Buddy", "parent": "project-buddy", "repo": null, "status": "PRD review", "statusClass": "st-prd", "tagline": "Per-car service tracking"}, {"attention": [], "brief": "https://docs.google.com/document/d/1SGspHdx-BlRJ_yRsnVpLS4sa5Ow-Q8mAPjueErdnqP4/edit", "docs": [], "id": "tv-buddy", "kind": "standalone", "mission": "TV Buddy kills the nightly 'what do we watch?' dead air \u2014 a mood-matched pick playing in under 2 minutes. The Mood Dial leads; Duel, Nightly Three, Roulette, and Chat Concierge are parked for now.", "name": "TV Buddy", "parent": "project-buddy", "repo": null, "status": "PRD review", "statusClass": "st-prd", "tagline": "Mood-matched pick in under 2 minutes"}, {"attention": [], "brief": "https://docs.google.com/document/d/11Zz2wGbuIKCqS7OSPOnjIAbz5VsmLQPvxS-OfRicSN0/edit", "docs": [], "id": "news-buddy", "kind": "standalone", "mission": "News Buddy (Briefing Buddy) is the personalized news companion \u2014 productized daily briefings, with topics as the personalization axis (AI/tech, markets, product design, engineering, motorsport, live music, Amador County local news), plus a listen mode.", "name": "News Buddy", "parent": "project-buddy", "repo": null, "status": "Brief review", "statusClass": "st-brief", "tagline": "Personalized news companion"}, {"attention": [], "brief": "https://docs.google.com/document/d/1Z1bdz-YNeRjODYTyPdTnj1FeewnCqxpEwJV2-SS5HUs/edit", "docs": [{"label": "Wisdom sheet (canonical)", "url": "https://docs.google.com/spreadsheets/d/1-UgKViOrfsWtmEufznVl18l8fTpzob6UKFAFaawS4uA/edit"}], "id": "wisdom-buddy", "kind": "standalone", "mission": "Wisdom Buddy revives the Wisdom Library \u2014 wisdom nuggets (mainly from Instagram) curated in the canonical Wisdom sheet and sent daily by text to Quentin and Sawyer. Currently an 8-week pilot with a decision gate; the central question is engagement (the feedback loop), not the automation.", "name": "Wisdom Buddy", "parent": "project-buddy", "repo": null, "status": "Pilot", "statusClass": "st-pilot", "tagline": "Daily wisdom nuggets to the kids"}, {"attention": [], "brief": "https://docs.google.com/document/d/1e5gJIQ02gxBeJr-mP7K6C0PnNcZ0iq36DZOxzAL0Lik/edit", "docs": [{"label": "Birthday Buddy \u2014 PRD Draft v1", "url": "https://docs.google.com/document/d/1z7WwImdL3ub3DoCiwQ02rrLR6gwsV5NxLSnBBvp5yVg/edit"}], "id": "birthday-buddy", "kind": "standalone", "mission": "Birthday Buddy is your buddy for witty birthday sayings with a little wisdom \u2014 reminders, a library of lines, match-and-personalize, a generator, and copy-ready posting. Nothing posts without your tap.", "name": "Birthday Buddy", "parent": "project-buddy", "repo": null, "status": "PRD review", "statusClass": "st-prd", "tagline": "Witty birthday sayings"}, {"attention": [{"date": "2026-10-08", "id": "job-buddy-prd", "text": "Start the Job Buddy PRD? (Side note: the Luis De Luna reply draft is still sitting in Gmail Drafts \u2014 needs Dave to hit send.)"}], "brief": "https://docs.google.com/document/d/19u8usL6X22ke5feSB-TE3VV0fYqK-U_U5f46eLZNkGM/edit", "docs": [], "id": "job-buddy", "kind": "standalone", "mission": "Job Buddy is the job-search and career buddy \u2014 proactive opportunity discovery, a 'tell it once' master profile (tailored resumes + website variants per opportunity), a daily hunting dashboard, a pull center that learns, and recruiter-email triage. Standing rule: nothing goes out to recruiters without Dave's sign-off.", "name": "Job Buddy", "parent": "project-buddy", "repo": null, "status": "PRD review", "statusClass": "st-prd", "tagline": "Job search \u2014 discovery, profile, triage"}, {"attention": [{"date": "2026-10-08", "id": "reminder-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Big open question: standalone app vs merged into existing buddies vs assistant-native capture inbox."}], "brief": null, "docs": [], "id": "reminder-buddy", "kind": "standalone", "mission": "Reminder Buddy is the fire-and-forget nudge buddy \u2014 the possible future home for the OmniFocus migration. Big open question: standalone app vs merged into existing buddies vs assistant-native capture inbox.", "name": "Reminder Buddy", "parent": "project-buddy", "repo": null, "status": "Brief review", "statusClass": "st-brief", "tagline": "Fire-and-forget nudges"}, {"attention": [{"date": "2026-10-08", "id": "housing-buddy-prd", "text": "PRD Draft v1 ready for review \u2014 valuation-led, homeowners first, Sacramento metro (RentCast + free sources ~$75\u2013200/mo)."}], "brief": "https://docs.google.com/document/d/1XrG_FERFrw-mfCIO-jVsTEBWTo4oie2UvxRoJl9iAdo/edit", "docs": [{"label": "Housing Buddy \u2014 PRD Draft v1", "url": "https://docs.google.com/document/d/1yzuFUxmnnSID4MSfI2JXyrREdWxLcx0QrQkDbCj5wEs/edit"}], "id": "housing-buddy", "kind": "standalone", "mission": "Housing Buddy is the know-your-market real estate tool \u2014 (1) Valuation: what your home is worth, aggregated estimates plus historical trends; (2) Search: requirements-based home search with a 360\u00b0 area view and a constantly-updated dashboard.", "name": "Housing Buddy", "parent": "project-buddy", "repo": null, "status": "PRD review", "statusClass": "st-prd", "tagline": "Know-your-market real estate"}, {"attention": [{"date": "2026-10-09", "id": "zen-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Open: guided vs. timer, what style, solo or family, how close it sits to Wisdom Buddy."}], "brief": "https://docs.google.com/document/d/1KGQfzCvsN3ERTsahhIqxZPRrexjgKOREGKD_P_bRLH8/edit", "docs": [], "id": "zen-buddy", "kind": "standalone", "mission": "Zen Buddy is your companion for meditation, spirituality, and becoming more zen \u2014 practice-oriented (sessions, breathwork, reminders tied to routine), not a content library. Possible tie-ins: sleep quality and Wisdom Buddy's spiritual readings.", "name": "Zen Buddy", "parent": "project-buddy", "repo": "zen-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Meditation, breathwork, practice"}, {"attention": [{"date": "2026-10-09", "id": "school-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer?"}, {"date": "2026-10-09", "id": "school-buddy-direction", "text": "Brief updated: curiosity-driven direction decided and folded in \u2014 'What do you want to learn?' now leads."}], "brief": "https://docs.google.com/document/d/1UOJPkZQaHlZja1P5PkVdcGxYeufX494X1gugXc-jS1m8/edit", "docs": [], "id": "school-buddy", "kind": "standalone", "mission": "School Buddy is your learning companion \u2014 it helps you learn anything. Its opening move: ask you 'What do you want to learn?' and then generate a learning plan for it. Curiosity-driven, not curriculum-driven.", "name": "School Buddy", "parent": "project-buddy", "repo": "school-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Learning companion"}, {"attention": [{"date": "2026-10-09", "id": "document-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? This was Project Buddy's first real end-to-end run."}], "brief": "https://docs.google.com/document/d/13ASNd4D68Tx8sIP0J1JDvGHYEAQspNZsGTxh_m_5sbk/edit", "docs": [], "id": "document-buddy", "kind": "standalone", "mission": "Document Buddy is the in-between layer for Google Docs that Drive's weak organization UX never gave you \u2014 it organizes folders, tracks per-doc meta info, and answers 'what are we working on?' with a formatted list in chat. This was Project Buddy's first real end-to-end run: thread, brief, repo, review ask, all from the tool.", "name": "Document Buddy", "parent": "project-buddy", "repo": "document-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "The Google Docs layer"}, {"attention": [{"date": "2026-10-09", "id": "tech-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer?"}], "brief": "https://docs.google.com/document/d/19YGpL1uHzU94CV1Yp_qyibZtlqVd8cejjvufn1SEM3g/edit", "docs": [], "id": "tech-buddy", "kind": "standalone", "mission": "Tech Buddy is your personal tech inventory plus gadget tutor \u2014 it tracks everything you own across both homes (what it is, where you bought it, warranty info), watches for relevant news, deals, and firmware updates, and walks you through using your tools step by step. Seed mission: programming the new Fiddletown Radio handhelds.", "name": "Tech Buddy", "parent": "project-buddy", "repo": "tech-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Tech inventory + gadget tutor"}, {"attention": [{"date": "2026-10-09", "id": "scaffold-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Next step after review: v1 template (stamp README.md, KNOWLEDGE.md, DECISIONS.md)."}], "brief": "https://docs.google.com/document/d/1rfrWpNABG-FbiHhbmOyYwVMZk1pwJekm6rNoPsMrh6k/edit", "docs": [], "id": "scaffold-buddy", "kind": "meta", "mission": "Scaffold Buddy is the meta-project that designs, versions, and evolves the skeleton every buddy project is born with \u2014 README.md, KNOWLEDGE.md (the persistent knowledge base), DECISIONS.md \u2014 plus the curation rule (threads stay conversational; durable items get written to the KB) and the kickoff-script stamping step. It's distinct from the Project Buddy tool (the launcher) and the Project Buddy product (the idea bank).", "name": "Scaffold Buddy", "parent": "project-buddy", "repo": "scaffold-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "The skeleton every buddy is born with"}, {"attention": [{"date": "2026-10-09", "id": "buddy-suite-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer? Open: working title confirmation and the domain decision (buddy.com is taken)."}], "brief": "https://docs.google.com/document/d/1LbFR4bTkRMsul84cM762-tvbpmAencxC0-Vu7fIZ-60/edit", "docs": [], "id": "buddy-suite", "kind": "meta", "mission": "Buddy Suite is the meta-project coordinating the whole buddy family \u2014 the shared brand and design language, the monetization plan, and the marketing strategy across all buddies. Working title; you confirm the suite name.", "name": "Buddy Suite", "parent": "project-buddy", "repo": "buddy-suite", "status": "Brief review", "statusClass": "st-brief", "tagline": "Brand, monetization, marketing"}, {"attention": [{"date": "2026-10-09", "id": "dream-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer?"}], "brief": "https://docs.google.com/document/d/1j3XiCfqIziUeDsGG185fda7maoQ23SsJkUpbXYOn40o/edit", "docs": [], "id": "dream-buddy", "kind": "standalone", "mission": "Dream Buddy is your dream journal buddy \u2014 capture dreams on waking, voice-first before they evaporate, keep them organized, and spot patterns over time. Its natural tie-in is your sleep tracking: sleep is the #1 health priority, and the Apple Watch data gives this buddy something to correlate against.", "name": "Dream Buddy", "parent": "project-buddy", "repo": null, "status": "Brief review", "statusClass": "st-brief", "tagline": "Dream journal buddy"}, {"attention": [{"date": "2026-10-09", "id": "feedback-buddy-brief", "text": "Product brief ready for review \u2014 looks good, edits, or defer?"}], "brief": "https://docs.google.com/document/d/1ZzDPRGNRuW8_ulpQE2Me8csFwmgAS9K9YlllHhOG9AM/edit", "docs": [], "id": "feedback-buddy", "kind": "standalone", "mission": "Feedback Buddy manages the feedback you want to send to outside parties \u2014 fast capture from any thread, smart routing (Muse-team feedback files direct through the feature-request channel; other companies get researched for the right recipient), a draft-approve-file loop, a history of filed/open/shipped reports, ship-watch notifications, and dedup against already-filed reports. Scope is organizations and companies only \u2014 feedback to individual humans is Relationship Buddy / coaching territory.", "name": "Feedback Buddy", "parent": "project-buddy", "repo": "feedback-buddy", "status": "Brief review", "statusClass": "st-brief", "tagline": "Feedback to outside parties"}];
+const ROOT_ORDER = ["project-buddy", "personal-buddy", "family-buddy", "property-buddy", "finance-buddy", "work-buddy", "car-buddy", "tv-buddy", "news-buddy", "wisdom-buddy", "birthday-buddy", "job-buddy", "reminder-buddy", "housing-buddy", "zen-buddy", "school-buddy", "document-buddy", "dream-buddy", "tech-buddy", "feedback-buddy", "scaffold-buddy", "buddy-suite"];
+const byId = Object.fromEntries(BUDDIES.map(b => [b.id, b]));
+const kidsOf = {};
+BUDDIES.forEach(b => { const p = b.parent || '__root'; (kidsOf[p] = kidsOf[p] || []).push(b); });
+const LS_KEY = 'buddyTree.v3';
+let S = {seen:{}, notes:{}, names:{}, sel:'view:tree'};
+try { Object.assign(S, JSON.parse(localStorage.getItem(LS_KEY) || '{}')); } catch(e) {}
+function save(){ localStorage.setItem(LS_KEY, JSON.stringify(S)); }
+function dispName(b){ return S.names[b.id] || b.name; }
+function unseenItems(b){ return (b.attention || []).filter(a => !S.seen[a.id]); }
+function descUnseen(id){
+  let n = 0;
+  (function walk(x){ const b = byId[x]; if(!b) return; n += unseenItems(b).length;
+    (kidsOf[x] || []).forEach(c => walk(c.id)); })(id);
+  return n;
+}
+function totalUnseen(){ return ROOT_ORDER.reduce((n,id) => n + (byId[id] && byId[id].parent === null ? descUnseen(id) : 0), 0); }
+function crumb(id){
+  const chain = []; let b = byId[id];
+  while (b) { chain.unshift(b); b = b.parent ? byId[b.parent] : null; }
+  return chain.map((c,i) => i < chain.length-1
+    ? '<a href="#" data-goto="'+c.id+'" style="color:#8b949e">'+escHtml(dispName(c))+'</a>'
+    : '<b>'+escHtml(dispName(c))+'</b>').join(' <span style="color:#6e7681">/</span> ');
+}
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function renderNav(){
+  const views = [['tree','Tree','▦'],['projects','Projects','☰'],['manifest','Manifest','✓']];
+  document.getElementById('view-nav').innerHTML = views.map(([v,l,ic]) =>
+    '<button class="navbtn'+(S.sel==='view:'+v?' sel':'')+'" data-view="'+v+'"><span class="nic">'+ic+'</span>'+l+'</button>').join('');
+  let h = '';
+  function row(id, depth){
+    const b = byId[id]; if(!b) return;
+    const un = descUnseen(id);
+    const kind = b.kind === 'root' ? 'root' : (b.parent === 'project-buddy' ? 'direct' : b.kind);
+    h += '<button class="brow'+(S.sel==='buddy:'+id?' sel':'')+(un?' has-unseen':'')+'" data-buddy="'+id+'"'
+      + ' style="padding-left:'+(8+depth*16)+'px" title="'+escHtml(b.tagline||'')+'">'
+      + '<span class="bdot"></span><span class="bname">'+escHtml(dispName(b))+'</span>'
+      + '<span class="bkind">'+kind+'</span></button>';
+    (kidsOf[id] || []).forEach(c => row(c.id, depth+1));
+  }
+  ROOT_ORDER.forEach(id => row(id, 0));
+  document.getElementById('buddy-nav').innerHTML = h;
+  const t = totalUnseen();
+  const pill = document.getElementById('attn-pill');
+  pill.textContent = t; pill.classList.toggle('zero', t === 0);
+}
+function artRow(icon, label, sub, url){
+  return '<a class="art-row" href="'+url+'" target="_blank" rel="noopener">'
+    + '<span class="art-ic">'+icon+'</span>'
+    + '<span><span class="art-label">'+escHtml(label)+'</span><div class="art-sub">'+escHtml(sub)+'</div></span>'
+    + '<span class="art-go">→</span></a>';
+}
+function renderBuddy(id){
+  const b = byId[id]; if(!b) return;
+  const items = (b.attention || []).slice().sort((x,y) => (S.seen[x.id]?1:0) - (S.seen[y.id]?1:0));
+  let arts = '';
+  if (b.brief) arts += artRow('<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 1.5h5.5L12.5 4.5v10h-8.5z"/><path d="M9.5 1.5v3h3M6 8.5h4M6 11h4"/></svg>', 'Product Brief', 'The canonical mission & intent — Google Doc', b.brief);
+  if (b.repo) arts += artRow('<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5.5 5.5l-2 2 2 2M10.5 5.5l2 2-2 2"/></svg>', 'GitHub Repo', 'davedellaquila/'+b.repo+' (private)', 'https://github.com/davedellaquila/'+b.repo);
+  (b.docs || []).forEach(d => { arts += artRow('<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6.5 9.5l3-3M7.5 5.5l1.5-1.5a2.5 2.5 0 013.5 3.5L11 9"/><path d="M8.5 10.5L7 12a2.5 2.5 0 01-3.5-3.5L5 7"/></svg>', d.label, 'Related document — Google Doc', d.url); });
+  if (!arts) arts = '<p class="bp-empty">No artifacts yet — the drill adds the brief and repo here when they exist.</p>';
+  let attn = '';
+  if (!items.length) attn = '<p class="bp-empty">Nothing needs your attention right now.</p>';
+  else {
+    attn = items.map(a => {
+      const seen = !!S.seen[a.id];
+      return '<div class="attn'+(seen?' seen':' unseen')+'" data-attn="'+a.id+'"><span class="adot"></span>'
+        + '<div class="attn-body"><div class="attn-text">'+escHtml(a.text)+'</div>'
+        + '<div class="attn-date">Asked '+a.date+'</div></div>'
+        + '<button class="seenbtn" data-seen="'+a.id+'">Mark seen</button></div>';
+    }).join('');
+    const un = items.filter(a => !S.seen[a.id]).length;
+    if (un > 1) attn += '<div class="attn-all"><button class="seenbtn" data-seen-all="'+id+'">Mark all seen</button></div>';
+  }
+  document.getElementById('buddy-home').innerHTML =
+    '<div class="bp-wrap">'
+    + '<div class="bp-crumb">'+crumb(id)+'</div>'
+    + '<div class="bp-top"><h2 class="bp-name" id="bp-name" contenteditable="true" spellcheck="false" data-buddy="'+id+'">'+escHtml(dispName(b))+'</h2>'
+    + '<span class="status '+b.statusClass+'">'+escHtml(b.status)+'</span></div>'
+    + '<p class="bp-tagline">'+escHtml(b.tagline||'')+'</p>'
+    + '<div class="bp-sec"><h3>What it does</h3><p class="bp-mission">'+escHtml(b.mission)+'</p>'
+    + '<p class="fineprint">The mission is the brief’s executive summary — tweak it through the buddy’s chat thread and it updates everywhere.</p></div>'
+    + '<div class="bp-sec"><h3>Artifacts</h3>'+arts+'</div>'
+    + '<div class="bp-sec"><h3>Needs your attention</h3>'+attn+'</div>'
+    + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this buddy…">'+escHtml(S.notes[id]||'')+'</textarea>'
+    + '<p class="fineprint">Saved on this device only.</p></div>'
+    + '</div>';
+  const nm = document.getElementById('bp-name');
+  nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
+  nm.addEventListener('blur', () => {
+    const v = nm.textContent.trim();
+    if (v && v !== dispName(b)) { S.names[id] = v; }
+    else { delete S.names[id]; }
+    save(); renderNav();
+  });
+  const nt = document.getElementById('bp-notes');
+  let t = null;
+  nt.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => { S.notes[id] = nt.value; save(); }, 400); });
+}
+function show(sel){
+  S.sel = sel; save();
+  document.querySelectorAll('#main .view').forEach(v => v.classList.remove('active'));
+  if (sel.startsWith('view:')) {
+    document.getElementById('view-' + sel.slice(5)).classList.add('active');
+  } else {
+    document.getElementById('view-buddy').classList.add('active');
+    renderBuddy(sel.slice(6));
+  }
+  renderNav();
+  document.getElementById('main').scrollTop = 0;
+  window.scrollTo(0,0);
+}
+document.addEventListener('click', e => {
+  const vb = e.target.closest('[data-view]');
+  if (vb) { show('view:' + vb.dataset.view); return; }
+  const bb = e.target.closest('[data-buddy]');
+  if (bb) { show('buddy:' + bb.dataset.buddy); return; }
+  const sb = e.target.closest('[data-seen]');
+  if (sb) { S.seen[sb.dataset.seen] = Date.now(); save(); renderBuddy(S.sel.slice(6)); renderNav(); return; }
+  const sa = e.target.closest('[data-seen-all]');
+  if (sa) { (byId[sa.dataset.seenAll].attention || []).forEach(a => S.seen[a.id] = Date.now()); save(); renderBuddy(S.sel.slice(6)); renderNav(); return; }
+  const gt = e.target.closest('[data-goto]');
+  if (gt) { e.preventDefault(); show('buddy:' + gt.dataset.goto); return; }
+});
+show(S.sel || 'view:tree');
+
+</script>
+</body>
+</html>
