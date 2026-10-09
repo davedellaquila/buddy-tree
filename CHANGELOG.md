@@ -6,6 +6,10 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
 ## 2026-10-09
 
 ### Added
+- **No more phantom highlighting** — text selection disabled on the chart
+  tiles (was leaving blue selection blocks when panning/zooming).
+- **Zoom keyboard shortcuts** — `+`/`=` zoom in, `-`/`_` zoom out,
+  `0` resets to 100%.
 - **Zoom slider floats over the chart** — moved from the margin into the
   chart area itself, map-control style. (`94948af`)
 - **Chart viewport polish** — visible border around the chart viewport so its
