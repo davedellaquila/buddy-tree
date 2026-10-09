@@ -209,6 +209,9 @@ body{padding:0}
 .notes:focus{outline:none;border-color:#1f6feb}
 .fineprint{font-size:12.5px;color:#6e7681;margin-top:8px;line-height:1.5}
 .bp-empty{color:#8b949e;font-size:14px}
+.bp-tree-wrap{border:1px solid #21262d;border-radius:12px;padding:18px 8px;background:#0d1117;overflow:hidden}
+.linkbtn{background:none;border:0;color:#1f6feb;font:inherit;font-size:12.5px;cursor:pointer;padding:0}
+.linkbtn:hover{text-decoration:underline}
 @media (max-width:900px){
   .app{flex-direction:column}
   #sidebar{width:auto;flex:none;position:static;height:auto;max-height:46vh;border-right:0;border-bottom:1px solid #21262d}
@@ -531,6 +534,10 @@ function renderBuddy(id){
     + '<p class="bp-tagline">'+escHtml(b.tagline||'')+'</p>'
     + '<div class="bp-sec"><h3>What it does</h3><p class="bp-mission">'+escHtml(b.mission)+'</p>'
     + '<p class="fineprint">The mission is the brief’s executive summary — tweak it through the buddy’s chat thread and it updates everywhere.</p></div>'
+    + (id === 'project-buddy'
+        ? '<div class="bp-sec"><h3>The Buddy Tree</h3><div class="bp-tree-wrap"></div>'
+          + '<p class="fineprint"><button class="linkbtn" data-view="tree">Open the tree as its own view →</button></p></div>'
+        : '')
     + '<div class="bp-sec"><h3>Artifacts</h3>'+arts+'</div>'
     + '<div class="bp-sec"><h3>Needs your attention</h3>'+attn+'</div>'
     + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this buddy…">'+escHtml(S.notes[id]||'')+'</textarea>'
@@ -547,6 +554,11 @@ function renderBuddy(id){
   const nt = document.getElementById('bp-notes');
   let t = null;
   nt.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => { S.notes[id] = nt.value; save(); }, 400); });
+  if (id === 'project-buddy') {
+    const tw = document.querySelector('#buddy-home .bp-tree-wrap');
+    const src = document.getElementById('view-tree');
+    if (tw && src) tw.innerHTML = src.innerHTML;
+  }
 }
 function show(sel){
   S.sel = sel; save();
