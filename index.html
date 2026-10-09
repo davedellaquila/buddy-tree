@@ -363,7 +363,11 @@ body.standalone .sa-bar{display:flex}
 .bp-empty{color:#8b949e;font-size:14px}
 .proj-row[data-plan]{cursor:pointer}
 .proj-row[data-plan]:hover{background:#161b22}
-.bp-tree-wrap{border:1px solid #21262d;border-radius:12px;padding:18px 8px;background:#0d1117;overflow:hidden}
+.bp-tree-wrap{border:1px solid #21262d;border-radius:12px;background:#0d1117;overflow:auto;position:relative;height:420px;cursor:grab}
+.bp-tree-wrap.panning{cursor:grabbing}
+.bp-mini-zoom{position:absolute;top:8px;right:8px;z-index:5;display:flex;gap:4px}
+.bp-mini-zoom button{background:rgba(22,27,34,.94);border:1px solid #30363d;color:#e6edf3;border-radius:8px;width:28px;height:28px;font-size:14px;cursor:pointer}
+.bp-mini-zoom button:hover{border-color:#1f6feb}
 .linkbtn{background:none;border:0;color:#1f6feb;font:inherit;font-size:12.5px;cursor:pointer;padding:0}
 .linkbtn:hover{text-decoration:underline}
 @media (max-width:900px){
@@ -401,10 +405,10 @@ body.standalone .sa-bar{display:flex}
 <div id="sb-resize" title="Drag to resize sidebar"></div>
   <div class="brand"><div class="eyebrow">Project Buddy &middot; macro view</div><h1 id="brand-name" title="Click to rename">Buddies</h1><div class="bcount">42 buddies &middot; one family</div></div>
   <div class="nav-sec"><h3>Views</h3><div id="view-nav"></div></div>
-  <div class="nav-sec"><h3>Buddies <span id="attn-pill" class="zero">0</span></h3>
+  <div class="nav-sec">
   <div style="padding:0 10px 8px"><input type="search" id="buddy-search" placeholder="Search buddies…" aria-label="Search buddies"
     style="width:100%;box-sizing:border-box;background:#0d1117;border:1px solid #30363d;color:#e6edf3;border-radius:8px;padding:7px 10px;font-size:13px"></div>
-  <div id="buddy-nav"></div></div>
+  <h3>Buddies <span id="attn-pill" class="zero">0</span></h3><div id="buddy-nav"></div></div>
   <div class="nav-sec"><h3>Business Plans</h3><div id="plan-nav"></div></div>
 </aside>
 <main id="main">
@@ -795,7 +799,7 @@ function renderBuddy(id){
     + '<textarea class="notes" id="bp-ingest" placeholder="Dump what’s in your head about '+escHtml(dispName(b))+'…"></textarea>'
     + '<div style="margin-top:8px"><button class="linkbtn" id="ingest-dump">Dump it →</button> <span class="fineprint" id="ingest-status"></span></div>'
     + '<div id="ingest-feed" style="margin-top:8px"></div></div>'
-    + '<div class="bp-build">Build 20261009.1514</div>'
+    + '<div class="bp-build">Build 20261009.1517</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -822,8 +826,21 @@ function renderBuddy(id){
   renderJournal();
   if (id === 'project-buddy') {
     const tw = document.querySelector('#buddy-home .bp-tree-wrap');
-    const src = document.getElementById('view-tree');
-    if (tw && src) { tw.innerHTML = src.innerHTML; const zb = tw.querySelector('#zoombar'); if (zb) zb.remove(); }
+    const srcEl = document.getElementById('view-tree');
+    if (tw && srcEl) {
+      tw.innerHTML = '<div class="bp-mini-zoom"><button id="bp-mz-out" title="Zoom out">−</button><button id="bp-mz-in" title="Zoom in">+</button></div><div class="bp-mini-chart"></div>';
+      const mc = tw.querySelector('.bp-mini-chart');
+      mc.innerHTML = srcEl.innerHTML;
+      const zb = mc.querySelector('#zoombar'); if (zb) zb.remove();
+      const zw = mc.querySelector('#zoomwrap'); if (zw) { zw.style.display = 'block'; }
+      const tz = mc.querySelector('#treezoom'); if (tz) { tz.style.overflow = 'visible'; tz.style.height = 'auto'; tz.removeAttribute('id'); }
+      let mz = 50;
+      const applyMz = () => { const ch = mc.querySelector('.chart'); if (ch) ch.style.zoom = mz + '%'; };
+      applyMz();
+      document.getElementById('bp-mz-in').addEventListener('click', e => { e.stopPropagation(); mz = Math.min(150, mz + 10); applyMz(); });
+      document.getElementById('bp-mz-out').addEventListener('click', e => { e.stopPropagation(); mz = Math.max(20, mz - 10); applyMz(); });
+      attachPan(tw);
+    }
   }
 }
 function toast(msg){
@@ -1144,7 +1161,7 @@ function renderPlan(id){
     + '<div class="bp-sec"><h3>Related buddies</h3>'+buds+'</div>'
     + '<div class="bp-sec"><h3>Notes</h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this plan…">'+escHtml(S.notes[id]||'')+'</textarea>'
     + '<p class="fineprint">Saved on this device only.</p></div>'
-    + '<div class="bp-build">Build 20261009.1514</div>'
+    + '<div class="bp-build">Build 20261009.1517</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
