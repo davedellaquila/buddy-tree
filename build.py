@@ -994,6 +994,16 @@ function renderHomepage(b){
   frame.id = 'homepage-frame';
   frame.src = b.homepage;
   frame.title = b.name + ' homepage';
+  frame.addEventListener('load', () => {
+    try {
+      frame.contentWindow.addEventListener('keydown', e => {
+        if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) {
+          document.dispatchEvent(new KeyboardEvent('keydown', {key: e.key, bubbles: true, cancelable: true}));
+          e.preventDefault();
+        }
+      });
+    } catch (err) {}
+  });
   wrap.appendChild(bar);
   wrap.appendChild(frame);
 }
