@@ -2433,7 +2433,8 @@ document.addEventListener('click', e => {
     openBuddy(projRow.dataset.buddy); return;
   }
   const bb = e.target.closest('[data-buddy]');
-  if (bb) { openBuddy(bb.dataset.buddy); return; }
+  // Don't re-open the buddy when clicking an editable field (e.g. the name)
+  if (bb && !e.target.closest('[contenteditable="true"]')) { openBuddy(bb.dataset.buddy); return; }
   const sb = e.target.closest('[data-seen]');
   if (sb) { S.seen[sb.dataset.seen] = Date.now(); save(); renderBuddy(S.sel.slice(6)); renderNav(); return; }
   const sa = e.target.closest('[data-seen-all]');
