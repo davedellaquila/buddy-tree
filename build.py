@@ -1927,8 +1927,30 @@ async function dumpIngest(id, keepText){
 }
 function prependDumpEntry(id, e){
   const feed = document.getElementById('ingest-feed'); if (!feed) return;
-  // If feed shows "No dumps yet", re-render fully to get proper structure
-  if (!feed.querySelector('.dumps')) { renderIngestFeed(id); return; }
+  // If feed is empty ("No dumps yet"), build the full structure with the new entry
+  if (!feed.querySelector('.dumps')) {
+    if (!S.dumpsCollapsed || typeof S.dumpsCollapsed !== 'object') S.dumpsCollapsed = {};
+    S.dumpsCollapsed[id] = false;
+    feed.innerHTML = '<div class="dumps">'
+      + '<div class="dumps-head" id="dumps-toggle"><span class="darrow">\u203a</span><h4>Dumps (1)</h4></div>'
+      + '<div class="dumps-body"><div style="height:8px"></div>'
+      + '<div class="attn"><div class="dump-actions"><button class="dump-act" data-dump-edit="0" title="Edit this dump">' + ICON_EDIT + '</button><button class="dump-act" data-dump-del="0" title="Delete this dump">' + ICON_TRASH + '</button></div><div class="attn-body"><div class="attn-text">' + linkify(escHtml(e.body.slice(0, 300))) + (e.body.length > 300 ? '\u2026' : '') + '</div><div class="attn-date">' + escHtml(e.stamp) + '</div></div></div>'
+      + '</div></div>';
+    feed._entries = [e];
+    // Wire up the toggle
+    var dt = document.getElementById('dumps-toggle');
+    if (dt) dt.addEventListener('click', function(){
+      var d = feed.querySelector('.dumps');
+      d.classList.toggle('collapsed');
+      if (!S.dumpsCollapsed || typeof S.dumpsCollapsed !== 'object') S.dumpsCollapsed = {};
+      S.dumpsCollapsed[id] = d.classList.contains('collapsed');
+      save();
+    });
+    // Wire up delete/edit for the new entry
+    wireDumpButtons(feed, id);
+    save();
+    return;
+  }
   const body = feed.querySelector('.dumps-body');
   if (!body) return;
   const div = document.createElement('div');
@@ -1982,7 +2004,12 @@ async function renderIngestFeed(id){
     S.dumpsCollapsed[id] = d.classList.contains('collapsed');
     save();
   });
+  wireDumpButtons(feed, id);
+}
+function wireDumpButtons(feed, id){
   feed.querySelectorAll('[data-dump-del]').forEach(function(btn){
+    // Avoid double-wiring
+    if (btn.dataset.wired) return; btn.dataset.wired = '1';
     btn.addEventListener('click', function(ev){
       ev.stopPropagation();
       if (!confirm('Delete this dump?')) return;
@@ -1990,6 +2017,7 @@ async function renderIngestFeed(id){
     });
   });
   feed.querySelectorAll('[data-dump-edit]').forEach(function(btn){
+    if (btn.dataset.wired) return; btn.dataset.wired = '1';
     btn.addEventListener('click', function(ev){
       ev.stopPropagation();
       editDump(id, parseInt(btn.getAttribute('data-dump-edit'), 10), btn);
