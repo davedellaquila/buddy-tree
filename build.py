@@ -540,9 +540,23 @@ function selectProject(id){
 }
 function openBuddy(id){
   if (!byId[id]) return;
+  const wasProjectView = S.sel === 'view:project';
   S.projectId = id; save();
-  if (S.sel === 'view:project') show('view:project');
-  else show('buddy:' + id);
+  if (wasProjectView) {
+    const pb = byId[id] || {};
+    if (pb.homepage) {
+      // Homepage exists: update main area and open panel
+      show('view:project');
+      show('buddy:' + id);
+    } else {
+      // No homepage: open panel, leave main area untouched
+      show('buddy:' + id);
+      // Restore Project view selection (show() changed S.sel)
+      S.sel = 'view:project'; save();
+    }
+  } else {
+    show('buddy:' + id);
+  }
 }
 function shortVal(v){
   if (v == null || v === '') return '(empty)';
@@ -1621,8 +1635,8 @@ document.addEventListener('keydown', e => {
   if (!total) return;
   e.preventDefault();
   let pos = -1;
-  const sel = S.sel || '';
-  if (sel.startsWith('buddy:')) pos = rows.findIndex(r => r.dataset.buddy === sel.slice(6));
+  const pid = S.projectId || '';
+  if (pid) pos = rows.findIndex(r => r.dataset.buddy === pid);
   if (e.key === 'ArrowDown') pos = (pos + 1 + total) % total;
   else if (e.key === 'ArrowUp') pos = (pos - 1 + total) % total;
   else if (e.key === 'ArrowLeft') pos = 0;

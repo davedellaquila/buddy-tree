@@ -882,9 +882,23 @@ function selectProject(id){
 }
 function openBuddy(id){
   if (!byId[id]) return;
+  const wasProjectView = S.sel === 'view:project';
   S.projectId = id; save();
-  if (S.sel === 'view:project') show('view:project');
-  else show('buddy:' + id);
+  if (wasProjectView) {
+    const pb = byId[id] || {};
+    if (pb.homepage) {
+      // Homepage exists: update main area and open panel
+      show('view:project');
+      show('buddy:' + id);
+    } else {
+      // No homepage: open panel, leave main area untouched
+      show('buddy:' + id);
+      // Restore Project view selection (show() changed S.sel)
+      S.sel = 'view:project'; save();
+    }
+  } else {
+    show('buddy:' + id);
+  }
 }
 function shortVal(v){
   if (v == null || v === '') return '(empty)';
@@ -1428,7 +1442,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Saved to the buddy’s repo (docs/notes.md) — visible to everyone with repo access.">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Shared notes…"></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261009.1817</div>'
+    + '<div class="bp-build">Build 20261009.1819</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -1865,7 +1879,7 @@ function renderPlan(id){
     + '<p class="fineprint">Saved on this device. (For your eyes only)</p></div>'
     + '<div class="bp-sec"><h3>Shared notes<span class="info-tip" data-tip="Visible to everyone with access to this project.">\u24d8</span></h3><textarea class="notes" id="bp-shared" placeholder="Shared notes\u2026 (visible to everyone with access)">'+escHtml((S.planShared||{})[id]||'')+'</textarea>'
     + '<p class="fineprint">Shared — visible to everyone with access.</p></div>'
-    + '<div class="bp-build">Build 20261009.1817</div>'
+    + '<div class="bp-build">Build 20261009.1819</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
@@ -1963,8 +1977,8 @@ document.addEventListener('keydown', e => {
   if (!total) return;
   e.preventDefault();
   let pos = -1;
-  const sel = S.sel || '';
-  if (sel.startsWith('buddy:')) pos = rows.findIndex(r => r.dataset.buddy === sel.slice(6));
+  const pid = S.projectId || '';
+  if (pid) pos = rows.findIndex(r => r.dataset.buddy === pid);
   if (e.key === 'ArrowDown') pos = (pos + 1 + total) % total;
   else if (e.key === 'ArrowUp') pos = (pos - 1 + total) % total;
   else if (e.key === 'ArrowLeft') pos = 0;
