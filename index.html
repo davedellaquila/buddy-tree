@@ -132,6 +132,9 @@
   .st-idea { background: #21262d; color: #8b949e; }
   .st-new { background: #33182a; color: #ff9bce; }
   .st-spec { background: #231a08; color: #e3b341; }
+  .st-auto { background: #122b18; color: #7ee787; }
+  .st-planned { background: #231a08; color: #e3b341; }
+  #manifest-tiles { display: flex; gap: 14px; margin: 2px auto 20px; max-width: 860px; flex-wrap: wrap; }
   .d0 { padding-left: 14px; background: #161b22; border-radius: 8px; margin-top: 18px; }
   .d0 .pname { font-size: 16px; }
   .d1 { padding-left: 34px; }
@@ -250,7 +253,7 @@ body{padding:0}
 #zoombar .zv{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
 #zoomfit{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:14px;width:30px;height:26px;cursor:pointer}
 #zoomfit:hover{color:var(--text);border-color:var(--muted)}
-#sb-resize{position:absolute;top:0;right:-6px;width:12px;height:100%;cursor:ew-resize;z-index:20;display:flex;align-items:center;justify-content:center}
+#sb-resize{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:center;width:12px;height:100vh;margin-left:auto;margin-right:-6px;margin-bottom:-100vh;cursor:ew-resize}
 #sb-resize::after{content:'';width:7px;height:56px;border-radius:3px;background:var(--faint)}
 #sb-resize:hover::after{background:var(--accent-hi)}
 #sb-resize:hover{background:var(--ghost)}
@@ -331,7 +334,7 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
   cursor:pointer;display:flex;align-items:center;justify-content:center}
 .bp-close-x:hover{color:var(--text)}
 #buddy-home{position:relative}
-#bp-resize{position:absolute;top:0;left:-6px;width:12px;height:100%;cursor:ew-resize;z-index:20;display:flex;align-items:center;justify-content:center}
+#bp-resize{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:center;width:12px;height:100vh;margin-right:auto;margin-left:-6px;margin-bottom:-100vh;cursor:ew-resize}
 #bp-resize::after{content:'';width:7px;height:56px;border-radius:3px;background:var(--faint)}
 #bp-resize:hover::after{background:var(--accent-hi)}
 #bp-resize:hover{background:var(--ghost)}
@@ -449,20 +452,21 @@ body.standalone .sa-bar{display:flex}
 #bp-close{display:none}
 #view-buddy.panel #bp-close,#view-buddy.sheet #bp-close{display:inline-block}
 /* ---------- Project view: stat tiles + buddy homepage embed ---------- */
-#project-tiles{display:flex;gap:14px;margin:2px 0 18px;flex-wrap:wrap}
+#project-tiles{display:flex;gap:14px;margin:2px auto 20px;max-width:860px;flex-wrap:wrap}
 .ptile{flex:1 1 170px;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 18px 12px;position:relative;overflow:hidden}
 .ptile::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--tint)}
 .ptile-label{font-size:11px;letter-spacing:.14em;font-weight:700;color:var(--muted)}
 .ptile-num{font-size:42px;font-weight:800;color:var(--tint);line-height:1.25}
 .ptile-sub{font-size:13px;color:var(--muted)}
-#homepage-wrap{flex:1;display:flex;flex-direction:column;min-height:480px}
-#homepage-bar{display:flex;align-items:center;gap:10px;padding:2px 2px 10px;color:var(--muted);font-size:13px}
-#homepage-title{font-weight:600;color:var(--text)}
-#homepage-meta{font-size:12px}
-#homepage-src{margin-left:auto;font-size:13px;color:var(--accent);text-decoration:none;white-space:nowrap}
-#homepage-src:hover{text-decoration:underline}
-#homepage-frame{flex:1;width:100%;min-height:0;border:1px solid var(--border);border-radius:12px;background:#fff;display:block}
-@media (max-width:760px){#main #view-project.active{min-height:calc(100vh - 88px)}}
+#main.homepage-mode{padding:0}
+#main.homepage-mode #view-project.active{min-height:100vh}
+#homepage-wrap{flex:1;display:flex;flex-direction:column;min-height:0;margin:0;position:relative}
+#homepage-open{position:absolute;top:14px;right:16px;z-index:5;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600;text-decoration:none;box-shadow:0 4px 16px rgba(0,0,0,.18);white-space:nowrap}
+#homepage-open:hover{border-color:var(--accent);color:var(--accent)}
+#homepage-frame{flex:1;width:100%;min-height:0;border:0;border-radius:0;background:#fff;display:block}
+@media (max-width:760px){#main #view-project.active{min-height:calc(100vh - 88px)}
+#main.homepage-mode{padding:0}
+#main.homepage-mode #view-project.active{min-height:100vh}}
 
 .pstrip img{height:150px;border-radius:10px;border:1px solid var(--border);display:block}
 .pstrip img:hover{border-color:var(--accent)}
@@ -773,19 +777,24 @@ body.standalone .sa-bar{display:flex}
   <!-- ============ MANIFEST VIEW ============ -->
   <div id="view-plans" class="view"><section class="projects-view" style="margin-top:24px"><h2>Business Plans</h2><p class="sub">BRDs and business plans — real-world ventures, separate from the buddy-app software projects. Plans link to the buddies that build them.</p><div class="proj-list"><div class="proj-row d1" data-plan="amador-transport"><span class="pname">🚌 Amador County Transport</span><span class="pdesc">Affordable book-way-in-advance transportation for Amador County, where options are scarce today. Riders schedu</span><span class="status st-brief">Brief review</span></div><div class="proj-row d1" data-plan="fiddletown-events"><span class="pname">🎪 Fiddletown Events Site</span><span class="pdesc">Events-listing website for the Fiddletown/Amador area. The business model is selling advertising to local busi</span><span class="status st-live">Live</span></div><div class="proj-row d1" data-plan="home-care"><span class="pname">🏥 Non-Medical Home Care (Amador)</span><span class="pdesc">Non-medical home care business in Amador County — one of the two options Dave narrowed his exploration to. Hig</span><span class="status st-idea">Exploring</span></div><div class="proj-row d1" data-plan="defensible-space"><span class="pname">🌲 Defensible Space (Amador)</span><span class="pdesc">Defensible-space / vegetation-management business in Amador County — ranked #1 in Dave's narrowing. Leaner sta</span><span class="status st-idea">Exploring</span></div><div class="proj-row d1" data-plan="expense-monetization"><span class="pname">💳 Money Buddy Monetization</span><span class="pdesc">Monetization plan for Money Buddy: freemium SaaS positioned as a privacy-first YNAB alternative for freelancer</span><span class="status st-active">Active</span></div><div class="proj-row d1" data-plan="buddy-suite-monetization"><span class="pname">🧩 Buddy Suite Monetization</span><span class="pdesc">The monetization plan and marketing strategy across the whole buddy family — defined scope of the Buddy Suite </span><span class="status st-new">Planned</span></div><div class="proj-row d1" data-plan="wisdom-families"><span class="pname">🦉 Wisdom for Families</span><span class="pdesc">Draft subscription business plan for the Wisdom Library revival. The draft lives inside the private davedellaq</span><span class="status st-spec">Draft</span></div></div></section></div><div id="view-manifest" class="view">
     <section class="projects-view" style="margin-top:24px">
+      <div id="manifest-tiles">
+        <div class="ptile" style="--tint:#2f9e44;flex:1 1 170px"><div class="ptile-label">AUTOMATIC</div><div class="ptile-num">8</div><div class="ptile-sub">The drill runs these every time</div></div>
+        <div class="ptile" style="--tint:#d97a1f;flex:1 1 170px"><div class="ptile-label">PLANNED</div><div class="ptile-num">2</div><div class="ptile-sub">Decided, not yet automatic</div></div>
+      </div>
       <h2>New-Project Manifest</h2>
       <p class="sub">What every new buddy automatically gets when it's born.</p>
       <div class="proj-list">
-        <div class="proj-row d0"><span class="pname">1 · Side thread</span><span class="pdesc">The project's conversational home — all discussion, decisions, and reviews live here.</span></div>
-        <div class="proj-row d0"><span class="pname">2 · Product brief</span><span class="pdesc">Canonical description in Zuki Docs (Google Doc): the idea, the problem, revenue potential, room for growth, v1 scope, open questions.</span></div>
-        <div class="proj-row d0"><span class="pname">3 · GitHub repo</span><span class="pdesc">Private repo holding the code — and eventually the knowledge base (KNOWLEDGE.md, DECISIONS.md).</span></div>
-        <div class="proj-row d0"><span class="pname">4 · INIT summary</span><span class="pdesc">First message in the thread: the brief's executive summary (the mission statement), plus links to brief, repo, related docs, parent and children.</span></div>
-        <div class="proj-row d0"><span class="pname">5 · Review ask</span><span class="pdesc">Quick-reply widget asking Dave to review the brief — looks good, edits, or defer.</span></div>
-        <div class="proj-row d0"><span class="pname">6 · Quick-links entry</span><span class="pdesc">One-tap link to the brief, appended to quick-links.md.</span></div>
-        <div class="proj-row d0"><span class="pname">7 · Memory entry</span><span class="pdesc">MEMORY.md bullet: what the project is, key links, current status.</span></div>
-        <div class="proj-row d0"><span class="pname">8 · Awaiting-reply entry</span><span class="pdesc">The brief review tracked in the registry until Dave answers.</span></div>
+        <div class="proj-row d0"><span class="pname">1 · Side thread</span><span class="pdesc">The project's conversational home — all discussion, decisions, and reviews live here.</span><span class="status st-auto">Automatic</span></div>
+        <div class="proj-row d0"><span class="pname">2 · Product brief</span><span class="pdesc">Canonical description in Zuki Docs (Google Doc): the idea, the problem, revenue potential, room for growth, v1 scope, open questions.</span><span class="status st-auto">Automatic</span></div>
+        <div class="proj-row d0"><span class="pname">3 · GitHub repo</span><span class="pdesc">Private repo holding the code — and eventually the knowledge base (KNOWLEDGE.md, DECISIONS.md).</span><span class="status st-auto">Automatic</span></div>
+        <div class="proj-row d0"><span class="pname">4 · INIT summary</span><span class="pdesc">First message in the thread: the brief's executive summary (the mission statement), plus links to brief, repo, related docs, parent and children.</span><span class="status st-auto">Automatic</span></div>
+        <div class="proj-row d0"><span class="pname">5 · Review ask</span><span class="pdesc">Quick-reply widget asking Dave to review the brief — looks good, edits, or defer.</span><span class="status st-auto">Automatic</span></div>
+        <div class="proj-row d0"><span class="pname">6 · Quick-links entry</span><span class="pdesc">One-tap link to the brief, appended to quick-links.md.</span><span class="status st-auto">Automatic</span></div>
+        <div class="proj-row d0"><span class="pname">7 · Memory entry</span><span class="pdesc">MEMORY.md bullet: what the project is, key links, current status.</span><span class="status st-auto">Automatic</span></div>
+        <div class="proj-row d0"><span class="pname">8 · Awaiting-reply entry</span><span class="pdesc">The brief review tracked in the registry until Dave answers.</span><span class="status st-auto">Automatic</span></div>
+        <div class="proj-row d0"><span class="pname">9 · Dashboard entry</span><span class="pdesc">The buddy appears here in the dashboard, in hierarchy order.</span><span class="status st-planned">Planned</span></div>
+        <div class="proj-row d0"><span class="pname">10 · Per-buddy home page</span><span class="pdesc">A home page view in the sidebar for the new buddy.</span><span class="status st-planned">Planned</span></div>
       </div>
-      <p class="sub" style="margin-top:20px">Decided, not yet automatic: a dashboard entry here, and a per-buddy home page view in the sidebar.</p>
     </section>
   </div>
 
@@ -864,7 +873,7 @@ function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
 const VIEW_DEFS = [
   ['tree','Tree','▦'],
   ['projects','Projects','☰'],
-  ['plans','Plans','💼'],
+  ['plans','Business Plans','💼'],
   ['manifest','Manifest','✓'],
   ['project','Project Homepage','🏠'],
   ['changelog','Changelog','🕘'],
@@ -891,6 +900,17 @@ function selectProject(id){
 }
 function openBuddy(id){
   if (!byId[id]) return;
+  const b = byId[id];
+  // Project Homepage view: clicking a buddy loads its homepage in the main view.
+  // No homepage -> leave the main view exactly as it was.
+  if (S.view === 'project') {
+    if (b.homepage) {
+      S.projectId = id; save();
+      renderProjectView();
+      renderNav();
+    }
+    return;
+  }
   const inView = (S.sel || '').startsWith('view:');
   S.projectId = id; save();
   if (inView) {
@@ -1336,29 +1356,18 @@ function renderProjectView(){
   const b = byId[projectId()] || {};
   pv.innerHTML = '';
   if (b.homepage) {
+    document.getElementById('main').classList.add('homepage-mode');
     const bar2 = document.getElementById('journal-bar');
     if (bar2) bar2.classList.remove('show');
     const wrap = document.createElement('div');
     wrap.id = 'homepage-wrap';
-    const bar = document.createElement('div');
-    bar.id = 'homepage-bar';
-    const title = document.createElement('span');
-    title.id = 'homepage-title';
-    title.textContent = (b.icon ? b.icon + ' ' : '') + b.name;
-    bar.appendChild(title);
-    const meta = document.createElement('span');
-    meta.id = 'homepage-meta';
-    meta.textContent = 'homepage' + (b.homepageSynced ? ' · mirrored ' + b.homepageSynced : '');
-    bar.appendChild(meta);
-    if (b.homepageSource) {
-      const a = document.createElement('a');
-      a.id = 'homepage-src';
-      a.href = b.homepageSource;
-      a.target = '_blank';
-      a.rel = 'noopener';
-      a.textContent = 'Open on Muse ↗';
-      bar.appendChild(a);
-    }
+    const open = document.createElement('a');
+    open.id = 'homepage-open';
+    open.href = b.homepageSource || b.homepage;
+    open.target = '_blank';
+    open.rel = 'noopener';
+    open.textContent = 'Open in a new tab';
+    wrap.appendChild(open);
     const frame = document.createElement('iframe');
     frame.id = 'homepage-frame';
     frame.src = b.homepage;
@@ -1373,10 +1382,10 @@ function renderProjectView(){
         });
       } catch (err) {}
     });
-    wrap.appendChild(bar);
     wrap.appendChild(frame);
     pv.appendChild(wrap);
   } else {
+    document.getElementById('main').classList.remove('homepage-mode');
     const empty = document.createElement('div');
     empty.style.cssText = 'display:flex;align-items:center;justify-content:center;height:40vh;color:var(--muted);font-size:15px';
     empty.textContent = 'No homepage for this project.';
@@ -1455,7 +1464,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Saved to the buddy’s repo (docs/notes.md) — visible to everyone with repo access.">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Shared notes…"></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261009.1844</div>'
+    + '<div class="bp-build">Build 20261009.1855</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -1906,7 +1915,7 @@ function renderPlan(id){
     + '<p class="fineprint">Saved on this device. (For your eyes only)</p></div>'
     + '<div class="bp-sec"><h3>Shared notes<span class="info-tip" data-tip="Visible to everyone with access to this project.">\u24d8</span></h3><textarea class="notes" id="bp-shared" placeholder="Shared notes\u2026 (visible to everyone with access)">'+escHtml((S.planShared||{})[id]||'')+'</textarea>'
     + '<p class="fineprint">Shared — visible to everyone with access.</p></div>'
-    + '<div class="bp-build">Build 20261009.1844</div>'
+    + '<div class="bp-build">Build 20261009.1855</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
@@ -1948,6 +1957,7 @@ function show(sel, push){
     // View-menu clicks switch the center view but never dismiss the buddy
     // detail panel: its visibility is controlled only by buddy selection.
     const overlayOpen = vb.classList.contains('panel') || vb.classList.contains('sheet');
+    document.getElementById('main').classList.remove('homepage-mode');
     document.querySelectorAll('#main .view').forEach(v => {
       if (v === vb && overlayOpen) return;
       v.classList.remove('active', 'panel', 'sheet');

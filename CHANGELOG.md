@@ -3,6 +3,32 @@
 All notable changes to the Buddies dashboard and buddy system. Newest first.
 `FEATURES.md` describes the current state; this file describes how it got there.
 
+## 2026-10-10 (Manifest tiles, homepage full-bleed, tile widths, grippers)
+
+### Added
+- **New-Project Manifest tiles** (Dave's idea) — the Manifest now opens
+  with AUTOMATIC (8) and PLANNED (2) tiles, and every manifest row carries
+  a colored pill (green Automatic, amber Planned) identifying its status.
+- **Homepage navigation from the tree** (Dave's idea) — when the Project
+  Homepage view is selected, clicking a buddy loads its homepage in the
+  main view if it has one; buddies without a homepage leave the view
+  untouched.
+
+### Changed
+- **Project Homepage is full-bleed** (Dave's idea) — the homepage iframe
+  now fills the entire main view area with no margins; the header bar is
+  replaced by a floating "Open in a new tab" pill button overlaid at the
+  top.
+- **Plans renamed to Business Plans** in the Views list (Dave's request).
+- **Projects tiles constrained to content width** (Dave's request) — the
+  TO REVIEW / NEW / CLEARED tiles now match the 860px buddy list below
+  instead of spanning the full page width.
+
+### Fixed
+- **Resize grippers stay fixed** (Dave's request) — the left sidebar and
+  right panel grippers now use sticky positioning so they stay vertically
+  centered in the visible area while the panels scroll.
+
 ## 2026-10-10 (Tiles: attention on Projects, types on Changelog)
 
 ### Changed

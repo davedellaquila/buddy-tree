@@ -122,6 +122,9 @@
   .st-idea { background: #21262d; color: #8b949e; }
   .st-new { background: #33182a; color: #ff9bce; }
   .st-spec { background: #231a08; color: #e3b341; }
+  .st-auto { background: #122b18; color: #7ee787; }
+  .st-planned { background: #231a08; color: #e3b341; }
+  #manifest-tiles { display: flex; gap: 14px; margin: 2px auto 20px; max-width: 860px; flex-wrap: wrap; }
   .d0 { padding-left: 14px; background: #161b22; border-radius: 8px; margin-top: 18px; }
   .d0 .pname { font-size: 16px; }
   .d1 { padding-left: 34px; }
@@ -398,19 +401,24 @@
   <!-- ============ MANIFEST VIEW ============ -->
   <div id="view-manifest" class="view">
     <section class="projects-view" style="margin-top:24px">
+      <div id="manifest-tiles">
+        <div class="ptile" style="--tint:#2f9e44;flex:1 1 170px"><div class="ptile-label">AUTOMATIC</div><div class="ptile-num">8</div><div class="ptile-sub">The drill runs these every time</div></div>
+        <div class="ptile" style="--tint:#d97a1f;flex:1 1 170px"><div class="ptile-label">PLANNED</div><div class="ptile-num">2</div><div class="ptile-sub">Decided, not yet automatic</div></div>
+      </div>
       <h2>New-Project Manifest</h2>
       <p class="sub">What every new buddy automatically gets when it's born.</p>
       <div class="proj-list">
-        <div class="proj-row d0"><span class="pname">1 · Side thread</span><span class="pdesc">The project's conversational home — all discussion, decisions, and reviews live here.</span></div>
-        <div class="proj-row d0"><span class="pname">2 · Product brief</span><span class="pdesc">Canonical description in Zuki Docs (Google Doc): the idea, the problem, revenue potential, room for growth, v1 scope, open questions.</span></div>
-        <div class="proj-row d0"><span class="pname">3 · GitHub repo</span><span class="pdesc">Private repo holding the code — and eventually the knowledge base (KNOWLEDGE.md, DECISIONS.md).</span></div>
-        <div class="proj-row d0"><span class="pname">4 · INIT summary</span><span class="pdesc">First message in the thread: the brief's executive summary (the mission statement), plus links to brief, repo, related docs, parent and children.</span></div>
-        <div class="proj-row d0"><span class="pname">5 · Review ask</span><span class="pdesc">Quick-reply widget asking Dave to review the brief — looks good, edits, or defer.</span></div>
-        <div class="proj-row d0"><span class="pname">6 · Quick-links entry</span><span class="pdesc">One-tap link to the brief, appended to quick-links.md.</span></div>
-        <div class="proj-row d0"><span class="pname">7 · Memory entry</span><span class="pdesc">MEMORY.md bullet: what the project is, key links, current status.</span></div>
-        <div class="proj-row d0"><span class="pname">8 · Awaiting-reply entry</span><span class="pdesc">The brief review tracked in the registry until Dave answers.</span></div>
+        <div class="proj-row d0"><span class="pname">1 · Side thread</span><span class="pdesc">The project's conversational home — all discussion, decisions, and reviews live here.</span><span class="status st-auto">Automatic</span></div>
+        <div class="proj-row d0"><span class="pname">2 · Product brief</span><span class="pdesc">Canonical description in Zuki Docs (Google Doc): the idea, the problem, revenue potential, room for growth, v1 scope, open questions.</span><span class="status st-auto">Automatic</span></div>
+        <div class="proj-row d0"><span class="pname">3 · GitHub repo</span><span class="pdesc">Private repo holding the code — and eventually the knowledge base (KNOWLEDGE.md, DECISIONS.md).</span><span class="status st-auto">Automatic</span></div>
+        <div class="proj-row d0"><span class="pname">4 · INIT summary</span><span class="pdesc">First message in the thread: the brief's executive summary (the mission statement), plus links to brief, repo, related docs, parent and children.</span><span class="status st-auto">Automatic</span></div>
+        <div class="proj-row d0"><span class="pname">5 · Review ask</span><span class="pdesc">Quick-reply widget asking Dave to review the brief — looks good, edits, or defer.</span><span class="status st-auto">Automatic</span></div>
+        <div class="proj-row d0"><span class="pname">6 · Quick-links entry</span><span class="pdesc">One-tap link to the brief, appended to quick-links.md.</span><span class="status st-auto">Automatic</span></div>
+        <div class="proj-row d0"><span class="pname">7 · Memory entry</span><span class="pdesc">MEMORY.md bullet: what the project is, key links, current status.</span><span class="status st-auto">Automatic</span></div>
+        <div class="proj-row d0"><span class="pname">8 · Awaiting-reply entry</span><span class="pdesc">The brief review tracked in the registry until Dave answers.</span><span class="status st-auto">Automatic</span></div>
+        <div class="proj-row d0"><span class="pname">9 · Dashboard entry</span><span class="pdesc">The buddy appears here in the dashboard, in hierarchy order.</span><span class="status st-planned">Planned</span></div>
+        <div class="proj-row d0"><span class="pname">10 · Per-buddy home page</span><span class="pdesc">A home page view in the sidebar for the new buddy.</span><span class="status st-planned">Planned</span></div>
       </div>
-      <p class="sub" style="margin-top:20px">Decided, not yet automatic: a dashboard entry here, and a per-buddy home page view in the sidebar.</p>
     </section>
   </div>
 

@@ -111,7 +111,7 @@ body{padding:0}
 #zoombar .zv{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
 #zoomfit{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:14px;width:30px;height:26px;cursor:pointer}
 #zoomfit:hover{color:var(--text);border-color:var(--muted)}
-#sb-resize{position:absolute;top:0;right:-6px;width:12px;height:100%;cursor:ew-resize;z-index:20;display:flex;align-items:center;justify-content:center}
+#sb-resize{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:center;width:12px;height:100vh;margin-left:auto;margin-right:-6px;margin-bottom:-100vh;cursor:ew-resize}
 #sb-resize::after{content:'';width:7px;height:56px;border-radius:3px;background:var(--faint)}
 #sb-resize:hover::after{background:var(--accent-hi)}
 #sb-resize:hover{background:var(--ghost)}
@@ -192,7 +192,7 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
   cursor:pointer;display:flex;align-items:center;justify-content:center}
 .bp-close-x:hover{color:var(--text)}
 #buddy-home{position:relative}
-#bp-resize{position:absolute;top:0;left:-6px;width:12px;height:100%;cursor:ew-resize;z-index:20;display:flex;align-items:center;justify-content:center}
+#bp-resize{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:center;width:12px;height:100vh;margin-right:auto;margin-left:-6px;margin-bottom:-100vh;cursor:ew-resize}
 #bp-resize::after{content:'';width:7px;height:56px;border-radius:3px;background:var(--faint)}
 #bp-resize:hover::after{background:var(--accent-hi)}
 #bp-resize:hover{background:var(--ghost)}
@@ -310,20 +310,21 @@ body.standalone .sa-bar{display:flex}
 #bp-close{display:none}
 #view-buddy.panel #bp-close,#view-buddy.sheet #bp-close{display:inline-block}
 /* ---------- Project view: stat tiles + buddy homepage embed ---------- */
-#project-tiles{display:flex;gap:14px;margin:2px 0 18px;flex-wrap:wrap}
+#project-tiles{display:flex;gap:14px;margin:2px auto 20px;max-width:860px;flex-wrap:wrap}
 .ptile{flex:1 1 170px;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 18px 12px;position:relative;overflow:hidden}
 .ptile::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--tint)}
 .ptile-label{font-size:11px;letter-spacing:.14em;font-weight:700;color:var(--muted)}
 .ptile-num{font-size:42px;font-weight:800;color:var(--tint);line-height:1.25}
 .ptile-sub{font-size:13px;color:var(--muted)}
-#homepage-wrap{flex:1;display:flex;flex-direction:column;min-height:480px}
-#homepage-bar{display:flex;align-items:center;gap:10px;padding:2px 2px 10px;color:var(--muted);font-size:13px}
-#homepage-title{font-weight:600;color:var(--text)}
-#homepage-meta{font-size:12px}
-#homepage-src{margin-left:auto;font-size:13px;color:var(--accent);text-decoration:none;white-space:nowrap}
-#homepage-src:hover{text-decoration:underline}
-#homepage-frame{flex:1;width:100%;min-height:0;border:1px solid var(--border);border-radius:12px;background:#fff;display:block}
-@media (max-width:760px){#main #view-project.active{min-height:calc(100vh - 88px)}}
+#main.homepage-mode{padding:0}
+#main.homepage-mode #view-project.active{min-height:100vh}
+#homepage-wrap{flex:1;display:flex;flex-direction:column;min-height:0;margin:0;position:relative}
+#homepage-open{position:absolute;top:14px;right:16px;z-index:5;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600;text-decoration:none;box-shadow:0 4px 16px rgba(0,0,0,.18);white-space:nowrap}
+#homepage-open:hover{border-color:var(--accent);color:var(--accent)}
+#homepage-frame{flex:1;width:100%;min-height:0;border:0;border-radius:0;background:#fff;display:block}
+@media (max-width:760px){#main #view-project.active{min-height:calc(100vh - 88px)}
+#main.homepage-mode{padding:0}
+#main.homepage-mode #view-project.active{min-height:100vh}}
 
 .pstrip img{height:150px;border-radius:10px;border:1px solid var(--border);display:block}
 .pstrip img:hover{border-color:var(--accent)}
@@ -521,7 +522,7 @@ function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
 const VIEW_DEFS = [
   ['tree','Tree','▦'],
   ['projects','Projects','☰'],
-  ['plans','Plans','💼'],
+  ['plans','Business Plans','💼'],
   ['manifest','Manifest','✓'],
   ['project','Project Homepage','🏠'],
   ['changelog','Changelog','🕘'],
@@ -548,6 +549,17 @@ function selectProject(id){
 }
 function openBuddy(id){
   if (!byId[id]) return;
+  const b = byId[id];
+  // Project Homepage view: clicking a buddy loads its homepage in the main view.
+  // No homepage -> leave the main view exactly as it was.
+  if (S.view === 'project') {
+    if (b.homepage) {
+      S.projectId = id; save();
+      renderProjectView();
+      renderNav();
+    }
+    return;
+  }
   const inView = (S.sel || '').startsWith('view:');
   S.projectId = id; save();
   if (inView) {
@@ -993,29 +1005,18 @@ function renderProjectView(){
   const b = byId[projectId()] || {};
   pv.innerHTML = '';
   if (b.homepage) {
+    document.getElementById('main').classList.add('homepage-mode');
     const bar2 = document.getElementById('journal-bar');
     if (bar2) bar2.classList.remove('show');
     const wrap = document.createElement('div');
     wrap.id = 'homepage-wrap';
-    const bar = document.createElement('div');
-    bar.id = 'homepage-bar';
-    const title = document.createElement('span');
-    title.id = 'homepage-title';
-    title.textContent = (b.icon ? b.icon + ' ' : '') + b.name;
-    bar.appendChild(title);
-    const meta = document.createElement('span');
-    meta.id = 'homepage-meta';
-    meta.textContent = 'homepage' + (b.homepageSynced ? ' \u00b7 mirrored ' + b.homepageSynced : '');
-    bar.appendChild(meta);
-    if (b.homepageSource) {
-      const a = document.createElement('a');
-      a.id = 'homepage-src';
-      a.href = b.homepageSource;
-      a.target = '_blank';
-      a.rel = 'noopener';
-      a.textContent = 'Open on Muse \u2197';
-      bar.appendChild(a);
-    }
+    const open = document.createElement('a');
+    open.id = 'homepage-open';
+    open.href = b.homepageSource || b.homepage;
+    open.target = '_blank';
+    open.rel = 'noopener';
+    open.textContent = 'Open in a new tab';
+    wrap.appendChild(open);
     const frame = document.createElement('iframe');
     frame.id = 'homepage-frame';
     frame.src = b.homepage;
@@ -1030,10 +1031,10 @@ function renderProjectView(){
         });
       } catch (err) {}
     });
-    wrap.appendChild(bar);
     wrap.appendChild(frame);
     pv.appendChild(wrap);
   } else {
+    document.getElementById('main').classList.remove('homepage-mode');
     const empty = document.createElement('div');
     empty.style.cssText = 'display:flex;align-items:center;justify-content:center;height:40vh;color:var(--muted);font-size:15px';
     empty.textContent = 'No homepage for this project.';
@@ -1605,6 +1606,7 @@ function show(sel, push){
     // View-menu clicks switch the center view but never dismiss the buddy
     // detail panel: its visibility is controlled only by buddy selection.
     const overlayOpen = vb.classList.contains('panel') || vb.classList.contains('sheet');
+    document.getElementById('main').classList.remove('homepage-mode');
     document.querySelectorAll('#main .view').forEach(v => {
       if (v === vb && overlayOpen) return;
       v.classList.remove('active', 'panel', 'sheet');

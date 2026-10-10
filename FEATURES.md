@@ -33,19 +33,24 @@ Build: `build.py` generates `index.html` from `buddies.json` + `plans.json`.
 
 ## Sidebar
 
-- **Main views** — Tree, Projects, Plans, Manifest, Project, Changelog;
-  order is user-rearrangeable in settings (gear icon). Number keys 1–6
-  select views in that order; Up/Down arrow through views then buddies.
-- **Project view** — shows the current project's homepage in the center;
-  clicking a sidebar buddy selects it as the current project. A buddy with
-  a `homepage` field loads that page in a full-center frame (with an "Open
-  on Muse ↗" link to its canonical URL); buddies without one show a
-  "No homepage for this project" empty state. Picking a view-menu option
-  never dismisses the right-side buddy panel.
+- **Main views** — Tree, Projects, Business Plans, Manifest, Project,
+  Changelog; order is user-rearrangeable in settings (gear icon). Number
+  keys 1–6 select views in that order; Up/Down arrow through views then
+  buddies.
+- **Project view** — shows the current project's homepage full-bleed in the
+  main view area (no margins); a floating "Open in a new tab" pill button
+  overlays the top. Clicking a sidebar buddy loads its homepage if it has
+  one, and leaves the view untouched if it doesn't. Buddies without a
+  homepage show a "No homepage for this project" empty state. Picking a
+  view-menu option never dismisses the right-side buddy panel.
 - **Projects view** — hierarchical outline of every buddy with its status;
   opens with global attention tiles (TO REVIEW / NEW / CLEARED across all
-  buddies). Clicking a row toggles its section and loads the buddy in the
+  buddies), constrained to the same 860px width as the list below.
+  Clicking a row toggles its section and loads the buddy in the
   right-side panel.
+- **Manifest view** — the new-project drill as rows, each badged with a
+  colored pill (Automatic / Planned); opens with AUTOMATIC (8) and
+  PLANNED (2) summary tiles.
 - **Horizontally resizable** — drag the edge, 220–560 px, width remembered
   per device.
 - **Drag-to-reparent** — drag any sidebar buddy onto a tree node or
