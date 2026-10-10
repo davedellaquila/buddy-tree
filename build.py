@@ -1356,6 +1356,11 @@ function renderBuddy(id){
     const after = S.names[id] != null ? S.names[id] : null;
     if (before !== after) logChange('rename', id, 'Renamed \u201c' + beforeLabel + '\u201d \u2192 \u201c' + dispName(byId[id]) + '\u201d', before, after);
     save(); renderNav();
+    // Immediately reflect the new name in the current view
+    if (S.view === 'project' && S.projectId === id) renderProjectView();
+    else if (S.view === 'projects') renderProjects();
+    // Update the panel itself to show the new name (in case hideBuddyWord applies)
+    renderBuddy(id);
   });
   // Homepage URL field: editable text input, saves to S.homepages override
   const hpu = document.getElementById('bp-homepage-url');
