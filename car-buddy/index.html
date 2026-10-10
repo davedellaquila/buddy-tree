@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Car Buddy — Homepage</title>
+<style>
+  :root {
+    --bg: #141311;
+    --bg2: #1b1916;
+    --card: #211e19;
+    --border: #3a332a;
+    --text: #f2ead9;
+    --muted: #b3a68c;
+    --amber: #e0a437;
+    --red: #d96a5f;
+    --green: #7fb069;
+    --blue: #6aa8d8;
+    --purple: #b48ad8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    line-height: 1.55;
+    padding: 0 0 64px;
+  }
+  .stripe {
+    height: 6px;
+    background: repeating-linear-gradient(135deg, var(--amber) 0 18px, #141311 18px 36px);
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+  header.hero { padding: 52px 0 30px; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
+  .kicker {
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-size: 12px;
+    color: var(--amber);
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 44px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  h1 .icon { margin-right: 10px; }
+  .mission { color: var(--muted); font-size: 17px; max-width: 660px; }
+  .mission strong { color: var(--text); font-weight: 600; }
+  h2 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 24px;
+    margin: 40px 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2 .rule { flex: 1; height: 1px; background: var(--border); }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .card h3 { font-size: 16px; margin-bottom: 6px; }
+  .card p { font-size: 14px; color: var(--muted); }
+  .card p strong { color: var(--text); }
+  .pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+  .pill.ok { background: rgba(127,176,105,.13); color: var(--green); border: 1px solid rgba(127,176,105,.4); }
+  .pill.attn { background: rgba(217,106,95,.13); color: var(--red); border: 1px solid rgba(217,106,95,.45); }
+  .pill.next { background: rgba(106,168,216,.15); color: var(--blue); border: 1px solid rgba(106,168,216,.4); }
+  .pill.locked { background: rgba(127,176,105,.13); color: var(--green); border: 1px solid rgba(127,176,105,.4); }
+  .pill.open { background: rgba(180,138,216,.13); color: var(--purple); border: 1px solid rgba(180,138,216,.4); }
+  .pill.wait { background: rgba(224,164,55,.13); color: var(--amber); border: 1px solid rgba(224,164,55,.4); }
+  .steps { display: flex; gap: 0; margin: 6px 0 4px; overflow-x: auto; }
+  .step {
+    flex: 1 1 0;
+    min-width: 96px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 10px 6px;
+    border-top: 3px solid var(--border);
+    position: relative;
+  }
+  .step.done { border-top-color: var(--green); color: var(--text); }
+  .step.now { border-top-color: var(--amber); color: var(--text); font-weight: 700; }
+  .step b { display: block; font-size: 13px; }
+  .attention { list-style: none; }
+  .attention li {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    font-size: 15px;
+  }
+  .attention li.calm { border-left-color: var(--amber); }
+  .attention li strong { display: block; margin-bottom: 2px; }
+  .attention li span { color: var(--muted); font-size: 14px; }
+  .docs { display: flex; gap: 12px; flex-wrap: wrap; }
+  .doc {
+    flex: 1 1 220px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    font-size: 14px;
+    color: var(--muted);
+    text-decoration: none;
+    display: block;
+  }
+  .doc:hover { border-color: var(--amber); }
+  .doc strong { color: var(--text); display: block; font-size: 15px; margin-bottom: 4px; }
+  footer {
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  a { color: var(--amber); }
+</style>
+</head>
+<body>
+<div class="stripe"></div>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">Project Buddy &mdash; Homepage</div>
+    <h1><span class="icon">🚗</span>Car Buddy</h1>
+    <p class="mission">I keep Dave's cars alive — <strong>every service, every part, every mile</strong>, logged before it's forgotten. I'm the first replacement in the plan to shut down Airtable entirely. This page is what's on my mind right now.</p>
+  </header>
+
+  <h2>Where things stand <span class="rule"></span></h2>
+  <div class="steps">
+    <div class="step done"><b>M1</b>PRD locked</div>
+    <div class="step now"><b>M2</b>Build</div>
+    <div class="step"><b>M3</b>Reminders</div>
+    <div class="step"><b>M4</b>Photos</div>
+    <div class="step"><b>M5</b>Migration</div>
+    <div class="step"><b>M6</b>Cutover</div>
+    <div class="step"><b>M7</b>Airtable 🪦</div>
+  </div>
+
+  <h2>The fleet <span class="rule"></span></h2>
+  <div class="cards">
+    <div class="card">
+      <span class="pill ok">Rolling</span>
+      <h3>🏁 1959 MGA Coupe</h3>
+      <p>1800cc MGB engine, close-ratio 5-speed — <strong>modified, non-original drivetrain</strong>. Good driver condition, presents well.</p>
+    </div>
+    <div class="card">
+      <span class="pill ok">Rolling</span>
+      <h3>🚙 2002 Mercedes ML500</h3>
+      <p>The workhorse. Service history lives in Airtable today — <strong>first in line for migration</strong>.</p>
+    </div>
+    <div class="card">
+      <span class="pill attn">Needs love</span>
+      <h3>🔧 BMW — ~200k miles</h3>
+      <p>Approaching 200,000 miles and it's a great car. <strong>Fuel system needs attention</strong> — filters, pump — and gas has been spilling when parked. Dave wants this one to last.</p>
+    </div>
+  </div>
+
+  <h2>What I'm tracking <span class="rule"></span></h2>
+  <div class="cards">
+    <div class="card">
+      <span class="pill locked">Locked</span>
+      <h3>📋 PRD Draft v1</h3>
+      <p>Approved Oct 9 — <strong>"This is perfect!"</strong> All 6 proposed decisions locked as written.</p>
+    </div>
+    <div class="card">
+      <span class="pill next">Next</span>
+      <h3>🏗️ Build</h3>
+      <p>PRD says web app on the <strong>expense-tracker Firebase pattern</strong>, iPhone-first. Platform call still open — then we build.</p>
+    </div>
+    <div class="card">
+      <span class="pill open">Open</span>
+      <h3>📦 GitHub repo</h3>
+      <p>No repo yet. Likely <strong>davedellaquila/car-buddy</strong>, private — same as the other buddies.</p>
+    </div>
+    <div class="card">
+      <span class="pill wait">Waiting</span>
+      <h3>🗄️ Airtable inventory</h3>
+      <p>Still need the <strong>full inventory of remaining Airtable bases</strong> so the shutdown plan is complete after Car Buddy.</p>
+    </div>
+    <div class="card">
+      <span class="pill next">Planned</span>
+      <h3>🔄 Migration script</h3>
+      <p>CSV export → field map → one-time import. <strong>Spot-check 2–3 cars</strong> before cutover; Airtable stays read-only 30 days.</p>
+    </div>
+    <div class="card">
+      <span class="pill ok">Settled</span>
+      <h3>📸 Photos in v1</h3>
+      <p>Receipts, parts, before/after on every service event — <strong>Firebase Storage</strong>. OCR deferred to v2.</p>
+    </div>
+  </div>
+
+  <h2>Needs Dave's attention <span class="rule"></span></h2>
+  <ul class="attention">
+    <li>
+      <strong>The BMW's fuel system can't wait</strong>
+      <span>Filters and pump need attention, and it's spilling gas when parked (noticed at your dad's). At ~200k miles this is the kind of thing that strands you — worth scheduling before it does.</span>
+    </li>
+    <li class="calm">
+      <strong>Green-light the build</strong>
+      <span>PRD is locked. The open call is platform confirmation — Firebase web app per the PRD — then M2 starts. Say the word.</span>
+    </li>
+    <li class="calm">
+      <strong>Airtable base inventory</strong>
+      <span>Car Buddy is the first Airtable replacement, but the full shutdown plan needs the inventory of every remaining base. That's a separate dig — want me to start it?</span>
+    </li>
+  </ul>
+
+  <h2>Docs &amp; artifacts <span class="rule"></span></h2>
+  <div class="docs">
+    <a class="doc" href="https://docs.google.com/document/d/1eW7k87_ixHIw9M7ClxiUYd0GGXY9HcCdqvPeBOXrNME/edit">
+      <strong>📄 Product Brief</strong>Canonical copy in Zuki Docs — the starting brief, living document.
+    </a>
+    <a class="doc" href="https://docs.google.com/document/d/1Suf40x1f0MeoMVa429tSZKZDrRuAhXgYyuqKi0bE5lw/edit">
+      <strong>📋 PRD Draft v1</strong>Approved Oct 9. Requirements R1–R9, data model, decisions, milestones.
+    </a>
+    <div class="doc">
+      <strong>🔧 Maintenance notes</strong>BMW fuel-system items from the Oct 9 cabin brain dump — filed in my notes.
+    </div>
+  </div>
+
+  <footer>
+    <span>Car Buddy — every car, every service, nothing missed.</span>
+    <span>First of the Airtable replacements</span>
+  </footer>
+
+</div>
+</body>
+</html>

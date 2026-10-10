@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🙋</text></svg>" />
+  <title>Personal Buddy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --paper: #f7f2e7;
+      --card: #fffdf6;
+      --ink: #2b2417;
+      --muted: #6f6450;
+      --faint: #9a8d74;
+      --line: #e3d9c2;
+      --honey: #a86e0b;
+      --honey-deep: #7c4f04;
+      --honey-soft: #faf0d7;
+      --teeth: #b3541e;
+      --teeth-soft: #fbe9dc;
+      --slip: #fbf7ec;
+      --shadow: 0 14px 38px rgba(80, 58, 10, .10);
+      --serif: "Fraunces", Georgia, "Times New Roman", serif;
+      --sans: "Manrope", ui-sans-serif, system-ui, -apple-system, sans-serif;
+      --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --paper: #161209;
+        --card: #201a10;
+        --ink: #f0e7d2;
+        --muted: #b3a686;
+        --faint: #7d735c;
+        --line: #38301f;
+        --honey: #e0a83e;
+        --honey-deep: #f0be5f;
+        --honey-soft: #2e2410;
+        --teeth: #f08a4b;
+        --teeth-soft: #3a2415;
+        --slip: #241d11;
+        --shadow: 0 14px 38px rgba(0, 0, 0, .35);
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    /* faint ruled-paper texture */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(to bottom, transparent 0 31px, var(--line) 31px 32px);
+      opacity: .28;
+      mask-image: linear-gradient(to bottom, black 0, transparent 480px);
+      -webkit-mask-image: linear-gradient(to bottom, black 0, transparent 480px);
+    }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 40px 22px 64px; position: relative; }
+    .eyebrow {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--faint); margin-bottom: 14px;
+    }
+    .eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--honey); }
+    h1 {
+      font-family: var(--serif); font-weight: 700;
+      font-size: clamp(34px, 6vw, 52px); line-height: 1.04;
+      margin: 0 0 10px; letter-spacing: -0.01em;
+    }
+    h1 .hand { font-family: var(--sans); }
+    .tagline {
+      font-family: var(--serif); font-style: italic;
+      font-size: 19px; color: var(--muted); margin: 0 0 8px;
+    }
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 12px; padding: 7px 14px 7px 10px;
+      background: var(--honey-soft); border: 1px solid var(--line); border-radius: 999px;
+      font-size: 13px; font-weight: 700; color: var(--honey-deep);
+    }
+    .status-pill .pulse { width: 9px; height: 9px; border-radius: 50%; background: var(--honey); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+    .mission {
+      margin: 26px 0 0; padding: 22px 24px;
+      background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+      box-shadow: var(--shadow); font-size: 16px;
+    }
+    .mission strong { color: var(--honey-deep); }
+    h2 {
+      font-family: var(--serif); font-size: 22px; font-weight: 600;
+      margin: 38px 0 4px; display: flex; align-items: baseline; gap: 10px;
+    }
+    h2 .count {
+      font-family: var(--sans); font-size: 12px; font-weight: 700;
+      background: var(--ink); color: var(--paper);
+      border-radius: 999px; padding: 2px 10px; letter-spacing: .06em;
+    }
+    .sub { color: var(--faint); font-size: 13.5px; margin: 0 0 16px; }
+    .card {
+      background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+      box-shadow: var(--shadow); padding: 20px 22px; margin-bottom: 14px;
+    }
+    .attention-card { border-left: 5px solid var(--teeth); }
+    .attention-card h3 { margin: 0 0 6px; font-size: 16px; }
+    .attention-card p { margin: 0 0 12px; color: var(--muted); font-size: 14.5px; }
+    .btn {
+      display: inline-block; text-decoration: none; font-weight: 700; font-size: 14px;
+      background: var(--ink); color: var(--paper);
+      padding: 10px 18px; border-radius: 10px;
+      transition: transform .15s ease, opacity .15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); opacity: .92; }
+    .btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--line-strong, var(--line)); }
+    /* the list item with its due-date nudge slip */
+    .item { display: grid; grid-template-columns: 1fr; gap: 14px; }
+    @media (min-width: 560px) { .item { grid-template-columns: 1fr 190px; } }
+    .item h3 { margin: 0 0 2px; font-size: 16px; }
+    .item .kicker {
+      font-size: 11.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--teeth); margin-bottom: 6px;
+    }
+    .item p { margin: 0; color: var(--muted); font-size: 14.5px; }
+    .slip {
+      background: var(--slip); border: 1px dashed var(--faint); border-radius: 10px;
+      padding: 12px 14px; font-family: var(--mono); font-size: 12px; color: var(--muted);
+      align-self: start;
+    }
+    .slip .slip-title {
+      font-family: var(--sans); font-weight: 700; font-size: 10.5px;
+      letter-spacing: .14em; text-transform: uppercase; color: var(--faint);
+      margin-bottom: 8px;
+    }
+    .slip .stamp {
+      display: inline-block; margin-top: 8px; padding: 4px 10px;
+      border: 2px solid var(--teeth); color: var(--teeth); border-radius: 6px;
+      font-weight: 700; letter-spacing: .18em; transform: rotate(-4deg);
+    }
+    .mind { margin: 0; padding-left: 20px; color: var(--muted); font-size: 14.5px; }
+    .mind li { margin-bottom: 8px; }
+    .mind li::marker { color: var(--honey); }
+    .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+    footer {
+      margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line);
+      color: var(--faint); font-size: 12.5px; display: flex; justify-content: space-between;
+      flex-wrap: wrap; gap: 8px;
+    }
+    a.inline { color: var(--honey-deep); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow"><span class="dot"></span>Project Buddy family · Personal-ops</div>
+    <h1><span class="hand">🙋</span> Personal Buddy</h1>
+    <p class="tagline">The &ldquo;figure it out later&rdquo; list — with teeth.</p>
+    <span class="status-pill"><span class="pulse"></span>Brief review — awaiting Dave</span>
+
+    <div class="mission">
+      Personal Buddy keeps the things you need to <strong>research, decide, or sort out</strong>
+      but don&rsquo;t have time for right now &mdash; captured with reminders so nothing evaporates.
+      Not fire-and-forget nudges (that&rsquo;s Reminder Buddy&rsquo;s job), not learning paths
+      (that&rsquo;s School Buddy). This is the list with teeth: every item gets a next-nudge date,
+      so &ldquo;later&rdquo; actually happens.
+    </div>
+
+    <h2>Needs your attention <span class="count">1</span></h2>
+    <p class="sub">Fresh from the thread — tap through and clear it.</p>
+    <div class="card attention-card">
+      <h3>📄 Product brief ready for review</h3>
+      <p>Looks good, edits, or defer? Your call decides whether this goes to a PRD. (Working title, per Dave: &ldquo;we&rsquo;ll think of a good name, we can change it later.&rdquo;)</p>
+      <a class="btn" href="https://docs.google.com/document/d/1jJ_xZDQeogti-GRPLNnY8e-IgsBa93-QhdG1EhLIEJs/edit">Read the brief</a>
+    </div>
+
+    <h2>On the list <span class="count">1</span></h2>
+    <p class="sub">Every item carries a nudge slip — like a library due-date card, but it bites.</p>
+    <div class="card item">
+      <div>
+        <div class="kicker">Seed item · Parked</div>
+        <h3>The calendar visibility problem</h3>
+        <p>A multi-day &ldquo;in San Jose&rdquo; indicator visible on <em>both</em> family and work
+        calendars &mdash; without showing Dave as busy, and without maintaining two separate events.
+        Parked, not solved: it&rsquo;s the first thing on the list for a reason.</p>
+      </div>
+      <div class="slip">
+        <div class="slip-title">Next nudge</div>
+        Date due —<br />to be set<br />
+        <span class="stamp">PARKED</span>
+      </div>
+    </div>
+
+    <h2>On my mind</h2>
+    <p class="sub">What I&rsquo;m chewing on between nudges.</p>
+    <div class="card">
+      <ul class="mind">
+        <li>The brief review is the gate: a thumbs-up starts the PRD, edits reshape it, defer parks the whole buddy.</li>
+        <li>Naming — &ldquo;Personal Buddy&rdquo; is a working title. The right name is out there; it can change later.</li>
+        <li>Once items start landing here, each one gets its nudge date the moment it&rsquo;s captured. No dateless drift.</li>
+      </ul>
+    </div>
+
+    <h2>Links</h2>
+    <div class="links">
+      <a class="btn ghost" href="https://docs.google.com/document/d/1jJ_xZDQeogti-GRPLNnY8e-IgsBa93-QhdG1EhLIEJs/edit">📄 Product brief</a>
+      <a class="btn ghost" href="https://github.com/davedellaquila/personal-buddy">💻 GitHub repo</a>
+    </div>
+
+    <footer>
+      <span>A Buddy in the Project Buddy family</span>
+      <span>Thread: <a class="inline" href="#">Personal Buddy</a> · davedellaquila/personal-buddy</span>
+    </footer>
+  </div>
+</body>
+</html>

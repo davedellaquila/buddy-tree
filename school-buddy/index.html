@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>" />
+  <title>School Buddy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #fbf7ee;
+      --surface: #fffdf8;
+      --surface-soft: #f3ecdc;
+      --ink: #22281f;
+      --muted: #6b6355;
+      --faint: #978b77;
+      --line: #e4d9c2;
+      --chalk: #1f5c40;
+      --chalk-deep: #17452f;
+      --chalk-soft: #e3efe6;
+      --chalk-ink: #1d4a34;
+      --amber: #9a6a0c;
+      --amber-soft: #fdf0cd;
+      --gold: #c98f1f;
+      --shadow: 0 16px 40px rgba(70, 54, 26, .09);
+      --serif: "Fraunces", Georgia, serif;
+      --sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+      --radius: 18px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f1512;
+        --surface: #172019;
+        --surface-soft: #212b23;
+        --ink: #f0ead9;
+        --muted: #b3a88f;
+        --faint: #857b64;
+        --line: #2f3a30;
+        --chalk: #5fb383;
+        --chalk-deep: #2c5a41;
+        --chalk-soft: #1c2e24;
+        --chalk-ink: #9fd4b6;
+        --amber: #eec25e;
+        --amber-soft: #372e13;
+        --gold: #e0aa3e;
+        --shadow: 0 16px 40px rgba(0, 0, 0, .3);
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--chalk); }
+    button { font: inherit; }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 0 22px 72px; }
+
+    /* top bar */
+    .topbar { display: flex; align-items: center; gap: 12px; padding: 18px 0 6px; }
+    .mark {
+      width: 44px; height: 44px; border-radius: 14px;
+      background: var(--chalk-soft);
+      display: grid; place-items: center; font-size: 24px;
+      box-shadow: var(--shadow);
+    }
+    .topbar .name { font-family: var(--serif); font-weight: 700; font-size: 19px; }
+    .topbar .sub { color: var(--muted); font-size: 13px; }
+    .pill {
+      margin-left: auto; font-size: 12.5px; font-weight: 700;
+      padding: 6px 13px; border-radius: 999px;
+      background: var(--amber-soft); color: var(--amber);
+      border: 1px solid var(--line); white-space: nowrap;
+    }
+
+    /* hero: the opening move */
+    .hero {
+      margin-top: 26px;
+      background: var(--chalk-deep);
+      color: #f4efe1;
+      border-radius: 22px;
+      padding: clamp(26px, 5vw, 44px);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: "";
+      position: absolute; inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,.06) 1px, transparent 1px);
+      background-size: 22px 22px;
+      pointer-events: none;
+    }
+    .hero .kicker {
+      font-size: 12.5px; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: #d9c68a; margin-bottom: 12px;
+      position: relative; z-index: 1;
+    }
+    .hero h1 {
+      font-family: var(--serif); font-weight: 600;
+      font-size: clamp(32px, 5.6vw, 50px); line-height: 1.1;
+      margin: 0 0 12px; letter-spacing: -0.01em;
+      position: relative; z-index: 1;
+    }
+    .hero p.lede { font-size: 16px; color: rgba(244,239,225,.82); max-width: 60ch; margin: 0 0 22px; position: relative; z-index: 1; }
+    .askbox { position: relative; z-index: 1; display: flex; gap: 10px; flex-wrap: wrap; }
+    .askbox input {
+      flex: 1 1 260px;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 999px;
+      padding: 13px 20px;
+      color: #f4efe1;
+      font-size: 15px;
+    }
+    .askbox input::placeholder { color: rgba(244,239,225,.55); }
+    .askbox input:focus { outline: 2px solid #d9c68a; outline-offset: 1px; }
+    .askbox button {
+      background: #d9c68a; color: #2a2416; border: 0; border-radius: 999px;
+      padding: 13px 24px; font-weight: 700; cursor: pointer;
+    }
+    .askbox button:hover { background: #e6d49c; }
+    .ask-hint { margin-top: 10px; font-size: 13px; color: rgba(244,239,225,.6); position: relative; z-index: 1; display: none; }
+    .ask-hint.show { display: block; }
+
+    /* attention */
+    .attention {
+      margin: 26px 0 8px; border-radius: var(--radius);
+      background: var(--amber-soft); border: 1px solid var(--line);
+      padding: 20px 22px; box-shadow: var(--shadow);
+    }
+    .attention h2 { font-family: var(--serif); font-size: 20px; margin: 0 0 6px; }
+    .attention p { margin: 0 0 14px; color: var(--muted); }
+    .attention p .done { color: var(--chalk); font-weight: 600; }
+    .btnrow { display: flex; flex-wrap: wrap; gap: 10px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-weight: 700; font-size: 14px; text-decoration: none;
+      padding: 10px 18px; border-radius: 999px; border: 1px solid var(--line);
+      background: var(--surface); color: var(--ink);
+    }
+    .btn.primary { background: var(--chalk); border-color: var(--chalk); color: #fff; }
+    @media (prefers-color-scheme: dark) { .btn.primary { color: #0f1512; } }
+
+    /* pipeline */
+    .pipe { display: flex; align-items: stretch; gap: 0; margin: 26px 0 8px; }
+    .step {
+      flex: 1; text-align: center; padding: 14px 8px;
+      background: var(--surface); border: 1px solid var(--line);
+      font-size: 13px; font-weight: 600; color: var(--muted);
+    }
+    .step:first-child { border-radius: 14px 0 0 14px; }
+    .step:last-child { border-radius: 0 14px 14px 0; }
+    .step + .step { border-left: 0; }
+    .step.now { background: var(--chalk-soft); color: var(--chalk-ink); border-color: var(--chalk); }
+    .step .dot { display: block; width: 10px; height: 10px; border-radius: 50%; background: var(--faint); margin: 0 auto 8px; }
+    .step.now .dot { background: var(--chalk); box-shadow: 0 0 0 5px var(--chalk-soft); }
+    .step.done .dot { background: var(--gold); }
+
+    /* sections */
+    section.block { margin-top: 34px; }
+    section.block > h2 { font-family: var(--serif); font-size: 23px; margin: 0 0 4px; display: flex; align-items: center; gap: 10px; }
+    section.block > p.note { color: var(--muted); margin: 0 0 16px; font-size: 14px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow);
+    }
+    .card h3 { font-size: 15px; margin: 0 0 6px; }
+    .card p { margin: 0; color: var(--muted); font-size: 14px; }
+    .card .tag {
+      display: inline-block; font-size: 11.5px; font-weight: 700;
+      letter-spacing: .06em; text-transform: uppercase;
+      color: var(--chalk); margin-bottom: 8px;
+    }
+    .spark { cursor: pointer; transition: transform .15s ease, border-color .15s ease; text-align: left; width: 100%; font: inherit; }
+    .spark:hover { transform: translateY(-2px); border-color: var(--chalk); }
+    .spark .go { display: inline-block; margin-top: 10px; font-size: 12.5px; font-weight: 700; color: var(--chalk); }
+    .card.decided { border-style: dashed; }
+    .card.decided .tag { color: var(--gold); }
+
+    /* momentum */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+    .stat {
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 20px 18px; text-align: center; box-shadow: var(--shadow);
+    }
+    .stat .num { font-family: var(--serif); font-size: 38px; font-weight: 600; line-height: 1; }
+    .stat .lbl { margin-top: 6px; color: var(--muted); font-size: 13px; }
+
+    /* empty shelf */
+    .shelf {
+      border: 2px dashed var(--line); border-radius: var(--radius);
+      padding: 34px 24px; text-align: center; color: var(--muted);
+      background: var(--surface);
+    }
+    .shelf .big { font-size: 34px; margin-bottom: 10px; }
+    .shelf h3 { font-family: var(--serif); color: var(--ink); margin: 0 0 6px; font-size: 19px; }
+    .shelf p { margin: 0; font-size: 14px; }
+
+    footer {
+      margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line);
+      color: var(--faint); font-size: 12.5px;
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <div class="topbar">
+      <div class="mark">🎓</div>
+      <div>
+        <div class="name">School Buddy</div>
+        <div class="sub">Your learning companion</div>
+      </div>
+      <div class="pill">● Brief review</div>
+    </div>
+
+    <div class="hero">
+      <div class="kicker">Curiosity-driven, not curriculum-driven</div>
+      <h1>What do you want to learn?</h1>
+      <p class="lede">That's my opening move — your answer becomes a learning plan: what to watch, read, try, and build, in an order that makes sense. Tap a spark below to try it, or type your own.</p>
+      <div class="askbox">
+        <input id="ask" type="text" placeholder="Anything — sourdough, SwiftUI, Spanish…" aria-label="What do you want to learn?" />
+        <button id="askgo" type="button">Build my plan</button>
+      </div>
+      <p class="ask-hint" id="askhint">Good — that's exactly how we'd start. Drop your answer in the School Buddy thread and I'll build your first real plan.</p>
+    </div>
+
+    <div class="attention">
+      <h2>📋 The brief is ready for your review</h2>
+      <p>Covers the idea, the problem, how it could work, revenue potential, room for growth, and the open questions. <span class="done">Your call is already folded in</span> — the brief now opens with "What do you want to learn?" and marks curiosity-driven as decided. After review: the PRD decision.</p>
+      <div class="btnrow">
+        <a class="btn primary" href="https://docs.google.com/document/d/1ZLYpo0FPzZja1P5PkVdcGxYeufX494X1gugXc-jS1m8/edit" target="_blank" rel="noopener">Read the brief</a>
+        <a class="btn" href="https://github.com/davedellaquila/school-buddy" target="_blank" rel="noopener">View the repo</a>
+      </div>
+    </div>
+
+    <div class="pipe">
+      <div class="step done"><span class="dot"></span>Idea captured</div>
+      <div class="step done"><span class="dot"></span>Direction set</div>
+      <div class="step now"><span class="dot"></span>Brief review</div>
+      <div class="step"><span class="dot"></span>PRD decision</div>
+      <div class="step"><span class="dot"></span>Build</div>
+    </div>
+
+    <section class="block">
+      <h2>⚡ Curiosity queue</h2>
+      <p class="note">Sparks I've noticed in your threads — tap one to try it in the question above. Yours to pick, reshape, or ignore.</p>
+      <div class="grid">
+        <button class="card spark" data-spark="Claude Code prototyping"><span class="tag">AI · craft</span><h3>Claude Code prototyping</h3><p>Your vibe-designing workflow — turn the late-night sessions into a repeatable method.</p><span class="go">Try it →</span></button>
+        <button class="card spark" data-spark="Investment research"><span class="tag">Money</span><h3>Investment research that sticks</h3><p>Timing AAPL, reading signals — a plan for sharper, calmer decisions.</p><span class="go">Try it →</span></button>
+        <button class="card spark" data-spark="Meditation practice"><span class="tag">Mind</span><h3>Meditation practice</h3><p>Breathwork and routine, not a content library — the Zen Buddy overlap.</p><span class="go">Try it →</span></button>
+        <button class="card spark" data-spark="Hot tub water chemistry"><span class="tag">Cabin</span><h3>Hot tub water chemistry</h3><p>Your Sundance Optima 880 — what the chemicals actually do, and when.</p><span class="go">Try it →</span></button>
+        <button class="card spark" data-spark="Amador County business landscape"><span class="tag">Venture</span><h3>Amador County business landscape</h3><p>Home care, defensible space — learn the market before you pick the venture.</p><span class="go">Try it →</span></button>
+        <button class="card spark" data-spark="F/A-18 systems"><span class="tag">Play</span><h3>F/A-18 systems</h3><p>The Hornet you're flying in the sim — avionics, procedures, the real thing behind it.</p><span class="go">Try it →</span></button>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>📚 Learning plans</h2>
+      <p class="note">Generated from your answers — watch, read, try, build, in an order that makes sense.</p>
+      <div class="shelf">
+        <div class="big">📝</div>
+        <h3>No plans yet</h3>
+        <p>Your first plan gets built the moment you answer the question up top.</p>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>📈 Momentum</h2>
+      <p class="note">Progress that feels like momentum, not homework. Fills in once your first plan starts.</p>
+      <div class="stats">
+        <div class="stat"><div class="num">0</div><div class="lbl">Topics explored</div></div>
+        <div class="stat"><div class="num">0</div><div class="lbl">Plans active</div></div>
+        <div class="stat"><div class="num">—</div><div class="lbl">Day streak</div></div>
+        <div class="stat"><div class="num">0</div><div class="lbl">Things built</div></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>⚙️ How it works</h2>
+      <p class="note">The shape, as described in the brief.</p>
+      <div class="grid">
+        <div class="card"><span class="tag">1 · Ask</span><h3>One question in</h3><p>"What do you want to learn?" — curiosity leads, structure follows.</p></div>
+        <div class="card"><span class="tag">2 · Plan</span><h3>A path, generated</h3><p>Watch this, read that, try this, build that — ordered so it makes sense.</p></div>
+        <div class="card"><span class="tag">3 · Momentum</span><h3>Progress you can feel</h3><p>Tracking that reads as momentum, with gentle check-ins — never nagging.</p></div>
+        <div class="card"><span class="tag">4 · Build</span><h3>Learn by making</h3><p>Paths tilt toward building things, because that's how Dave learns.</p></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>❓ Open questions</h2>
+      <p class="note">From the brief — answered before (or during) the PRD.</p>
+      <div class="grid">
+        <div class="card decided"><span class="tag">✓ Decided 2026-10-09</span><h3>Curiosity-driven</h3><p>The buddy opens with "What do you want to learn?" and builds the plan from there — your call.</p></div>
+        <div class="card"><h3>Video, text, interactive — what mix?</h3><p>Different topics want different media. How much does the buddy choose vs. you?</p></div>
+        <div class="card"><h3>Does it quiz or just guide?</h3><p>Test understanding along the way, or keep it a guide — your call during review.</p></div>
+        <div class="card"><h3>Solo, or shared learning?</h3><p>Just for you, or learning alongside family and friends?</p></div>
+      </div>
+    </section>
+
+    <footer>
+      <span>🎓 School Buddy · child of Project Buddy</span>
+      <span>Homepage seeded 2026-10-09</span>
+    </footer>
+
+  </div>
+
+  <script>
+    (function () {
+      var input = document.getElementById('ask');
+      var hint = document.getElementById('askhint');
+      var go = document.getElementById('askgo');
+      function respond() {
+        hint.classList.add('show');
+        hint.textContent = input.value.trim()
+          ? '“' + input.value.trim() + '” — good pick. Drop it in the School Buddy thread and I\'ll build your first real plan.'
+          : 'Good — that\'s exactly how we\'d start. Drop your answer in the School Buddy thread and I\'ll build your first real plan.';
+      }
+      go.addEventListener('click', respond);
+      input.addEventListener('keydown', function (e) { if (e.key === 'Enter') respond(); });
+      document.querySelectorAll('.spark').forEach(function (el) {
+        el.addEventListener('click', function () {
+          input.value = el.getAttribute('data-spark');
+          input.focus();
+          input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

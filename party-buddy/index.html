@@ -226,3 +226,156 @@
     }
   </style>
 </head>
+<body>
+  <div class="app">
+    <aside class="sidebar" aria-label="Primary navigation">
+      <div class="side-context">Party dashboard</div>
+      <nav class="side-nav">
+        <button class="nav-item active" data-jump="top" aria-current="page"><span class="emo">🍲</span><span>Gatherings</span></button>
+        <button class="nav-item" data-jump="neighbor"><span class="emo">📮</span><span>Neighbor hosting</span></button>
+        <button class="nav-item" data-jump="playbook"><span class="emo">📖</span><span>Playbook</span></button>
+        <button class="nav-item" data-jump="links"><span class="emo">🔗</span><span>Links</span></button>
+      </nav>
+      <div class="side-note"><strong>The coziest gatherings</strong><span>One home per hosted gathering — guest list, food &amp; drink, setup checklist, date.</span></div>
+    </aside>
+
+    <main class="main" id="top">
+      <header class="topbar">
+        <div>
+          <p class="date">Friday, October 9</p>
+          <h1>Let's get this party planned. <span class="wave">🎉</span></h1>
+        </div>
+        <div class="top-summary"><strong>On my mind:</strong> the soup party is parked waiting for a date, and the neighbor-hosting spec is sitting in the brief ready for your review.</div>
+      </header>
+
+      <div class="dashboard">
+        <div class="primary">
+          <section class="focus-card" aria-labelledby="focus-title">
+            <div class="focus-accent"></div>
+            <div class="focus-body">
+              <div class="focus-head">
+                <div><p class="eyebrow">Seed gathering</p><h2 id="focus-title">The soup party</h2></div>
+                <span class="pill">Parked · no date yet</span>
+              </div>
+              <p class="focus-copy">Everyone brings a different soup. <em>Foil muffin pans</em> hold the little tasting samples so you can taste them all — plus bread, crackers, and a few toppings. <em>"The coziest gathering of friends."</em></p>
+              <div class="focus-actions">
+                <div class="action-block"><div class="action-label">Still needed</div><div class="action-value">A date &amp; a guest list</div><div class="action-sub">Ideas park here until they're real plans</div></div>
+                <div class="action-block"><div class="action-label">To attach</div><div class="action-value">Photo + Facebook post</div><div class="action-sub">Send them whenever — I'll file them here</div></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="section-card" id="neighbor" aria-labelledby="neighbor-title">
+            <div class="section-head">
+              <div><h2 id="neighbor-title">Neighbor hosting<span class="count">new · specced Oct 9</span></h2></div>
+              <span class="tag hot">Awaiting your review</span>
+            </div>
+            <div class="items">
+              <article class="item">
+                <button class="item-toggle" aria-expanded="false"><span class="item-emo">📮</span><span><span class="item-title">A public link for the local newsletter</span><span class="item-meta"><span>Neighbors open it, volunteer to host at their place</span><span>No account · no app to install</span></span></span><span class="tag hot">In the brief</span><svg class="chevron" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+                <div class="item-detail">
+                  <p>Any neighbor with the link can offer up their place for a party. Every submission lands here as a draft gathering — nothing goes live on the neighborhood feed without your one-tap approval.</p>
+                  <div class="steps">
+                    <div class="step"><span class="step-n">1</span><p><strong>Volunteer form</strong> — name, place, date options, headcount, theme. Address stays private until someone RSVPs.</p></div>
+                    <div class="step"><span class="step-n">2</span><p><strong>Theme picker</strong> — soup party, watch party, BBQ, holiday potluck, game night, wine tasting… plus <em>"suggest one for me"</em> for the undecided, with seasonal suggestions.</p></div>
+                    <div class="step"><span class="step-n">3</span><p><strong>Bring-list</strong> — host lists what's needed and how many; neighbors claim items at RSVP so nothing doubles up or gets missed.</p></div>
+                    <div class="step"><span class="step-n">4</span><p><strong>Your approval</strong> — draft gathering arrives pre-sketched from the theme template; one tap and it's live with its own RSVP link.</p></div>
+                    <div class="step"><span class="step-n">5</span><p><strong>Planning timeline</strong> — reminders as the date approaches, a live covered-vs-needed tally, and post-party notes. Good ones become repeat traditions.</p></div>
+                  </div>
+                </div>
+              </article>
+              <article class="item">
+                <button class="item-toggle" aria-expanded="false"><span class="item-emo">🤔</span><span><span class="item-title">Open questions on neighbor hosting</span><span class="item-meta"><span>Three decisions baked into the spec as questions</span></span></span><span class="tag wait">Decide at review</span><svg class="chevron" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+                <div class="item-detail">
+                  <p>Approval for every submission, or do trusted neighbors post directly? One newsletter link for everything, or a fresh link per party type? How private is the address — hidden until RSVP, or visible to the neighborhood?</p>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="section-card" id="playbook" aria-labelledby="playbook-title">
+            <div class="section-head">
+              <div><h2 id="playbook-title">The playbook<span class="count">repeatable hosting, on purpose</span></h2></div>
+            </div>
+            <div class="items">
+              <article class="item">
+                <button class="item-toggle" aria-expanded="false"><span class="item-emo">🍲</span><span><span class="item-title">Every gathering gets the same four things</span><span class="item-meta"><span>The template every party is built from</span></span></span><span class="tag go">The shape</span><svg class="chevron" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+                <div class="item-detail">
+                  <div class="detail-grid">
+                    <div class="detail-item"><span>Who</span><strong>Guest list</strong></div>
+                    <div class="detail-item"><span>What</span><strong>Food &amp; drink plan</strong></div>
+                    <div class="detail-item"><span>How</span><strong>Setup checklist</strong></div>
+                    <div class="detail-item"><span>When</span><strong>Date + reminders</strong></div>
+                  </div>
+                </div>
+              </article>
+              <article class="item">
+                <button class="item-toggle" aria-expanded="false"><span class="item-emo">🔁</span><span><span class="item-title">Room to grow</span><span class="item-meta"><span>Where this goes after v1</span></span></span><span class="tag">Later</span><svg class="chevron" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+                <div class="item-detail">
+                  <p>Recurring gatherings (an annual soup party?), reusable templates per gathering type — watch party, dinner, day trip — reminders as dates approach, and post-party notes on what worked and what to change next time.</p>
+                </div>
+              </article>
+            </div>
+          </section>
+        </div>
+
+        <aside class="rail" aria-label="Party overview">
+          <section class="rail-card milestone" aria-labelledby="attn-title">
+            <div class="milestone-top"><h2 class="rail-title" id="attn-title">Needs Dave</h2><span class="flag">2 open</span></div>
+            <div class="attn">
+              <div class="attn-item"><strong>Review the brief</strong><span>Product brief + the new neighbor-hosting spec — <span class="due">looks good, edits, or defer?</span></span></div>
+              <div class="attn-item"><strong>Then: PRD or not?</strong><span>After the brief lands, decide whether Party Buddy goes to a full PRD.</span></div>
+            </div>
+          </section>
+
+          <section class="rail-card links" id="links" aria-labelledby="links-title">
+            <h2 class="rail-title" id="links-title" style="margin-bottom:6px">Links</h2>
+            <a class="link-row" href="https://docs.google.com/document/d/1Y44Cs9JD9uj2O2UIdKXd28F0mdhyXT7nevVIoMOc5AU/edit"><span class="link-emo">📄</span><span><span class="link-name">Product brief</span><br><span class="link-sub">Zuki Docs · the mission statement</span></span><span class="link-arrow">→</span></a>
+            <a class="link-row" href="https://github.com/davedellaquila/party-buddy"><span class="link-emo">💻</span><span><span class="link-name">davedellaquila/party-buddy</span><br><span class="link-sub">Private repo · empty, waiting for code</span></span><span class="link-arrow">→</span></a>
+            <a class="link-row" href="https://davedellaquila.github.io/buddy-tree/"><span class="link-emo">🌲</span><span><span class="link-name">Buddy dashboard</span><br><span class="link-sub">Child of Cabin Buddy ⊂ Property Buddy</span></span><span class="link-arrow">→</span></a>
+          </section>
+
+          <section class="rail-card quote-card" aria-labelledby="quote-title">
+            <h2 class="rail-title" id="quote-title">The vibe</h2>
+            <p class="quote">"The coziest gathering of friends."</p>
+            <p class="quote-note">That's the bar. Every party this buddy touches should feel like that — planned without the planning feeling like work.</p>
+          </section>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <nav class="mobile-nav" aria-label="Mobile navigation">
+    <button class="active" data-jump="top">🍲<small>Parties</small></button>
+    <button data-jump="neighbor">📮<small>Hosting</small></button>
+    <button data-jump="playbook">📖<small>Playbook</small></button>
+    <button data-jump="links">🔗<small>Links</small></button>
+  </nav>
+
+  <script>
+    (function () {
+      var toggles = document.querySelectorAll('.item-toggle');
+      toggles.forEach(function (toggle) {
+        toggle.addEventListener('click', function () {
+          var detail = toggle.nextElementSibling;
+          var open = toggle.getAttribute('aria-expanded') === 'true';
+          toggle.setAttribute('aria-expanded', String(!open));
+          detail.classList.toggle('open', !open);
+        });
+      });
+      var jumpers = document.querySelectorAll('[data-jump]');
+      jumpers.forEach(function (button) {
+        button.addEventListener('click', function () {
+          var target = document.getElementById(button.getAttribute('data-jump'));
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          var group = button.closest('nav');
+          if (group) {
+            group.querySelectorAll('[data-jump]').forEach(function (item) { item.classList.remove('active'); });
+            button.classList.add('active');
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

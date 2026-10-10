@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quentin Buddy — Homepage</title>
+<style>
+  :root {
+    --paper: #f5efe2;
+    --paper2: #efe7d4;
+    --card: #fffdf6;
+    --ink: #2c2620;
+    --muted: #7d7261;
+    --line: #ddd2b8;
+    --accent: #b3541e;
+    --accent-soft: rgba(179, 84, 30, .1);
+    --gold: #a07d1c;
+    --green: #4e7a3a;
+    --red: #a03a2e;
+    --shadow: 0 1px 2px rgba(60, 45, 20, .06), 0 4px 14px rgba(60, 45, 20, .07);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    background-image: radial-gradient(rgba(120, 95, 50, .05) 1px, transparent 1px);
+    background-size: 22px 22px;
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    line-height: 1.55;
+    padding: 0 0 64px;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+  header.hero {
+    padding: 52px 0 28px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .kicker {
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 44px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  .stamp {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 2px solid var(--accent);
+    border-radius: 6px;
+    padding: 4px 12px;
+    transform: rotate(-2deg);
+    margin: 10px 0 14px;
+    background: var(--accent-soft);
+  }
+  .mission { color: var(--muted); font-size: 17px; max-width: 660px; }
+  .mission strong { color: var(--ink); font-weight: 600; }
+  h2 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 23px;
+    margin: 38px 0 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  h2 .rule { flex: 1; height: 1px; background: var(--line); }
+  h2 .count {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 999px;
+    padding: 2px 10px;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 18px; right: 18px;
+    height: 3px;
+    border-radius: 0 0 4px 4px;
+    background: var(--accent);
+    opacity: .85;
+  }
+  .card h3 { font-size: 16px; margin-bottom: 6px; }
+  .card p { font-size: 14px; color: var(--muted); }
+  .card p strong { color: var(--ink); }
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+  .tag.fact { background: var(--accent-soft); color: var(--accent); border: 1px solid rgba(179,84,30,.35); }
+  .tag.open { background: rgba(160,58,46,.08); color: var(--red); border: 1px solid rgba(160,58,46,.35); }
+  .tag.idea { background: rgba(160,125,28,.1); color: var(--gold); border: 1px solid rgba(160,125,28,.4); }
+  .timeline { list-style: none; }
+  .timeline li {
+    display: flex;
+    gap: 16px;
+    padding: 13px 4px;
+    border-bottom: 1px solid var(--line);
+    font-size: 15px;
+    align-items: baseline;
+  }
+  .timeline li:last-child { border-bottom: none; }
+  .date {
+    flex: 0 0 132px;
+    font-weight: 700;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    font-size: 14px;
+  }
+  .date.unknown { color: var(--muted); font-weight: 600; }
+  .attention { list-style: none; }
+  .attention li {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    box-shadow: var(--shadow);
+  }
+  .attention li strong { display: block; margin-bottom: 2px; }
+  .attention li span { color: var(--muted); font-size: 14px; }
+  .empty {
+    background: var(--paper2);
+    border: 2px dashed var(--line);
+    border-radius: 10px;
+    padding: 26px 22px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .empty strong { color: var(--ink); display: block; font-size: 17px; margin-bottom: 4px; font-family: Georgia, serif; }
+  .family { display: flex; gap: 12px; flex-wrap: wrap; }
+  .fam {
+    flex: 1 1 200px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-size: 14px;
+    color: var(--muted);
+    box-shadow: var(--shadow);
+  }
+  .fam strong { color: var(--ink); display: block; font-size: 15px; margin-bottom: 4px; }
+  footer {
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 2px solid var(--ink);
+    color: var(--muted);
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">Project Buddy &mdash; Homepage</div>
+    <h1>🧑 Quentin Buddy</h1>
+    <div class="stamp">Living Dossier</div>
+    <p class="mission">The one place for everything Dave needs to <strong>remember, track, and do</strong> regarding <strong>Quentin</strong> — key facts, important dates, notes, reminders, and gift ideas. This page is the file I'm keeping on him.</p>
+  </header>
+
+  <h2>Key facts <span class="rule"></span><span class="count">5</span></h2>
+  <div class="cards">
+    <div class="card">
+      <span class="tag fact">Fact</span>
+      <h3>🏠 Lenwood</h3>
+      <p>Dave's son. Lives at <strong>6929 Lenwood Way, San Jose</strong> with his girlfriend/fianc&eacute;e <strong>Amanda</strong>.</p>
+    </div>
+    <div class="card">
+      <span class="tag fact">Fact</span>
+      <h3>💵 Rent</h3>
+      <p><strong>$1,000/mo &rarr; $2,000/mo</strong> via 90-day notice, effective <strong>Jan 7, 2027</strong>. Notice out for in-person delivery.</p>
+    </div>
+    <div class="card">
+      <span class="tag fact">Fact</span>
+      <h3>📞 Weekly check-in</h3>
+      <p>Standing <strong>weekly check-in with Dave</strong> — the rhythm that keeps them close.</p>
+    </div>
+    <div class="card">
+      <span class="tag fact">Fact</span>
+      <h3>💬 Wisdom texts</h3>
+      <p>Receives the <strong>Wisdom Buddy daily text</strong> — one of its first readers.</p>
+    </div>
+    <div class="card">
+      <span class="tag open">Open question</span>
+      <h3>❓ Older or younger?</h3>
+      <p>Whether Quentin is the <strong>older (31) or younger (28)</strong> son <strong>isn't established yet</strong>.</p>
+    </div>
+  </div>
+
+  <h2>Important dates <span class="rule"></span></h2>
+  <ul class="timeline">
+    <li><span class="date">Oct 9, 2026</span><span><strong>Family rent discussion</strong> — Quentin, Amanda &amp; Nan talk through the notice and the road ahead.</span></li>
+    <li><span class="date">Jan 7, 2027</span><span><strong>New rent takes effect</strong> — $2,000/mo under the 90-day notice.</span></li>
+    <li><span class="date unknown">Not captured</span><span><strong>Quentin's birthday</strong> — the single most important date in this file, still missing.</span></li>
+    <li><span class="date unknown">Not captured</span><span><strong>Amanda's birthday</strong> — worth knowing for the same reason.</span></li>
+  </ul>
+
+  <h2>Needs Dave's attention <span class="rule"></span><span class="count">4</span></h2>
+  <ul class="attention">
+    <li>
+      <strong>Review the product brief</strong>
+      <span>The <a href="https://docs.google.com/document/d/157C3sNyJcRIgzNevCbwuWx7V1F4YPYZRwjw1TOCUaNA/edit">Quentin Buddy brief</a> is waiting on Dave's review before any PRD work.</span>
+    </li>
+    <li>
+      <strong>Older or younger?</strong>
+      <span>Settle whether Quentin is the 31-year-old or the 28-year-old — it anchors half the facts in this file.</span>
+    </li>
+    <li>
+      <strong>Capture the birthdays</strong>
+      <span>Quentin's and Amanda's birthdays belong in Important dates. One question, asked once, remembered forever.</span>
+    </li>
+    <li>
+      <strong>Seed the gift list</strong>
+      <span>Gift ideas is empty. Next time something reminds Dave of Quentin, it goes here — not into the void.</span>
+    </li>
+  </ul>
+
+  <h2>Gift ideas <span class="rule"></span><span class="count">0</span></h2>
+  <div class="empty">
+    <strong>The shelf is empty.</strong>
+    Nothing filed yet. When something comes to mind — a thing he'd love, a thing he mentioned once — say the word and I'll keep it here.
+  </div>
+
+  <h2>Family &amp; artifacts <span class="rule"></span></h2>
+  <div class="family">
+    <div class="fam"><strong>⬆️ Parent: Family Buddy</strong>Quentin Buddy is one of Family Buddy's children — the deep file on one person, inside the whole-family picture.</div>
+    <div class="fam"><strong>📄 Product Brief</strong><a href="https://docs.google.com/document/d/157C3sNyJcRIgzNevCbwuWx7V1F4YPYZRwjw1TOCUaNA/edit">Quentin Buddy — Product Brief</a> in Zuki Docs. Awaiting Dave's review.</div>
+    <div class="fam"><strong>💻 Repo</strong><a href="https://github.com/davedellaquila/quentin-buddy">davedellaquila/quentin-buddy</a> — private, empty, ready when the build starts.</div>
+  </div>
+
+  <footer>
+    <span>Quentin Buddy keeps the file on Quentin.</span>
+    <span>Child of Family Buddy</span>
+  </footer>
+
+</div>
+</body>
+</html>

@@ -92,7 +92,8 @@
       "statusClass": "st-brief",
       "tagline": "Stay-in-touch nudges, notes, milestones",
       "icon": "\ud83d\udc9e",
-      "photos": []
+      "photos": [],
+      "homepage": "relationship-buddy/"
     },
     {
       "attention": [
@@ -232,7 +233,8 @@
       "statusClass": "st-brief",
       "tagline": "Plans and tracks hosted gatherings",
       "icon": "\ud83c\udf89",
-      "photos": []
+      "photos": [],
+      "homepage": "party-buddy/"
     },
     {
       "attention": [
@@ -705,7 +707,8 @@
         }
       ],
       "icon": "\ud83e\uddd1",
-      "photos": []
+      "photos": [],
+      "homepage": "quentin-buddy/"
     },
     {
       "id": "sawyer-buddy",
