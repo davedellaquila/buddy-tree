@@ -319,6 +319,7 @@ body.standalone .sa-bar{display:flex}
 /* ---------- Project view: stat tiles + buddy homepage embed ---------- */
 #project-tiles{display:flex;gap:14px;margin:2px auto 20px;max-width:860px;flex-wrap:wrap}
 #project-status-tiles{display:flex;gap:14px;margin:2px auto 20px;max-width:860px;flex-wrap:wrap}
+#project-status-tiles .ptile{flex:1 1 180px;max-width:calc(25% - 11px)}
 .ptile{flex:1 1 170px;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 18px 12px;position:relative;overflow:hidden;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
 .ptile:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.12)}
 .ptile::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--tint)}
