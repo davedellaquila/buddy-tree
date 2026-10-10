@@ -878,6 +878,7 @@ function initTheme(){
   }
 }
 function dispName(b){ let n = S.names[b.id] || b.name; if (S.hideBuddyWord) n = n.replace(/\s+Buddy$/i, ''); return n; }
+function getHomepage(b){ return (S.homepages && S.homepages[b.id]) || b.homepage || ''; }
 function unseenItems(b){ return (b.attention || []).filter(a => !S.seen[a.id]); }
 function descUnseen(id){
   let n = 0;
@@ -941,7 +942,7 @@ function openBuddy(id){
   // (if it has one) AND opens the right-side detail panel.
   // No homepage -> leave the main view exactly as it was, but still open the panel.
   if (S.view === 'project') {
-    if (b.homepage) {
+    if (getHomepage(b)) {
       S.projectId = id; save();
       renderProjectView();
       renderNav();
@@ -1105,6 +1106,11 @@ const FIELD_DEFS = [
 ];
 function getFieldOrder(){
   if (!S.fieldOrder || !Array.isArray(S.fieldOrder)) S.fieldOrder = FIELD_DEFS.map(f => f.id);
+  // Add any new fields that weren't in the saved order
+  const ids = FIELD_DEFS.map(f => f.id);
+  ids.forEach(id => { if (!S.fieldOrder.includes(id)) S.fieldOrder.push(id); });
+  // Remove any stale IDs no longer in FIELD_DEFS
+  S.fieldOrder = S.fieldOrder.filter(id => ids.includes(id));
   return S.fieldOrder;
 }
 function applySectionCollapse(bid){
@@ -1406,7 +1412,8 @@ function renderProjectView(){
   if (!pv) return;
   const b = byId[projectId()] || {};
   pv.innerHTML = '';
-  if (b.homepage) {
+  const hp = getHomepage(b);
+  if (hp) {
     document.getElementById('main').classList.add('homepage-mode');
     const bar2 = document.getElementById('journal-bar');
     if (bar2) bar2.classList.remove('show');
@@ -1414,14 +1421,14 @@ function renderProjectView(){
     wrap.id = 'homepage-wrap';
     const open = document.createElement('a');
     open.id = 'homepage-open';
-    open.href = b.homepageSource || b.homepage;
+    open.href = b.homepageSource || hp;
     open.target = '_blank';
     open.rel = 'noopener';
     open.textContent = 'Open in a new tab';
     wrap.appendChild(open);
     const frame = document.createElement('iframe');
     frame.id = 'homepage-frame';
-    frame.src = b.homepage;
+    frame.src = hp;
     frame.title = b.name + ' homepage';
     frame.addEventListener('load', () => {
       try {
@@ -1502,7 +1509,11 @@ function renderBuddy(id){
     + '<div style="margin-top:8px"><span class="fineprint" id="ingest-status"></span></div>'
     + '<div id="ingest-feed" style="margin-top:8px"></div></div>'
     + '<div class="bp-sec" data-field="mission"><h3>About<span class="info-tip" data-tip="The mission is the brief\u2019s executive summary \u2014 tweak it through the buddy\u2019s chat thread and it updates everywhere.">\u24d8</span></h3><p class="bp-mission">'+escHtml(b.mission)+'</p></div>'
-    + (b.homepage ? '<div class="bp-sec" data-field="homepage"><h3>Homepage</h3><div style="display:flex;align-items:center;gap:8px"><a href="'+escHtml(b.homepage)+'" target="_blank" rel="noopener" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escHtml(b.homepage)+'</a><button class="linkbtn" data-copy-hp="'+escHtml(b.homepage)+'" title="Copy homepage URL">Copy</button></div></div>' : '')
+    + '<div class="bp-sec" data-field="homepage"><h3>Homepage URL</h3>'
+    + '<div style="display:flex;align-items:center;gap:8px">'
+    + '<input type="url" id="bp-homepage-url" value="'+escHtml(getHomepage(b))+'" placeholder="Paste homepage URL here…" style="flex:1;min-width:0;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text)" title="The full URL for this buddy’s homepage. Paste a URL and click away to save.">'
+    + '<button class="linkbtn" id="bp-homepage-copy" title="Copy homepage URL to clipboard" style="flex-shrink:0">Copy</button>'
+    + '</div></div>'
     + (unseenCount > 0 ? '<div class="bp-sec" data-field="attention"><h3>Needs your attention</h3>'+attn+'</div>' : '')
     + photos
     + (id === 'project-buddy'
@@ -1516,7 +1527,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Anybody with repo access can see this note. Saved to the buddy’s repo (docs/notes.md).">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Anybody with repo access can see this note."></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261009.2004</div>'
+    + '<div class="bp-build">Build 20261009.2010</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -1529,6 +1540,38 @@ function renderBuddy(id){
     if (before !== after) logChange('rename', id, 'Renamed “' + beforeLabel + '” → “' + dispName(byId[id]) + '”', before, after);
     save(); renderNav();
   });
+  // Homepage URL field: editable text input, saves to S.homepages override
+  const hpu = document.getElementById('bp-homepage-url');
+  if (hpu) {
+    hpu.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); hpu.blur(); } });
+    hpu.addEventListener('blur', () => {
+      const v = hpu.value.trim();
+      if (!S.homepages || typeof S.homepages !== 'object') S.homepages = {};
+      const before = getHomepage(b);
+      if (v && v !== b.homepage) S.homepages[id] = v; else delete S.homepages[id];
+      const after = getHomepage(b);
+      if (before !== after) logChange('homepage', id, 'Homepage URL → ' + (after || '(cleared)'), before || null, after || null);
+      save();
+    });
+    // Prevent the global click handler from re-opening the buddy when clicking the input
+    hpu.addEventListener('click', e => e.stopPropagation());
+  }
+  const hpc = document.getElementById('bp-homepage-copy');
+  if (hpc) {
+    hpc.addEventListener('click', e => {
+      e.stopPropagation();
+      const url = (document.getElementById('bp-homepage-url') || {}).value || getHomepage(b);
+      if (!url) return;
+      const done = () => { hpc.textContent = 'Copied!'; setTimeout(() => { hpc.textContent = 'Copy'; }, 1500); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(done).catch(() => {});
+      } else {
+        const ta = document.createElement('textarea'); ta.value = url; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch (err) {}
+        ta.remove();
+      }
+    });
+  }
   const nt = document.getElementById('bp-notes');
   let t = null, notesBefore = null;
   nt.addEventListener('focus', () => { notesBefore = nt.value; });
@@ -2006,7 +2049,7 @@ function renderPlan(id){
     + '<p class="fineprint">Saved on this device. (For your eyes only)</p></div>'
     + '<div class="bp-sec"><h3>Shared notes<span class="info-tip" data-tip="Visible to everyone with access to this project.">\u24d8</span></h3><textarea class="notes" id="bp-shared" placeholder="Shared notes\u2026 (visible to everyone with access)">'+escHtml((S.planShared||{})[id]||'')+'</textarea>'
     + '<p class="fineprint">Shared — visible to everyone with access.</p></div>'
-    + '<div class="bp-build">Build 20261009.2004</div>'
+    + '<div class="bp-build">Build 20261009.2010</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
@@ -2699,7 +2742,7 @@ function initGear(){
 // has a newer build than the one currently loaded (helps Safari web apps
 // and other containers without a hard-refresh shortcut).
 function initVersionCheck(){
-  const myBuild = '20261009.2004';
+  const myBuild = '20261009.2010';
   async function check(){
     try {
       const r = await fetch('version.txt?_=' + Date.now(), {cache: 'no-store'});
@@ -2868,20 +2911,6 @@ document.addEventListener('click', e => {
       save(); renderProjects();
     }
     openBuddy(projRow.dataset.buddy); return;
-  }
-  // Copy homepage URL button
-  const cph = e.target.closest('[data-copy-hp]');
-  if (cph) {
-    e.preventDefault(); e.stopPropagation();
-    const url = cph.dataset.copyHp;
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(url).then(() => { cph.textContent = 'Copied!'; setTimeout(() => { cph.textContent = 'Copy'; }, 1500); });
-    } else {
-      const ta = document.createElement('textarea'); ta.value = url; document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); cph.textContent = 'Copied!'; setTimeout(() => { cph.textContent = 'Copy'; }, 1500); } catch (err) {}
-      ta.remove();
-    }
-    return;
   }
   const bb = e.target.closest('[data-buddy]');
   // Don't re-open the buddy when clicking an editable field (e.g. the name)
