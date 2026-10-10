@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<script>try{var _t=(JSON.parse(localStorage.getItem('buddyTree.v3')||'{}').theme)||'system';if(_t==='light'||(_t!=='dark'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches))document.documentElement.classList.add('light');}catch(e){}</script>
+<script>try{var _t=(JSON.parse(localStorage.getItem('buddyTree.v3')||'{}').theme)||'default';if(_t==='light')document.documentElement.classList.add('light');else if(_t==='muse')document.documentElement.classList.add('muse');else if(_t==='system'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches)document.documentElement.classList.add('light');}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="application-name" content="Buddies">
 <meta name="apple-mobile-web-app-title" content="Buddies">
@@ -192,6 +192,20 @@ html.light{
   --danger:#cf222e;
   --shadow:rgba(31,35,40,.18); --shadow-soft:rgba(31,35,40,.08);
   --scrim:rgba(31,35,40,.5);
+}
+html.muse{
+  --bg:#0a0e1a; --panel:#131824; --hover:#1a2030; --active:#7c3aed22;
+  --wash:#7c3aed18; --wash2:#1e2a45;
+  --border:#2a3548; --border2:#1f2937;
+  --text:#e5e7eb; --text2:#d1d5db; --muted:#9ca3af; --faint:#6b7280;
+  --accent:#7c3aed; --accent-hi:#a78bfa; --on-accent:#ffffff;
+  --ghost:rgba(124,58,237,.1);
+  --amber:#fbbf24; --amber-bd:#92400e; --amber-bg:#451a03; --amber-bg2:#78350f;
+  --amber-hi:#fcd34d; --amber-tx:#fbbf24; --amber-tx2:#fde68a;
+  --grn-bg:#064e3b; --grn-bd:#059669; --grn-tx:#34d399; --grn-solid:#10b981;
+  --danger:#ef4444;
+  --shadow:rgba(0,0,0,.6); --shadow-soft:rgba(0,0,0,.4);
+  --scrim:rgba(0,0,0,.7);
 }
 body{background:var(--bg);color:var(--text)}
 .theme-pick{display:flex;margin:12px 10px 0;border:1px solid var(--border);border-radius:8px;overflow:hidden}
@@ -665,7 +679,9 @@ body.standalone .sa-bar{display:flex}
   <div style="padding:0 10px 8px"><input type="search" id="buddy-search" placeholder="Search buddies…" aria-label="Search buddies"
     title="Search all buddies by name or tagline. Filters the sidebar list as you type. Press / anywhere to jump here. Arrow keys navigate results."
     style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 10px;font-size:13px"></div>
-  <h3>Buddies <span id="attn-pill" class="zero">0</span></h3><div id="buddy-nav"></div></div>
+  <h3>Buddies <span id="attn-pill" class="zero">0</span></h3>
+  <div style="padding:0 10px 4px;font-size:11px;color:var(--faint);line-height:1.4">Drag to move. Hold Shift while dragging to reorder.</div>
+  <div id="buddy-nav"></div></div>
   <div class="nav-sec" id="plans-sec"><h3 style="cursor:pointer" id="plans-toggle"><span id="plans-arrow">›</span> Business Plans</h3><div id="plan-nav"></div></div>
 </aside>
 <main id="main">
@@ -927,21 +943,26 @@ const SB_DEFAULT_W = 308;
 let S = {seen:{}, notes:{}, names:{}, parents:{}, zoom:100, sel:'view:tree', view:'tree'};
 try { Object.assign(S, JSON.parse(localStorage.getItem(LS_KEY) || '{}')); } catch(e) {}
 S.parents = S.parents || {};
+S.buddyOrder = S.buddyOrder || [];
 S.zoom = S.zoom || 100;
 initTheme();
 buildKids();
 function save(){ localStorage.setItem(LS_KEY, JSON.stringify(S)); }
 function applyTheme(){
-  const t = S.theme || 'system';
-  let light = false;
-  if (t === 'light') light = true;
-  else if (t === 'dark') light = false;
-  else if (window.matchMedia) light = window.matchMedia('(prefers-color-scheme: light)').matches;
-  document.documentElement.classList.toggle('light', light);
+  const t = S.theme || 'default';
+  document.documentElement.classList.remove('light', 'muse');
+  if (t === 'light') {
+    document.documentElement.classList.add('light');
+  } else if (t === 'muse') {
+    document.documentElement.classList.add('muse');
+  } else if (t === 'system') {
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (!prefersDark) document.documentElement.classList.add('light');
+  }
   document.querySelectorAll('[data-theme-pick]').forEach(b => b.classList.toggle('sel', b.dataset.themePick === t));
 }
 function setTheme(t){
-  if (['light', 'dark', 'system'].indexOf(t) < 0) return;
+  if (['light', 'default', 'muse', 'system'].indexOf(t) < 0) return;
   S.theme = t; save(); applyTheme();
 }
 function wireThemePicks(root){
@@ -1176,8 +1197,17 @@ function renderNav(){
       + '<span class="binfo" data-buddy-info="'+id+'" title="Open '+escHtml(dispName(b))+' details" style="margin-left:auto;padding:2px 6px;opacity:0;transition:opacity 0.15s;cursor:pointer" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">ⓘ</span></button>';
     (kidsOf[id] || []).forEach(c => row(c.id, depth+1));
   }
-  ROOT_ORDER.filter(id => { const b = byId[id]; const p = b ? effParent(b) : null; return p === null; })
-    .forEach(id => row(id, 0));
+  let topLevel = ROOT_ORDER.filter(id => { const b = byId[id]; const p = b ? effParent(b) : null; return p === null; });
+  // Apply custom buddy order if exists
+  if (S.buddyOrder && Array.isArray(S.buddyOrder)) {
+    const orderMap = Object.fromEntries(S.buddyOrder.map((id, idx) => [id, idx]));
+    topLevel.sort((a, b) => {
+      const aIdx = orderMap[a] !== undefined ? orderMap[a] : 999999;
+      const bIdx = orderMap[b] !== undefined ? orderMap[b] : 999999;
+      return aIdx - bIdx;
+    });
+  }
+  topLevel.forEach(id => row(id, 0));
   document.getElementById('buddy-nav').innerHTML = h;
   if (Object.keys(S.parents).length) {
     document.getElementById('buddy-nav').insertAdjacentHTML('beforeend',
@@ -1305,7 +1335,7 @@ function renderSettingChecks(){
   const sdiv = document.getElementById('fset-settings');
   if (!sdiv) return;
   sdiv.innerHTML = '<div style="margin-bottom:12px"><div style="font-size:13px;margin-bottom:6px">Theme</div>'
-    + '<div class="theme-pick" role="group" aria-label="Theme" style="margin:0"><button data-theme-pick="light" title="Light theme">Light</button><button data-theme-pick="dark" title="Dark theme">Dark</button><button data-theme-pick="system" title="Follow system theme">System</button></div></div>'
+    + '<div class="theme-pick" role="group" aria-label="Theme" style="margin:0"><button data-theme-pick="default" title="Default dark theme">Default</button><button data-theme-pick="light" title="Light theme">Light</button><button data-theme-pick="muse" title="Muse dark theme with purple accents">Muse</button><button data-theme-pick="system" title="Follow system theme">System</button></div></div>'
     + SETTING_DEFS.map(s => {
     const val = getSetting(s.id);
     if (s.type === 'bool') return '<label class="fset-check"><input type="checkbox" data-setting="' + s.id + '"' + (val ? ' checked' : '') + '> <span>' + s.label + '</span></label>';
@@ -1935,6 +1965,39 @@ function moveBuddy(src, target){
   if (S.sel === 'buddy:' + src || S.sel === 'buddy:' + target || S.sel === 'buddy:project-buddy') renderBuddy(S.sel.slice(6));
   toast(dispName(b) + ' moved under ' + dispName(byId[target]) + '.');
 }
+function reorderBuddy(src, target){
+  if (!src || !target || src === target) return;
+  const srcBuddy = byId[src];
+  const targetBuddy = byId[target];
+  if (!srcBuddy || !targetBuddy) return;
+  
+  let topLevel = ROOT_ORDER.filter(id => { 
+    const b = byId[id]; 
+    const p = b ? effParent(b) : null; 
+    return p === null; 
+  });
+  
+  if (S.buddyOrder && Array.isArray(S.buddyOrder)) {
+    const orderMap = Object.fromEntries(S.buddyOrder.map((id, idx) => [id, idx]));
+    topLevel.sort((a, b) => {
+      const aIdx = orderMap[a] !== undefined ? orderMap[a] : 999999;
+      const bIdx = orderMap[b] !== undefined ? orderMap[b] : 999999;
+      return aIdx - bIdx;
+    });
+  }
+  
+  topLevel = topLevel.filter(id => id !== src);
+  
+  const targetIdx = topLevel.indexOf(target);
+  if (targetIdx === -1) return;
+  
+  topLevel.splice(targetIdx, 0, src);
+  
+  S.buddyOrder = topLevel;
+  save();
+  renderNav();
+  toast('Reordered ' + dispName(srcBuddy));
+}
 const FAMKINDS = ['personal', 'family', 'property', 'finance', 'work'];
 function nodeTag(b, depth){
   if (depth === 1) {
@@ -2249,18 +2312,24 @@ document.getElementById('view-tree').addEventListener('wheel', e => {
   save(); applyZoom();
 }, { passive: false });
 let dragId = null;
+let dragShiftKey = false;
 (function initDrag(){
   const nav = document.getElementById('buddy-nav');
   nav.addEventListener('dragstart', e => {
     const r = e.target.closest('[data-buddy]');
     if (!r || r.dataset.buddy === 'project-buddy') { e.preventDefault(); return; }
     dragId = r.dataset.buddy;
+    dragShiftKey = e.shiftKey;
     e.dataTransfer.effectAllowed = 'move';
     try { e.dataTransfer.setData('text/plain', dragId); } catch (_e) {}
     r.classList.add('dragging');
+    if (dragShiftKey) {
+      toast('⬍ Reorder mode — drop on another buddy to reorder');
+    }
   });
   nav.addEventListener('dragend', () => {
     dragId = null;
+    dragShiftKey = false;
     nav.querySelectorAll('.dragging,.drop-target').forEach(x => x.classList.remove('dragging', 'drop-target'));
   });
   nav.addEventListener('dragover', e => {
@@ -2277,8 +2346,17 @@ let dragId = null;
     e.preventDefault();
     const src = dragId, target = r.dataset.buddy;
     dragId = null;
+    const wasShift = dragShiftKey;
+    dragShiftKey = false;
     nav.querySelectorAll('.drop-target').forEach(x => x.classList.remove('drop-target'));
-    moveBuddy(src, target);
+    
+    if (wasShift) {
+      // Reorder mode: move src before target in the list
+      reorderBuddy(src, target);
+    } else {
+      // Hierarchy mode: change parent
+      moveBuddy(src, target);
+    }
   });
 })();
 function renderPlan(id){
