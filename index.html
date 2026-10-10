@@ -450,10 +450,13 @@ body.standalone .sa-bar{display:flex}
 .sa-bar .linkbtn{font-size:13px}
 
 /* ============ RESPONSIVE ============ */
-/* Muse-style floating open control (shown when sidebar collapsed / mobile drawer) */
+/* Mobile topbar: real flex row wrapping Muse menu + page title (sticky) */
+#mobile-topbar{display:none}
+#mobile-topbar-title{display:none}
+/* Muse-style open control (desktop collapsed sidebar = floating; mobile = in topbar) */
 #menu-btn{
   display:none;align-items:center;justify-content:center;position:fixed;top:14px;left:14px;z-index:90;
-  width:44px;height:44px;padding:0;margin:0;border-radius:50%;cursor:pointer;
+  width:44px;height:44px;padding:0;margin:0;border-radius:50%;cursor:pointer;flex:none;
   color:#c9d1d9;background:rgba(22,27,34,.72);border:1px solid rgba(255,255,255,.08);
   -webkit-backdrop-filter:blur(16px) saturate(1.25);backdrop-filter:blur(16px) saturate(1.25);
   box-shadow:0 6px 22px rgba(0,0,0,.42),0 1px 3px rgba(0,0,0,.28);
@@ -470,18 +473,42 @@ html.light #menu-btn{
   box-shadow:0 6px 22px rgba(0,0,0,.14),0 1px 3px rgba(0,0,0,.08)}
 html.light #menu-btn:hover{background:rgba(255,255,255,.9)}
 html.light #menu-btn .menu-btn-dot{box-shadow:0 0 0 2px rgba(255,255,255,.85)}
+/* Desktop: collapsed sidebar still uses floating Muse button */
+@media (min-width:640px){
+  body.sb-closed #mobile-topbar{
+    display:block;position:fixed;top:0;left:0;width:0;height:0;overflow:visible;
+    padding:0;margin:0;border:0;background:transparent;box-shadow:none;z-index:90}
+  body.sb-closed #menu-btn{display:flex}
+  body.sb-closed #mobile-topbar-title{display:none}
+}
 /* ---- Small: <640px (iPhone) ---- */
 @media (max-width:639px){
   .app{display:block}
   /* Prevent iOS auto-zoom on input focus */
   input, textarea, select{font-size:16px !important}
-  /* Muse menu shares one sticky header row with page titles (not stacked above them) */
+  /* One shared sticky bar: [menu] [title] — at rest and while scrolling */
+  #mobile-topbar{
+    display:flex;align-items:center;gap:10px;
+    position:sticky;top:0;z-index:92;
+    box-sizing:border-box;min-height:56px;width:100%;
+    padding:max(6px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) 8px max(10px, env(safe-area-inset-left, 0px));
+    background:var(--bg);border-bottom:1px solid var(--border);
+    box-shadow:0 8px 16px -12px rgba(0,0,0,.5)}
   #menu-btn{
-    display:flex;
-    top:max(8px, calc(env(safe-area-inset-top, 0px) + 6px));
-    left:max(10px, env(safe-area-inset-left, 0px));
-    z-index:92;
-  }
+    display:flex;position:static;top:auto;left:auto;z-index:auto;
+    flex:0 0 auto;margin:0}
+  #mobile-topbar-title{
+    display:block;flex:1 1 auto;min-width:0;
+    font-size:20px;font-weight:700;line-height:1.2;color:var(--text);
+    text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    /* Balance the 44px menu so the title reads centered in the bar */
+    padding-right:44px}
+  #mobile-topbar:not(.has-title) #mobile-topbar-title{display:none}
+  /* In-page h2 mirrored into the topbar — hide duplicate on mobile */
+  .projects-view h2,.standalones h2,#view-changelog h2,.changelog h2{
+    position:absolute !important;width:1px !important;height:1px !important;padding:0 !important;margin:-1px !important;
+    overflow:hidden !important;clip:rect(0,0,0,0) !important;white-space:nowrap !important;border:0 !important;
+    box-shadow:none !important;background:transparent !important}
   /* Sidebar drawer with scrim */
   #sidebar{position:fixed;left:0;top:0;bottom:0;z-index:95;height:100vh;height:100dvh;
     transform:translateX(-105%);transition:transform .28s cubic-bezier(.32,.72,.35,1);width:min(85vw,340px);flex:none}
@@ -489,10 +516,9 @@ html.light #menu-btn .menu-btn-dot{box-shadow:0 0 0 2px rgba(255,255,255,.85)}
   #sb-resize{display:none}
   #sb-scrim{display:none;position:fixed;inset:0;z-index:94;background:rgba(0,0,0,.45);opacity:0;transition:opacity .25s}
   #sb-scrim.show{display:block;opacity:1}
-  /* Side gutters; top padding ≈ one header row (menu + sticky title share it) */
+  /* Side gutters — topbar is in normal flow, so no extra top pad for a floating menu */
   #main{
-    padding:56px 18px 60px;
-    padding-top:max(56px, calc(env(safe-area-inset-top, 0px) + 52px));
+    padding:12px 18px 60px;
     padding-left:max(18px, env(safe-area-inset-left, 0px));
     padding-right:max(18px, env(safe-area-inset-right, 0px));
   }
@@ -708,15 +734,6 @@ html.light #menu-btn .menu-btn-dot{box-shadow:0 0 0 2px rgba(255,255,255,.85)}
   .ptile-sub{font-size:10px;line-height:1.2;margin-top:1px;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .ptile-label,.ptile-sub{overflow-wrap:normal;word-break:normal;hyphens:none}
-  /* Sticky title shares the same top row as #menu-btn (menu left, title centered in bar) */
-  .projects-view h2,.standalones h2{
-    font-size:20px;line-height:1.2;position:sticky;z-index:7;background:var(--bg);
-    top:max(0px, env(safe-area-inset-top, 0px));
-    box-sizing:border-box;min-height:56px;
-    display:flex;align-items:center;justify-content:center;text-align:center;
-    /* Symmetric horizontal pad clears the 44px Muse button so the title stays optically centered */
-    padding:8px 56px;margin:0 0 6px;
-    box-shadow:0 8px 16px -12px rgba(0,0,0,.5)}
   .projects-view p.sub,.standalones p.sub{font-size:16px;line-height:1.45;margin-bottom:16px}
   .proj-path{font-size:13px;color:var(--muted);line-height:1.35;margin:0 0 2px}
   .plan-card{padding:14px 16px;margin-bottom:12px;border-radius:12px}
@@ -816,12 +833,15 @@ html.light #menu-btn .menu-btn-dot{box-shadow:0 0 0 2px rgba(255,255,255,.85)}
 </head>
 <body>
 <div class="app">
-<button id="menu-btn" type="button" aria-label="Open menu">
-  <svg class="menu-btn-icon" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
-    <path d="M4.75 6.85h8.5M4.75 11.15h8.5" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round"/>
-  </svg>
-  <span class="menu-btn-dot" aria-hidden="true"></span>
-</button>
+<header id="mobile-topbar" aria-label="Page header">
+  <button id="menu-btn" type="button" aria-label="Open menu">
+    <svg class="menu-btn-icon" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
+      <path d="M4.75 6.85h8.5M4.75 11.15h8.5" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round"/>
+    </svg>
+    <span class="menu-btn-dot" aria-hidden="true"></span>
+  </button>
+  <div id="mobile-topbar-title"></div>
+</header>
 <div id="sb-scrim"></div>
 <aside id="sidebar"><div id="sb-tools"><button id="sb-gear" title="Settings (⌘,)" aria-label="Settings"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button id="sb-close" title="Close sidebar" aria-label="Close sidebar"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><path class="xmark-x" d="M8.8 8.8l6.4 6.4m0-6.4l-6.4 6.4" fill="none" stroke-width="2.25" stroke-linecap="round"/></svg></button></div>
 <div id="sb-resize" title="Drag left or right to resize the sidebar. Double-click to reset to default width."></div>
@@ -1169,6 +1189,42 @@ const VIEW_DEFS = [
   ['project','Project Homepage','🏠'],
   ['changelog','Changelog','🕘'],
 ];
+/* Mobile topbar titles (may differ from short nav labels) */
+const VIEW_TOPBAR_TITLES = {
+  tree: 'Tree',
+  projects: 'Projects by Buddy',
+  plans: 'Business Plans',
+  manifest: 'New-Project Manifest',
+  project: 'Project Homepage',
+  changelog: 'Changelog',
+};
+function setMobileTopbarTitle(text){
+  const bar = document.getElementById('mobile-topbar');
+  const el = document.getElementById('mobile-topbar-title');
+  if (!el || !bar) return;
+  const t = (text || '').trim();
+  el.textContent = t;
+  bar.classList.toggle('has-title', !!t);
+}
+function syncMobileTopbarTitle(sel){
+  sel = sel || S.sel || '';
+  if (sel.indexOf('view:') === 0) {
+    const id = sel.slice(5);
+    setMobileTopbarTitle(VIEW_TOPBAR_TITLES[id] || ((VIEW_DEFS.find(v => v[0] === id) || [])[1]) || '');
+    return;
+  }
+  if (sel.indexOf('plan:') === 0) {
+    const p = planById[sel.slice(5)];
+    setMobileTopbarTitle(p ? p.name : 'Business Plans');
+    return;
+  }
+  if (sel.indexOf('buddy:') === 0) {
+    const b = byId[sel.slice(6)];
+    setMobileTopbarTitle(b ? dispName(b) : '');
+    return;
+  }
+  setMobileTopbarTitle('');
+}
 const VIEW_TIPS = {
   tree: 'Tree view — visual hierarchy of all buddies. Click a node to open its details. Drag the background to pan, scroll to zoom. Drag a node by its grip handle to reparent it.',
   projects: 'Projects list — every buddy in hierarchy order with status. Click a tile to filter by attention status. Click the chevron to expand/collapse sections.',
@@ -2643,6 +2699,7 @@ function show(sel, push){
     }
   }
   renderNav();
+  syncMobileTopbarTitle(sel);
   document.getElementById('main').scrollTop = 0;
   window.scrollTo(0,0);
   setIcon(sel.startsWith('plan:') ? ((planById[sel.slice(5)] || {}).icon)
