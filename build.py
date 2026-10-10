@@ -954,12 +954,6 @@ function openFieldSettings(){
       updateFactory(); toast('Factory defaults updated.');
     });
   }
-  if (!window._fsetEscBound) {
-    window._fsetEscBound = true;
-    document.addEventListener('keydown', function escClose(e){
-      if (e.key === 'Escape') { const fm = document.getElementById('field-settings'); if (fm) fm.classList.remove('show'); }
-    });
-  }
   const list = document.getElementById('fset-list');
   list.innerHTML = getFieldOrder().map(fid => {
     const def = FIELD_DEFS.find(f => f.id === fid);
@@ -1694,6 +1688,23 @@ document.addEventListener('keydown', e => {
       openFieldSettings();
     }
     return;
+  }
+  // Escape closes settings or detail panel
+  if (e.key === 'Escape') {
+    const m = document.getElementById('field-settings');
+    if (m && m.classList.contains('show')) {
+      m.classList.remove('show');
+      e.preventDefault();
+      return;
+    }
+    const vb = document.getElementById('view-buddy');
+    if (vb && vb.classList.contains('active')) {
+      // Don't close if user is editing text
+      if (e.target && e.target.closest && e.target.closest('input,textarea,[contenteditable="true"]')) return;
+      closeDetail();
+      e.preventDefault();
+      return;
+    }
   }
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   if (e.target && e.target.closest && e.target.closest('input,textarea,[contenteditable]')) return;

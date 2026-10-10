@@ -1278,12 +1278,6 @@ function openFieldSettings(){
       updateFactory(); toast('Factory defaults updated.');
     });
   }
-  if (!window._fsetEscBound) {
-    window._fsetEscBound = true;
-    document.addEventListener('keydown', function escClose(e){
-      if (e.key === 'Escape') { const fm = document.getElementById('field-settings'); if (fm) fm.classList.remove('show'); }
-    });
-  }
   const list = document.getElementById('fset-list');
   list.innerHTML = getFieldOrder().map(fid => {
     const def = FIELD_DEFS.find(f => f.id === fid);
@@ -1520,7 +1514,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Anybody with repo access can see this note. Saved to the buddy’s repo (docs/notes.md).">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Anybody with repo access can see this note."></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261009.1956</div>'
+    + '<div class="bp-build">Build 20261009.2000</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -1994,7 +1988,7 @@ function renderPlan(id){
     + '<p class="fineprint">Saved on this device. (For your eyes only)</p></div>'
     + '<div class="bp-sec"><h3>Shared notes<span class="info-tip" data-tip="Visible to everyone with access to this project.">\u24d8</span></h3><textarea class="notes" id="bp-shared" placeholder="Shared notes\u2026 (visible to everyone with access)">'+escHtml((S.planShared||{})[id]||'')+'</textarea>'
     + '<p class="fineprint">Shared — visible to everyone with access.</p></div>'
-    + '<div class="bp-build">Build 20261009.1956</div>'
+    + '<div class="bp-build">Build 20261009.2000</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
@@ -2018,6 +2012,23 @@ document.addEventListener('keydown', e => {
       openFieldSettings();
     }
     return;
+  }
+  // Escape closes settings or detail panel
+  if (e.key === 'Escape') {
+    const m = document.getElementById('field-settings');
+    if (m && m.classList.contains('show')) {
+      m.classList.remove('show');
+      e.preventDefault();
+      return;
+    }
+    const vb = document.getElementById('view-buddy');
+    if (vb && vb.classList.contains('active')) {
+      // Don't close if user is editing text
+      if (e.target && e.target.closest && e.target.closest('input,textarea,[contenteditable="true"]')) return;
+      closeDetail();
+      e.preventDefault();
+      return;
+    }
   }
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   if (e.target && e.target.closest && e.target.closest('input,textarea,[contenteditable]')) return;
@@ -2642,7 +2653,7 @@ function initGear(){
 // has a newer build than the one currently loaded (helps Safari web apps
 // and other containers without a hard-refresh shortcut).
 function initVersionCheck(){
-  const myBuild = '20261009.1956';
+  const myBuild = '20261009.2000';
   async function check(){
     try {
       const r = await fetch('version.txt?_=' + Date.now(), {cache: 'no-store'});
