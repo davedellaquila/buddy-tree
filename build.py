@@ -187,7 +187,7 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
   cursor:pointer;display:flex;align-items:center;justify-content:center}
 .bp-close-x:hover{color:var(--text)}
 #buddy-home{position:relative}
-#bp-resize{position:absolute;left:-8px;top:0;bottom:0;width:13px;cursor:ew-resize;z-index:20;
+#bp-resize{position:absolute;left:4px;top:0;bottom:0;width:13px;cursor:ew-resize;z-index:20;
   display:flex;align-items:center;justify-content:center}
 #bp-resize::after{content:'';width:8px;height:56px;border-radius:3px;background:var(--faint)}
 #bp-resize:hover::after{background:var(--accent-hi)}
