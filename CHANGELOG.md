@@ -5,6 +5,14 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
 
 ## 2026-10-10 (Theme setting)
 
+### Fixed
+- **Projects-view chevrons** — chevrons now render only on rows that have
+  children (no more dead chevrons on leaf rows), and clicking one reliably
+  collapses/expands its section (toggle moved into the central click
+  handler so row navigation can't swallow it).
+- **Centered changelog** — the changelog content is now centered in the
+  viewport (max-width 760px) instead of hugging the left edge.
+
 ### Added
 - **Light / Dark / System theme** — a three-way segmented picker under
   the sidebar brand. Persisted per device in localStorage (default:
