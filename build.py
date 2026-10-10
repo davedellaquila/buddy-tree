@@ -177,6 +177,10 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 #field-settings .fset-resize{position:absolute;right:3px;bottom:3px;width:14px;height:14px;cursor:nwse-resize;opacity:.55;
   background:linear-gradient(135deg,transparent 55%,var(--muted) 55%);border-radius:0 0 8px 0}
 #field-settings .fset-resize:hover{opacity:1}
+#field-settings .fset-close-x{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;
+  border:1px solid var(--border);background:var(--panel);color:var(--muted);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;padding:0}
+#field-settings .fset-close-x:hover{color:var(--text);border-color:var(--muted)}
 .fset-row{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--border2);border-radius:8px;margin-bottom:6px;background:var(--bg);cursor:grab}
 .fset-row.dragging{opacity:.5}
 .fset-row .fh{color:var(--muted);cursor:grab;font-size:14px}
@@ -796,7 +800,8 @@ function openFieldSettings(){
   let m = document.getElementById('field-settings');
   if (!m) {
     m = document.createElement('div'); m.id = 'field-settings';
-    m.innerHTML = '<div class="fset-head" id="fset-drag"><h3>Settings</h3></div>'
+    m.innerHTML = '<button class="fset-close-x" id="fset-x" title="Close">\u2715</button>'
+      + '<div class="fset-head" id="fset-drag"><h3>Settings</h3></div>'
       + '<div class="fset-body"><div id="fset-settings"></div>'
       + '<h3 style="margin-top:18px">Buddy fields</h3><p class="fineprint" style="margin-bottom:12px">Drag to reorder. Uncheck to hide.</p><div id="fset-list"></div>'
       + '<h3 style="margin-top:18px">Main views</h3><p class="fineprint" style="margin-bottom:12px">Drag to reorder. Number keys 1–9 follow this order.</p><div id="vset-list"></div></div>'
@@ -808,6 +813,7 @@ function openFieldSettings(){
     document.body.appendChild(m);
     initFsetChrome(m);
     m.querySelector('#fset-close').addEventListener('click', () => m.classList.remove('show'));
+    m.querySelector('#fset-x').addEventListener('click', () => m.classList.remove('show'));
     renderSettingChecks();
     m.querySelector('#fset-reset').addEventListener('click', () => {
       if (!confirm('Reset all settings to factory defaults?')) return;
