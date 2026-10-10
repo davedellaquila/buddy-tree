@@ -3,6 +3,51 @@
 All notable changes to the Buddies dashboard and buddy system. Newest first.
 `FEATURES.md` describes the current state; this file describes how it got there.
 
+## 2026-10-10
+
+### Added
+- **Project view** — a fifth main view. Clicking any buddy in the left
+  sidebar now selects it as the current project and shows its homepage in
+  the center via the Project view (replaces the earlier direct
+  buddy-center behavior, which is retired). The selected project's row
+  stays highlighted in the sidebar. Keyboard shortcuts 1–6 follow the
+  current view order.
+- **Changelog view** — a sixth main view listing the full change history
+  (the journal), newest first, each with old → new values.
+- **Rearrangeable main views** — the gear/settings sheet has a "Main
+  views" section; drag to reorder Tree, Projects, Plans, Manifest,
+  Project, Changelog. Number-key shortcuts and arrow-key cycling follow
+  the order.
+- **Arrow keys cycle views and buddies** — with focus outside inputs,
+  Up/Down move through view buttons then buddy rows as one sequence
+  (last view ↓ → first buddy; first buddy ↑ → last view). Down-arrow
+  inside the search box jumps to the first buddy in the filtered list.
+- **What Changed shows old → new** — every journal entry displays its
+  before → after values (buddy names resolved for moves, long notes
+  truncated).
+
+### Changed
+- **Reviewed changes stay reviewed** — expanding "What changed?" marks
+  entries seen; the sticky bar only reappears for new, unreviewed
+  changes. Full history remains in the Changelog view.
+- **Dismiss button** — the journal sticky bar's small ✕ is now a labeled
+  "Dismiss" button on the right edge.
+- **Right detail-panel resize +1px** — hit area 12→13px and gripper
+  7→8px wide.
+
+### Fixed
+- **Settings panel was completely broken** — it threw on open
+  (missing `SETTING_DEFS`/`getSetting`/`resetToFactory`/`updateFactory`,
+  modal never appended to the document, Escape listener duplicated per
+  open, `renderTree()` didn't exist). All repaired; Reset/Update Factory
+  Defaults now snapshot and restore hideBuddyWord, field order/hidden,
+  and view order.
+- **Projects expand/collapse never rendered** — `renderProjects()` (with
+  per-project › chevrons and persisted collapse state) only ran when the
+  user had reparented buddies; the boot path restored static HTML
+  without chevrons. The Projects view now always renders with working
+  expand/collapse.
+
 ## 2026-10-09
 
 ### Fixed

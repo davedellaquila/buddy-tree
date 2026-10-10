@@ -78,7 +78,7 @@ body{padding:0}
 #zoomfit:hover{color:#e6edf3;border-color:#8b949e}
 body.light #zoombar{background:#ffffff;border-color:#d0d7de}
 #sb-resize{position:absolute;top:0;right:-6px;width:12px;height:100%;cursor:ew-resize;z-index:20;display:flex;align-items:center;justify-content:center}
-#sb-resize::after{content:'';width:8px;height:56px;border-radius:3px;background:#6e7681}
+#sb-resize::after{content:'';width:10px;height:56px;border-radius:3px;background:#6e7681}
 #sb-resize:hover::after{background:#58a6ff}
 #sb-resize:hover{background:rgba(31,111,235,.1)}
 @media (max-width:900px){#sb-resize{display:none}}

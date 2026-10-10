@@ -28,6 +28,11 @@ Build: `build.py` generates `index.html` from `buddies.json` + `plans.json`.
 
 ## Sidebar
 
+- **Main views** — Tree, Projects, Plans, Manifest, Project, Changelog;
+  order is user-rearrangeable in settings (gear icon). Number keys 1–6
+  select views in that order; Up/Down arrow through views then buddies.
+- **Project view** — shows the current project's homepage in the center;
+  clicking a sidebar buddy selects it as the current project.
 - **Horizontally resizable** — drag the edge, 220–560 px, width remembered
   per device.
 - **Drag-to-reparent** — drag any sidebar buddy onto a tree node or
@@ -70,8 +75,12 @@ Build: `build.py` generates `index.html` from `buddies.json` + `plans.json`.
 ## Change journal
 
 - Tracks buddy renames, note edits, hierarchy moves, and app-name changes.
-- Shows `Revert (N)` and "What changed?"; persists across reloads via
-  localStorage; reverts all logged changes at once.
+- Shows `Revert (N)`, "What changed?", and a labeled Dismiss button;
+  persists across reloads via localStorage; reverts all logged changes
+  at once.
+- "What changed?" lists each entry with old → new values; expanding it
+  marks entries reviewed so the sticky bar only returns for new changes.
+- The **Changelog** main view keeps the full history permanently.
 
 ## GitHub integration
 
