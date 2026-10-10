@@ -1898,7 +1898,13 @@ function show(sel, push){
 document.addEventListener('keydown', e => {
   if (e.target && e.target.id === 'buddy-search' && (e.key === 'ArrowDown' || e.key === 'Tab')) {
     const first = document.querySelector('#buddy-nav [data-buddy]');
-    if (first) { e.preventDefault(); e.target.blur(); openBuddy(first.dataset.buddy); }
+    if (first) {
+      e.preventDefault(); e.target.blur();
+      const bid = first.dataset.buddy;
+      const wantPanel = S.autoOpenPanel || S.view !== 'project';
+      if (wantPanel) openBuddy(bid);
+      else selectBuddy(bid);
+    }
     return;
   }
   if (e.target && e.target.matches && e.target.matches('input, textarea, [contenteditable="true"]')) return;
@@ -1925,7 +1931,12 @@ document.addEventListener('keydown', e => {
   else if (e.key === 'ArrowUp') pos = (pos - 1 + total) % total;
   else if (e.key === 'ArrowLeft') pos = 0;
   else if (e.key === 'ArrowRight') pos = total - 1;
-  if (pos >= 0 && pos < rows.length) openBuddy(rows[pos].dataset.buddy);
+  if (pos >= 0 && pos < rows.length) {
+    const bid = rows[pos].dataset.buddy;
+    const wantPanel = S.autoOpenPanel || S.view !== 'project';
+    if (wantPanel) openBuddy(bid);
+    else selectBuddy(bid);
+  }
 });
 /* ---------- sidebar resize ---------- */
 (function initSbResize(){
