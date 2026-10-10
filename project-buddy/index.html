@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Buddy</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --text: #1a1a1a;
+  --muted: #666;
+  --card: #f5f5f5;
+  --border: #e0e0e0;
+  --accent: #0066cc;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1a1a;
+    --text: #e0e0e0;
+    --muted: #999;
+    --card: #2a2a2a;
+    --border: #3a3a3a;
+    --accent: #4da6ff;
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  padding: 40px 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.header { text-align: center; margin-bottom: 40px; }
+.icon { font-size: 64px; margin-bottom: 16px; }
+h1 { font-size: 32px; margin-bottom: 8px; }
+.tagline { color: var(--muted); font-size: 18px; }
+.mission {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+  font-size: 17px;
+}
+h2 { font-size: 22px; margin: 32px 0 16px; }
+.attn {
+  background: var(--card);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+}
+.attn-date { color: var(--muted); font-size: 14px; margin-top: 8px; }
+.children { display: flex; flex-wrap: wrap; gap: 12px; }
+.child {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 20px;
+  text-decoration: none;
+  color: var(--text);
+}
+.child:hover { border-color: var(--accent); }
+.footer {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+.empty { color: var(--muted); font-style: italic; }
+</style>
+</head>
+<body>
+<div class="header">
+<div class="icon">🧭</div>
+<h1>Project Buddy</h1>
+<div class="tagline">The macro view — status &amp; next actions for every buddy</div>
+</div>
+
+<div class="mission">Project Buddy is the one place for all of Dave&#x27;s ideas and projects — fast capture, an idea bank with statuses (New → Considering → Active → Parked → Done/Dropped), promote-to-project with next actions, and lightweight review nudges. This dashboard is its macro view: the status and next action items for every buddy.</div>
+
+<h2>Needs Attention</h2>
+<div class="attn"><div>Dashboard v2 ready for review — Tree, Projects, and Manifest tabs are live.</div><div class="attn-date">2026-10-09</div></div>
+<div class="attn"><div>Open: run the full new-buddy drill (brief, repo, thread) for Family Buddy?</div><div class="attn-date">2026-10-09</div></div>
+
+
+<h2>Sub-buddies</h2>
+<div class="children">
+<a class="child" href="../astro/">🚀 Astro</a>
+<a class="child" href="../birthday-buddy/">🎂 Birthday Buddy</a>
+<a class="child" href="../buddy-suite/">🧩 Buddy Suite</a>
+<a class="child" href="../car-buddy/">🚗 Car Buddy</a>
+<a class="child" href="../document-buddy/">📄 Document Buddy</a>
+<a class="child" href="../dream-buddy/">💭 Dream Buddy</a>
+<a class="child" href="../family-buddy/">👨‍👩‍👧‍👦 Family Buddy</a>
+<a class="child" href="../feedback-buddy/">📣 Feedback Buddy</a>
+<a class="child" href="../finance-buddy/">💰 Finance Buddy</a>
+<a class="child" href="../housing-buddy/">🏘️ Housing Buddy</a>
+<a class="child" href="../job-buddy/">🔎 Job Buddy</a>
+<a class="child" href="../news-buddy/">📰 News Buddy</a>
+<a class="child" href="../property-buddy/">🏠 Property Buddy</a>
+<a class="child" href="../reminder-buddy/">⏰ Reminder Buddy</a>
+<a class="child" href="../scaffold-buddy/">🏗️ Scaffold Buddy</a>
+<a class="child" href="../school-buddy/">🎓 School Buddy</a>
+<a class="child" href="../sharing-buddy/">🔗 Sharing Buddy</a>
+<a class="child" href="../tv-buddy/">📺 TV Buddy</a>
+<a class="child" href="../tech-buddy/">🤖 Tech Buddy</a>
+<a class="child" href="../wisdom-buddy/">🦉 Wisdom Buddy</a>
+<a class="child" href="../work-buddy/">💻 Work Buddy</a>
+<a class="child" href="../zen-buddy/">🧘 Zen Buddy</a>
+</div>
+
+<div class="footer">
+Generated 2026-10-10 · Part of the Buddy System
+</div>
+</body>
+</html>
