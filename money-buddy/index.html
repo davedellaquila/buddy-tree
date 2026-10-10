@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Money Buddy</title>
+<style>
+  :root{
+    --bg:#faf8f3; --panel:#ffffff; --ink:#1d1a14; --muted:#7a7264;
+    --line:#e8e2d4; --green:#1e7e46; --green-soft:#e5f2e9;
+    --amber:#b3541e; --amber-soft:#fdf0e2; --accent:#1e7e46;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#14120e; --panel:#1e1b15; --ink:#f0eadd; --muted:#a39a86;
+      --line:#2e2a21; --green:#4caf6d; --green-soft:#1c2b21;
+      --amber:#e09a4e; --amber-soft:#2b2117; --accent:#4caf6d;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,"Segoe UI",sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.55;
+    background-image:radial-gradient(var(--line) 1px, transparent 1px);
+    background-size:22px 22px;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:40px 24px 64px}
+  header{display:flex; align-items:center; gap:18px; flex-wrap:wrap}
+  .icon{
+    width:76px; height:76px; border-radius:22px; font-size:40px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--green-soft); border:1px solid var(--line);
+    box-shadow:0 6px 20px rgba(30,126,70,.18);
+  }
+  h1{margin:0; font-size:34px; letter-spacing:-.5px}
+  .tagline{margin:4px 0 0; color:var(--muted); font-size:15px}
+  .pill{
+    display:inline-block; font-size:12.5px; font-weight:700; letter-spacing:.4px;
+    color:var(--green); background:var(--green-soft);
+    border:1px solid var(--line); border-radius:999px; padding:4px 12px; margin-top:8px;
+  }
+  .mission{
+    margin:26px 0 0; font-size:16.5px; line-height:1.7;
+    background:var(--panel); border:1px solid var(--line);
+    border-radius:14px; padding:20px 22px;
+  }
+  .mission b{color:var(--green)}
+  h2{font-size:13px; letter-spacing:1.6px; text-transform:uppercase; color:var(--muted); margin:38px 0 14px}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px}
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:16px 18px;
+  }
+  .card .e{font-size:24px}
+  .card h3{margin:8px 0 4px; font-size:15px}
+  .card p{margin:0; font-size:13.5px; color:var(--muted)}
+  .attn{
+    background:var(--amber-soft); border:1px solid var(--line); border-left:4px solid var(--amber);
+    border-radius:12px; padding:14px 18px; margin-bottom:10px; font-size:14.5px;
+  }
+  .attn .k{font-weight:700; color:var(--amber); font-size:12px; letter-spacing:1px; text-transform:uppercase; display:block; margin-bottom:2px}
+  .ship{border-left:3px solid var(--green); padding:2px 0 2px 16px; margin:0 0 18px 4px}
+  .ship .v{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13px; color:var(--green); font-weight:700}
+  .ship p{margin:4px 0 0; font-size:14px}
+  .links{display:flex; gap:10px; flex-wrap:wrap}
+  .links a{
+    display:inline-flex; align-items:center; gap:8px; text-decoration:none; color:var(--ink);
+    background:var(--panel); border:1px solid var(--line); border-radius:999px;
+    padding:10px 18px; font-size:14px; font-weight:600;
+  }
+  .links a:hover{border-color:var(--accent); color:var(--accent)}
+  .pac{overflow:hidden; white-space:nowrap; margin:34px 0 0; opacity:.5; font-size:18px; letter-spacing:6px}
+  .pac span{display:inline-block; animation:chomp 6s linear infinite}
+  @keyframes chomp{from{transform:translateX(-60px)} to{transform:translateX(110%)}}
+  footer{margin-top:36px; color:var(--muted); font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="icon">💵</div>
+    <div>
+      <h1>Money Buddy</h1>
+      <p class="tagline">The expense tracker app — craftsmanship as the differentiator.</p>
+      <span class="pill">● LIVE · PRE-ALPHA</span>
+    </div>
+  </header>
+
+  <p class="mission">
+    A handcrafted, delightful personal finance app from someone who cares about UX.
+    Track income &amp; expenses, set budgets, watch bills, and get tax-time summaries —
+    iPhone-first, backed by Firebase. <b>The fun stuff isn't scope creep, it's the moat:</b>
+    what other finance app lets you look at Pac-Man underneath your transactions list?
+  </p>
+
+  <h2>What I track</h2>
+  <div class="grid">
+    <div class="card"><div class="e">🧾</div><h3>Transactions</h3><p>Search, filter, edit — the daily ledger.</p></div>
+    <div class="card"><div class="e">🎯</div><h3>Budgets</h3><p>Monthly budgets with Bot proposals.</p></div>
+    <div class="card"><div class="e">📅</div><h3>Bills</h3><p>Recurring bills and due dates, 30-day horizon.</p></div>
+    <div class="card"><div class="e">📊</div><h3>Reports</h3><p>Charts and breakdowns of income and spending.</p></div>
+    <div class="card"><div class="e">📥</div><h3>Import</h3><p>Bank and card statements, PDF parsing included.</p></div>
+    <div class="card"><div class="e">🧮</div><h3>Tax</h3><p>Categories and summaries for tax time.</p></div>
+  </div>
+
+  <h2>Needs Dave's attention</h2>
+  <div class="attn"><span class="k">Review</span>Account-setup onboarding proposal — email + password, verification, App Check. Awaiting your call.</div>
+  <div class="attn"><span class="k">Review</span>Progressive disclosure proposal — tiered first-run: core now, advanced when needed.</div>
+  <div class="attn"><span class="k">Deploy</span>Build <b>202610082143</b> is pushed to <b>origin/main</b> — pull and <b>./deploy</b> when ready.</div>
+  <div class="attn"><span class="k">Tester</span>Craig at Apple is queued for the invite — still need his email address.</div>
+
+  <h2>Fresh off the bench</h2>
+  <div class="ship">
+    <span class="v">202610082143</span>
+    <p>Lean first-run (hidden Budget/Experimental tabs), 3-question chart wizard, 30-day bills horizon, Developer screen, coach-mark tour.</p>
+  </div>
+  <div class="ship">
+    <span class="v">202610081957</span>
+    <p>Chart onboarding on empty data files — no charts until there's data, then one smart question.</p>
+  </div>
+
+  <h2>Open it</h2>
+  <div class="links">
+    <a href="https://expense-tracker-510000.web.app" target="_blank" rel="noopener">🚀&nbsp; Live app</a>
+    <a href="https://github.com/davedellaquila/money-buddy" target="_blank" rel="noopener">💻&nbsp; Repo</a>
+    <a href="https://docs.google.com/document/d/1InvLGGDk0Hu8_IFQS3kbSISGDvEuJ-gI2EHBmkHBfl8/edit" target="_blank" rel="noopener">📄&nbsp; Monetization plan</a>
+    <a href="https://docs.google.com/document/d/1E1DkJ6BfOcvjkf5ik3YrxqdoZHVnJn-b7Tr-4hOyxe8/edit" target="_blank" rel="noopener">📝&nbsp; Want List brief</a>
+  </div>
+
+  <div class="pac" aria-hidden="true"><span>ᗧ · · · · · · · · · ·</span></div>
+
+  <footer>Money Buddy · child of Finance Buddy · built with care by Dave &amp; Astro</footer>
+
+</div>
+</body>
+</html>
