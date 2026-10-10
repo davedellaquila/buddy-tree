@@ -1556,10 +1556,16 @@ function show(sel, push){
   } else {
     document.querySelectorAll('#main .view').forEach(v => v.classList.remove('active', 'panel', 'sheet'));
     if (sel === 'view:project') {
-      vb.classList.add('active');
-      vb.style.width = '';
       const pb = byId[projectId()] || {};
-      if (pb.homepage) renderHomepage(pb); else renderBuddy(projectId());
+      if (pb.homepage) {
+        vb.classList.add('active');
+        vb.style.width = '';
+        renderHomepage(pb);
+      } else {
+        hideHomepage();
+        const home = document.getElementById('buddy-home');
+        if (home) home.innerHTML = '';
+      }
     } else if (sel.startsWith('view:')) {
       const ev = document.getElementById('view-' + sel.slice(5));
       if (ev) ev.classList.add('active');

@@ -1422,7 +1422,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Saved to the buddy’s repo (docs/notes.md) — visible to everyone with repo access.">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Shared notes…"></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261009.1807</div>'
+    + '<div class="bp-build">Build 20261009.1809</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -1859,7 +1859,7 @@ function renderPlan(id){
     + '<p class="fineprint">Saved on this device. (For your eyes only)</p></div>'
     + '<div class="bp-sec"><h3>Shared notes<span class="info-tip" data-tip="Visible to everyone with access to this project.">\u24d8</span></h3><textarea class="notes" id="bp-shared" placeholder="Shared notes\u2026 (visible to everyone with access)">'+escHtml((S.planShared||{})[id]||'')+'</textarea>'
     + '<p class="fineprint">Shared — visible to everyone with access.</p></div>'
-    + '<div class="bp-build">Build 20261009.1807</div>'
+    + '<div class="bp-build">Build 20261009.1809</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
@@ -1898,10 +1898,16 @@ function show(sel, push){
   } else {
     document.querySelectorAll('#main .view').forEach(v => v.classList.remove('active', 'panel', 'sheet'));
     if (sel === 'view:project') {
-      vb.classList.add('active');
-      vb.style.width = '';
       const pb = byId[projectId()] || {};
-      if (pb.homepage) renderHomepage(pb); else renderBuddy(projectId());
+      if (pb.homepage) {
+        vb.classList.add('active');
+        vb.style.width = '';
+        renderHomepage(pb);
+      } else {
+        hideHomepage();
+        const home = document.getElementById('buddy-home');
+        if (home) home.innerHTML = '';
+      }
     } else if (sel.startsWith('view:')) {
       const ev = document.getElementById('view-' + sel.slice(5));
       if (ev) ev.classList.add('active');
