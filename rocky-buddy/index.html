@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rocky Buddy — Living dossier for Rocky</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐱</text></svg>">
+<style>
+  :root {
+    --paper: #F5F1E6;
+    --card: #FFFDF6;
+    --ink: #23281F;
+    --dim: #7A7565;
+    --line: #E2D9C2;
+    --green: #1E4D3B;
+    --green-deep: #143527;
+    --green-soft: #E3EDE6;
+    --gold: #B98A2F;
+    --gold-soft: #F7ECD4;
+    --red: #B3402E;
+    --red-soft: #F7E2DC;
+    --note: #FDF3D8;
+    --amber: #C77B29;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font-family: -apple-system, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+    line-height: 1.55; padding: 28px 20px 70px;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; }
+  .serif { font-family: Georgia, "Iowan Old Style", "Times New Roman", serif; }
+
+  header.hero {
+    background: linear-gradient(135deg, #FFFBEF 0%, #F6EEDA 55%, #EDE3CB 100%);
+    border: 1px solid var(--line); border-radius: 16px;
+    padding: 34px 32px 26px; margin-bottom: 0;
+    position: relative; overflow: hidden;
+  }
+  header.hero::after {
+    content: "🐾"; position: absolute; right: 22px; top: 14px;
+    font-size: 96px; opacity: .14; transform: rotate(-12deg); pointer-events: none;
+  }
+  .kicker { color: var(--green); font-size: 12px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; }
+  h1 { font-size: 40px; margin: 8px 0 6px; font-weight: 700; }
+  h1 .ico { margin-right: 10px; }
+  .tagline { font-size: 18px; color: var(--dim); font-style: italic; }
+  .mission { margin-top: 12px; max-width: 74ch; font-size: 15px; }
+  .mission b { color: var(--green); }
+  .meta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 999px;
+    padding: 6px 14px; font-size: 13px; color: var(--ink); text-decoration: none;
+  }
+  .pill.st { background: var(--green-soft); border-color: #B9CFC0; font-weight: 600; }
+  a.pill:hover { border-color: var(--green); }
+
+  h2 { font-size: 21px; margin: 34px 0 6px; }
+  h2 .sub { display: block; font-family: -apple-system, "Segoe UI", Inter, sans-serif;
+            font-size: 13px; color: var(--dim); font-weight: 400; margin-top: 2px; }
+
+  .mind { border: 1px solid var(--line); border-left: 5px solid var(--red);
+          background: var(--card); border-radius: 10px; padding: 14px 18px;
+          margin-bottom: 12px; display: flex; gap: 14px; align-items: flex-start; }
+  .mind.gold { border-left-color: var(--gold); }
+  .mind.green { border-left-color: var(--green); }
+  .mind .dot { font-size: 20px; line-height: 1.4; }
+  .mind .t { font-weight: 700; font-size: 15px; }
+  .mind .d { color: var(--dim); font-size: 13.5px; }
+  .mind a { color: var(--green); font-weight: 600; }
+
+  .facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-top: 14px; }
+  .fact { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .fact .e { font-size: 24px; margin-bottom: 6px; }
+  .fact .t { font-weight: 700; font-size: 14.5px; }
+  .fact .d { color: var(--dim); font-size: 13px; margin-top: 4px; }
+  .fact.dim { background: transparent; border-style: dashed; }
+  .fact.dim .t { color: var(--dim); }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; margin-top: 14px; }
+  .card ul { margin: 8px 0 0 20px; font-size: 14.5px; }
+  .card li { margin-bottom: 6px; }
+  .card li b { color: var(--green); }
+
+  .track { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; margin-top: 14px; }
+  .tile { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+  .tile .e { font-size: 26px; }
+  .tile .t { font-weight: 700; font-size: 15px; margin: 8px 0 4px; }
+  .tile .d { color: var(--dim); font-size: 13px; }
+  .tile .empty { display: inline-block; margin-top: 8px; font-size: 12.5px; color: var(--dim);
+                 background: var(--paper); border: 1px dashed var(--line); border-radius: 999px; padding: 3px 12px; }
+
+  .rel { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+  .rel a { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--ink);
+           background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 16px; font-size: 14px; }
+  .rel a:hover { border-color: var(--green); }
+  .rel a .e { font-size: 20px; }
+  .rel a small { display: block; color: var(--dim); font-size: 12px; }
+
+  footer { margin-top: 44px; color: var(--dim); font-size: 12.5px; text-align: center; }
+  footer a { color: var(--green); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">Family Buddy &middot; Living dossier</div>
+    <h1><span class="ico">🐱</span><span class="serif">Rocky Buddy</span></h1>
+    <div class="tagline">Key facts, vet notes, and reminders for Rocky.</div>
+    <div class="mission">
+      Rocky is one of Dave's three cats, along with <b>Marley (Mars)</b> and <b>Little Guy</b>.
+      This buddy is the one place for everything Dave wants to remember about Rocky —
+      what we know, what's still unknown, vet visits, and reminders. Unknowns are
+      <b>flagged, never guessed</b>.
+    </div>
+    <div class="meta">
+      <span class="pill st">📋 Brief review</span>
+      <a class="pill" href="https://docs.google.com/document/d/1Xm6mqiOZQxw7DqThK2NFjVh0deZEzK4r_EgpHxytjdM/edit">📄 Product brief</a>
+      <a class="pill" href="https://github.com/davedellaquila/rocky-buddy">💻 rocky-buddy repo</a>
+      <a class="pill" href="https://github.com/davedellaquila/marley-buddy">🐈 Marley</a>
+      <a class="pill" href="https://github.com/davedellaquila/little-guy-buddy">🐈‍⬛ Little Guy</a>
+    </div>
+  </header>
+
+  <h2 class="serif">On my mind <span class="sub">What needs Dave's attention</span></h2>
+  <div class="mind gold">
+    <div class="dot">📋</div>
+    <div><div class="t">Product brief ready for review</div>
+    <div class="d">Looks good, edits, or defer? <a href="https://docs.google.com/document/d/1Xm6mqiOZQxw7DqThK2NFjVh0deZEzK4r_EgpHxytjdM/edit">Open the brief</a> — it's short.</div></div>
+  </div>
+  <div class="mind">
+    <div class="dot">❓</div>
+    <div><div class="t">Four open questions about Rocky</div>
+    <div class="d">Age, breed, vet history, and which house he lives at are all unknown — flagged in the brief, not guessed. A sentence or two from Dave fills the whole dossier in.</div></div>
+  </div>
+
+  <h2 class="serif">Known facts <span class="sub">Seeded from the brief — everything else is flagged unknown</span></h2>
+  <div class="facts">
+    <div class="fact">
+      <div class="e">🐱</div>
+      <div class="t">One of three cats</div>
+      <div class="d">Rocky lives with Dave's family — alongside Marley (Mars) and Little Guy.</div>
+    </div>
+    <div class="fact">
+      <div class="e">🏠</div>
+      <div class="t">Household</div>
+      <div class="d">Which house Rocky lives at (Fiddletown or San Jose) — unknown.</div>
+    </div>
+    <div class="fact dim">
+      <div class="e">🎂</div>
+      <div class="t">Age</div>
+      <div class="d">Unknown — flagged, not guessed.</div>
+    </div>
+    <div class="fact dim">
+      <div class="e">🧬</div>
+      <div class="t">Breed</div>
+      <div class="d">Unknown — flagged, not guessed.</div>
+    </div>
+    <div class="fact dim">
+      <div class="e">🏥</div>
+      <div class="t">Vet history</div>
+      <div class="d">Unknown — the first thing to capture when there's a visit.</div>
+    </div>
+  </div>
+
+  <h2 class="serif">What this buddy tracks <span class="sub">The dossier grows as Dave shares</span></h2>
+  <div class="track">
+    <div class="tile">
+      <div class="e">📝</div>
+      <div class="t">Key facts</div>
+      <div class="d">The living dossier — age, breed, traits, nicknames, house.</div>
+      <span class="empty">1 fact so far</span>
+    </div>
+    <div class="tile">
+      <div class="e">🏥</div>
+      <div class="t">Vet visits &amp; medical notes</div>
+      <div class="d">Visits, vaccinations, treatments — a running health record.</div>
+      <span class="empty">No visits logged yet</span>
+    </div>
+    <div class="tile">
+      <div class="e">⏰</div>
+      <div class="t">Reminders</div>
+      <div class="d">Flea treatment, vet appointments, anything time-bound.</div>
+      <span class="empty">No reminders set</span>
+    </div>
+  </div>
+
+  <h2 class="serif">Open questions <span class="sub">From the brief — Dave's answers go straight into the dossier</span></h2>
+  <div class="card">
+    <ul>
+      <li><b>Age</b> — how old is Rocky?</li>
+      <li><b>Breed</b> — breed or mix?</li>
+      <li><b>Vet history</b> — who’s his vet, any past visits or conditions?</li>
+      <li><b>Which house</b> — Fiddletown, San Jose, or both?</li>
+    </ul>
+  </div>
+
+  <h2 class="serif">Related buddies <span class="sub">The rest of the family</span></h2>
+  <div class="rel">
+    <a href="https://github.com/davedellaquila/marley-buddy"><span class="e">🐈</span><span>Marley Buddy<small>Rocky's sibling — Marley (Mars)</small></span></a>
+    <a href="https://github.com/davedellaquila/little-guy-buddy"><span class="e">🐈‍⬛</span><span>Little Guy Buddy<small>Rocky's sibling</small></span></a>
+    <a href="https://docs.google.com/document/d/1nJzmN-A3TBk23RH-f8bKbc3BxuPbLDiWRk3AaGJb6uo/edit"><span class="e">🐾</span><span>Pet Buddy<small>Pet health-and-care tracker</small></span></a>
+  </div>
+
+  <footer>
+    Rocky Buddy · living dossier · seeded 2026-10-09 · <a href="https://github.com/davedellaquila/rocky-buddy">repo</a>
+  </footer>
+
+</div>
+</body>
+</html>
