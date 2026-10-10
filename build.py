@@ -645,7 +645,7 @@ function renderNav(){
     if (words.length && !matches(b)) { (kidsOf[id] || []).forEach(c => row(c.id, depth+1)); return; }
     const un = descUnseen(id);
     const kind = b.kind === 'root' ? 'root' : (b.parent === 'project-buddy' ? 'direct' : b.kind);
-    h += '<button class="brow'+((S.sel==='buddy:'+id || (S.sel==='view:project' && projectId()===id))?' sel':'')+(un?' has-unseen':'')+'" data-buddy="'+id+'"'
+    h += '<button class="brow'+((S.projectId===id || S.sel==='buddy:'+id)?' sel':'')+(un?' has-unseen':'')+'" data-buddy="'+id+'"'
       + ' draggable="'+(id==='project-buddy'?'false':'true')+'"'
       + ' style="padding-left:'+(8+depth*16)+'px" title="'+escHtml(b.tagline||'')+'">'
       + '<span class="bdot"></span><span class="bicon">'+escHtml(b.icon||'')+'</span><span class="bname">'+escHtml(dispName(b))+'</span>'
