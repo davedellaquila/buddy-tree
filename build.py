@@ -545,9 +545,9 @@ function selectProject(id){
 }
 function openBuddy(id){
   if (!byId[id]) return;
-  const wasProjectView = S.sel === 'view:project';
+  const inView = (S.sel || '').startsWith('view:');
   S.projectId = id; save();
-  if (wasProjectView) {
+  if (inView) {
     // Open panel WITHOUT changing S.sel — view and buddy selections stay independent
     const vb = document.getElementById('view-buddy');
     vb.classList.add('active');
