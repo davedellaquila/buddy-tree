@@ -259,10 +259,12 @@ body{padding:0}
 #zoombar .zv{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
 #zoomfit{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:14px;width:30px;height:26px;cursor:pointer}
 #zoomfit:hover{color:var(--text);border-color:var(--muted)}
-#sb-resize{position:absolute;top:0;right:-7px;z-index:20;display:flex;align-items:center;justify-content:center;width:10px;height:100vh;cursor:ew-resize}
+/* Sidebar gripper stays in the viewport frame (not scrolled with sidebar content) */
+#sb-resize{position:fixed;top:0;bottom:0;left:calc(var(--sbw, 308px) - 7px);z-index:45;display:flex;align-items:center;justify-content:center;width:10px;height:auto;cursor:ew-resize;touch-action:none}
 #sb-resize::after{content:'';width:7px;height:56px;border-radius:3px;background:var(--faint)}
 #sb-resize:hover::after{background:var(--accent-hi)}
 #sb-resize:hover{background:var(--ghost)}
+body.sb-closed #sb-resize{display:none}
 @media (max-width:639px){#sb-resize{display:none}}
 .bp-topnav{display:flex;gap:4px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
 .bp-topnav .sep{color:var(--faint);margin:0 2px}
@@ -360,12 +362,14 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
   background:none;border:none;border-radius:8px;color:var(--muted);font-size:24px;
   cursor:pointer;display:flex;align-items:center;justify-content:center}
 .bp-close-x:hover{color:var(--text)}
-#buddy-home{position:relative}
-#bp-resize{position:absolute;top:0;left:-7px;z-index:20;display:flex;align-items:center;justify-content:center;width:10px;height:100vh;cursor:ew-resize}
+#buddy-home{position:relative;flex:1 1 auto;min-height:0}
+/* Gripper is panel chrome — pinned to the panel frame, not the scrolling body */
+#bp-resize{position:absolute;top:0;bottom:0;left:-7px;z-index:30;display:flex;align-items:center;justify-content:center;width:10px;height:auto;cursor:ew-resize;touch-action:none}
 #bp-resize::after{content:'';width:10px;height:56px;border-radius:3px;background:var(--faint)}
 #bp-resize:hover::after{background:var(--accent-hi)}
 #bp-resize:hover{background:var(--ghost)}
-#view-buddy.active:not(.panel):not(.sheet) #bp-resize{display:none}
+#view-buddy.active:not(.panel):not(.sheet) #bp-resize,
+#view-buddy.sheet #bp-resize{display:none}
 .pupload{height:150px;min-width:120px;border-radius:10px;border:1px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:var(--bg);flex:0 0 auto}
 .pupload .pbar{width:80px;height:6px;background:var(--border2);border-radius:3px;overflow:hidden}
 .pupload .pbar > div{height:100%;background:var(--accent);border-radius:3px;transition:width .2s}
@@ -405,11 +409,9 @@ body.no-write .pdel,body.no-write [data-dump-del],body.no-write [data-dump-edit]
 #sb-close:hover{color:var(--muted)}
 #sb-close .xmark-x{stroke:var(--bg)}
 #sidebar .brand{padding-right:112px}
-/* Collapsed sidebar (iPad/desktop): hide panel, show hamburger to reopen */
+/* Collapsed sidebar (iPad/desktop): hide panel, show Muse-style reopen control */
 body.sb-closed #sidebar{display:none}
-body.sb-closed #menu-btn{display:flex;align-items:center;justify-content:center;position:fixed;top:12px;left:12px;z-index:90;
-  background:var(--panel);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:20px;
-  width:48px;height:48px;cursor:pointer;box-shadow:0 2px 12px var(--shadow)}
+body.sb-closed #menu-btn{display:flex}
 #plans-sec.collapsed #plan-nav{display:none}
 #plans-sec #plans-arrow{transform:rotate(90deg);display:inline-block}
 #plans-sec.collapsed #plans-arrow{transform:rotate(0deg)}
@@ -446,15 +448,32 @@ body.standalone .sa-bar{display:flex}
 .sa-bar .linkbtn{font-size:13px}
 
 /* ============ RESPONSIVE ============ */
-#menu-btn{display:none}
+/* Muse-style floating open control (shown when sidebar collapsed / mobile drawer) */
+#menu-btn{
+  display:none;align-items:center;justify-content:center;position:fixed;top:14px;left:14px;z-index:90;
+  width:44px;height:44px;padding:0;margin:0;border-radius:50%;cursor:pointer;
+  color:#c9d1d9;background:rgba(22,27,34,.72);border:1px solid rgba(255,255,255,.08);
+  -webkit-backdrop-filter:blur(16px) saturate(1.25);backdrop-filter:blur(16px) saturate(1.25);
+  box-shadow:0 6px 22px rgba(0,0,0,.42),0 1px 3px rgba(0,0,0,.28);
+  transition:background .15s ease,box-shadow .15s ease,transform .12s ease}
+#menu-btn:hover{background:rgba(33,38,45,.82);box-shadow:0 8px 26px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.3)}
+#menu-btn:active{transform:scale(.96)}
+#menu-btn .menu-btn-icon{display:block;pointer-events:none}
+#menu-btn .menu-btn-dot{
+  position:absolute;top:5px;right:5px;width:9px;height:9px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 0 2px rgba(13,17,23,.65);display:none;pointer-events:none}
+#menu-btn.has-attn .menu-btn-dot{display:block}
+html.light #menu-btn{
+  color:#57606a;background:rgba(255,255,255,.78);border-color:rgba(27,31,36,.1);
+  box-shadow:0 6px 22px rgba(0,0,0,.14),0 1px 3px rgba(0,0,0,.08)}
+html.light #menu-btn:hover{background:rgba(255,255,255,.9)}
+html.light #menu-btn .menu-btn-dot{box-shadow:0 0 0 2px rgba(255,255,255,.85)}
 /* ---- Small: <640px (iPhone) ---- */
 @media (max-width:639px){
   .app{display:block}
   /* Prevent iOS auto-zoom on input focus */
   input, textarea, select{font-size:16px !important}
-  #menu-btn{display:flex;align-items:center;justify-content:center;position:fixed;top:12px;left:12px;z-index:90;
-    background:var(--panel);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:20px;
-    width:48px;height:48px;cursor:pointer;box-shadow:0 2px 12px var(--shadow)}
+  #menu-btn{display:flex}
   /* Sidebar drawer with scrim */
   #sidebar{position:fixed;left:0;top:0;bottom:0;z-index:95;height:100vh;height:100dvh;
     transform:translateX(-105%);transition:transform .28s cubic-bezier(.32,.72,.35,1);width:min(85vw,340px);flex:none}
@@ -462,39 +481,53 @@ body.standalone .sa-bar{display:flex}
   #sb-resize{display:none}
   #sb-scrim{display:none;position:fixed;inset:0;z-index:94;background:rgba(0,0,0,.45);opacity:0;transition:opacity .25s}
   #sb-scrim.show{display:block;opacity:1}
-  #main{padding:72px 12px 60px}
-  /* Tree becomes clean vertical cards */
-  .tree,.tree ul{display:block;padding:0;margin:0}
-  .tree ul{padding-top:0}
-  .tree li{display:block;padding:0;text-align:left}
-  .tree li::before,.tree li::after,.tree ul ul::before,.root-stub{display:none}
-  .node{display:flex;align-items:center;gap:12px;width:auto;margin:0 0 8px;padding:14px 16px;
-    border-radius:14px;min-height:56px}
-  .node.root{width:auto}
-  .node .n-icon{font-size:24px;flex:none}
-  .node .n-name{font-size:16px;font-weight:600}
+  /* Side gutters for metric tiles + main content (safe-area aware) */
+  #main{
+    padding:72px 18px 60px;
+    padding-left:max(18px, env(safe-area-inset-left, 0px));
+    padding-right:max(18px, env(safe-area-inset-right, 0px));
+  }
+  /* Tree: keep hierarchy on mobile (stacked cards + indent), not a flat 3-col list */
+  #view-tree{margin:0;height:auto;overflow:visible}
+  #view-tree .chart{overflow:visible;padding:8px 0 24px}
+  #view-tree .tree,#view-tree .tree ul{display:block;padding:0;margin:0}
+  #view-tree .tree ul{padding:4px 0 0 14px;margin-left:6px;border-left:2px solid var(--border2)}
+  #view-tree .tree li{display:block;padding:0;text-align:left}
+  #view-tree .tree li::before,#view-tree .tree li::after,#view-tree .tree ul ul::before,#view-tree .root-stub{display:none}
+  #view-tree .node{
+    display:flex;flex-direction:column;align-items:flex-start;gap:6px;
+    width:auto;max-width:none;margin:0 0 8px;padding:12px 14px;border-radius:14px;text-align:left}
+  #view-tree .node.root{width:auto}
+  #view-tree .node .desc{font-size:14px;line-height:1.4;margin:0}
+  #view-tree .node .tag{margin-top:2px}
+  #view-tree .node .n-icon{font-size:24px;flex:none}
+  #view-tree .node .n-name{font-size:16px;font-weight:600}
   .standalones .grid{display:block}
   #treezoom{height:auto;max-height:none;overflow:visible;cursor:default}
   #zoombar{display:none}
-  /* Bottom sheet panel — taller, grabbable */
+  /* Bottom sheet: chrome (handle) fixed; body scrolls inside #buddy-home */
   #view-buddy.sheet{position:fixed;left:0;right:0;bottom:0;top:6%;z-index:96;
     background:var(--bg);border-top:1px solid var(--border);border-radius:20px 20px 0 0;
-    overflow-y:auto;overflow-x:hidden;padding:8px 18px 60px;box-shadow:0 -12px 40px rgba(0,0,0,.35);
-    -webkit-overflow-scrolling:touch}
+    display:flex;flex-direction:column;overflow:hidden;padding:8px 0 0;box-shadow:0 -12px 40px rgba(0,0,0,.35)}
   #view-buddy.sheet::before{content:'';display:block;width:48px;height:5px;border-radius:3px;
-    background:var(--border);margin:4px auto 14px;flex:none}
-  /* Tiles: 2-column grid */
+    background:var(--border);margin:4px auto 10px;flex:none}
+  #view-buddy.sheet #buddy-home{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;padding:0 20px 72px;
+    padding-left:max(20px, env(safe-area-inset-left, 0px));
+    padding-right:max(20px, env(safe-area-inset-right, 0px));
+    padding-bottom:max(72px, env(safe-area-inset-bottom, 0px))}
+  /* Tiles: 2-column grid inside #main gutters (compact sizes set after base .ptile rules) */
   #project-tiles,#changelog-tiles,#plans-tiles,#manifest-tiles,#project-status-tiles{display:grid !important;
-    grid-template-columns:1fr 1fr;gap:10px;max-width:none;margin:0 0 18px}
-  #project-tiles .ptile,#changelog-tiles .ptile,#plans-tiles .ptile,#manifest-tiles .ptile{flex:none !important;max-width:none !important}
-  .ptile{padding:14px 12px;border-radius:14px}
-  .ptile-num{font-size:28px}
+    grid-template-columns:1fr 1fr;gap:8px;max-width:none;width:100%;margin:0 0 12px;box-sizing:border-box}
+  #project-tiles .ptile,#changelog-tiles .ptile,#plans-tiles .ptile,#manifest-tiles .ptile,#project-status-tiles .ptile{
+    flex:none !important;max-width:none !important;min-width:0;width:auto}
   /* Plans: single column cards */
   .plan-grid{display:block;max-width:none}
   .plan-card{margin-bottom:12px}
   /* Projects outline: larger touch targets */
   .proj-row{padding:14px 12px;min-height:52px;border-radius:12px}
-  .proj-row .pname{font-size:15px}
+  .proj-row .pname{font-size:16px}
+  .proj-row .pdesc{font-size:15px}
   /* Changelog entries */
   .cl-entry{padding:14px 12px}
   /* View nav: vertical list with larger touch targets */
@@ -509,9 +542,6 @@ body.standalone .sa-bar{display:flex}
   /* Homepage iframe: fill safely */
   #view-project.active{min-height:calc(100dvh - 140px)}
   #homepage-frame{min-height:60vh}
-  /* Detail panel content */
-  .bp-wrap{padding:4px 2px}
-  .bp-name{font-size:22px}
   /* Ensure buttons are tappable */
   button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   .icon-btn,button.icon{width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center}
@@ -527,14 +557,24 @@ body.standalone .sa-bar{display:flex}
   #main.homepage-mode{padding:0}
   .node{width:172px}
   #view-buddy.panel{position:fixed;top:0;right:0;bottom:0;width:min(380px,calc(100vw - 250px));z-index:30;
-    background:var(--bg);border-left:1px solid var(--border);overflow-y:auto;overflow-x:hidden;
-    padding:20px 18px 48px;box-shadow:-8px 0 32px var(--shadow)}
+    background:var(--bg);border-left:1px solid var(--border);display:flex;flex-direction:column;
+    overflow:hidden;padding:0;box-shadow:-8px 0 32px var(--shadow)}
+  #view-buddy.panel #buddy-home{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;padding:20px 18px 48px}
+  /* Mild usability bumps in the narrow detail panel */
+  #view-buddy.panel .bp-topnav{gap:6px 8px}
+  #view-buddy.panel .bp-topnav .linkbtn{font-size:13.5px;padding:8px 6px;min-height:36px}
+  #view-buddy.panel .bp-crumb{font-size:13.5px}
+  #view-buddy.panel .seenbtn{font-size:13.5px;padding:9px 14px;min-height:40px}
+  #view-buddy.panel .attn-text{font-size:15px}
 }
 /* ---- Large: >1100px (desktop) ---- */
 @media (min-width:1101px){
   #view-buddy.panel{position:fixed;top:0;right:0;bottom:0;width:400px;z-index:60;
-    background:var(--bg);border-left:1px solid var(--border);overflow-y:auto;overflow-x:hidden;
-    padding:24px 20px 48px;box-shadow:-8px 0 32px var(--shadow)}
+    background:var(--bg);border-left:1px solid var(--border);display:flex;flex-direction:column;
+    overflow:hidden;padding:0;box-shadow:-8px 0 32px var(--shadow)}
+  #view-buddy.panel #buddy-home{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;padding:24px 20px 48px}
 }
 #view-buddy.panel.active,#view-buddy.sheet.active{display:block}
 #main .view{display:none}
@@ -545,8 +585,11 @@ body.standalone .sa-bar{display:flex}
 /* ---------- Project view: stat tiles + buddy homepage embed ---------- */
 #project-tiles{display:flex;gap:14px;margin:2px auto 20px;max-width:860px;flex-wrap:wrap}
 #project-status-tiles{display:flex;gap:14px;margin:2px auto 20px;max-width:860px;flex-wrap:wrap}
-#project-status-tiles .ptile{flex:1 1 180px;max-width:calc(25% - 11px)}
 .ptile{flex:1 1 170px;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 18px 12px;position:relative;overflow:hidden;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
+/* Desktop only — never leave 25% max-width on iPhone (crushes status tiles) */
+@media (min-width:640px){
+  #project-status-tiles .ptile{flex:1 1 180px;max-width:calc(25% - 11px)}
+}
 .ptile:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.12)}
 .ptile::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--tint)}
 /* ---- Business Plans cards ---- */
@@ -591,7 +634,11 @@ body.standalone .sa-bar{display:flex}
 .bp-crumb .reposlug{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:600}
 .bp-crumb b{color:var(--text);font-weight:600}
 .bp-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.bp-sticky-head{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 0 8px;margin:-12px 0 0;border-bottom:1px solid var(--border)}
+/* Sticky chrome = breadcrumbs + entity icon ONLY (title/badge/body scroll under) */
+.bp-sticky-head{position:sticky;top:0;z-index:8;background:var(--bg);padding:8px 0 10px;margin:0 0 6px;
+  border-bottom:1px solid var(--border);box-shadow:0 8px 16px -12px rgba(0,0,0,.45)}
+.bp-sticky-head .bp-crumb{margin:0 0 8px}
+.bp-sticky-head .bp-icon{display:inline-block;font-size:38px;line-height:1}
 .bp-name{font-size:32px;font-weight:700;margin:0;outline:none;border-bottom:2px dashed transparent;
   padding-bottom:2px;min-width:120px}
 .bp-name:hover{border-bottom-color:var(--border)}
@@ -641,6 +688,108 @@ body.standalone .sa-bar{display:flex}
 .bp-mini-zoom button:hover{border-color:var(--accent)}
 .linkbtn{background:none;border:0;color:var(--accent);font:inherit;font-size:12.5px;cursor:pointer;padding:0}
 .linkbtn:hover{text-decoration:underline}
+/* ---- iPhone: compact metric tiles + readable list body (after base rules) ---- */
+@media (max-width:639px){
+  /* Metric/status cards: compact so the tile block ~top 20% of viewport */
+  #project-tiles,#changelog-tiles,#plans-tiles,#manifest-tiles,#project-status-tiles{gap:6px;margin:0 0 10px}
+  .ptile{padding:7px 10px 6px;border-radius:10px}
+  .ptile::before{width:3px}
+  .ptile-label{font-size:9px;letter-spacing:.1em;line-height:1.2}
+  .ptile-num{font-size:18px;line-height:1.1;font-weight:800}
+  .ptile-sub{font-size:10px;line-height:1.2;margin-top:1px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ptile-label,.ptile-sub{overflow-wrap:normal;word-break:normal;hyphens:none}
+  /* Business Plans / list page body type — above iOS comfort minimum */
+  .projects-view h2,.standalones h2{
+    font-size:22px;position:sticky;z-index:7;background:var(--bg);
+    /* Sit below the floating Muse menu button */
+    top:max(58px, calc(env(safe-area-inset-top, 0px) + 52px));
+    padding:10px 8px 8px;margin:0 0 6px;
+    box-shadow:0 8px 16px -12px rgba(0,0,0,.5)}
+  .projects-view p.sub,.standalones p.sub{font-size:16px;line-height:1.45;margin-bottom:16px}
+  .plan-card{padding:14px 16px;margin-bottom:12px;border-radius:12px}
+  .plan-card-head{margin-bottom:8px;gap:8px}
+  .plan-card-icon{font-size:22px}
+  .plan-card-name{font-size:18px;line-height:1.25}
+  .plan-card-desc{font-size:16.5px;line-height:1.45;margin-bottom:10px}
+  .plan-card-link{font-size:15px;margin-top:6px}
+  .proj-row .pname{font-size:16px}
+  .proj-row .pdesc{font-size:15.5px;line-height:1.4}
+  /* Project / Manifest / SME rows: card stack — title+status, then full-width description */
+  .proj-row{
+    display:flex !important;flex-direction:column !important;flex-wrap:nowrap !important;
+    align-items:stretch !important;gap:6px;
+    background:var(--panel);border:1px solid var(--border);border-bottom:1px solid var(--border);
+    border-radius:12px;margin:0 0 8px;padding:12px 14px}
+  .proj-row .dot{display:none}
+  .proj-row-head{display:flex;align-items:center;gap:8px;width:100%;min-width:0}
+  .proj-row-head .parrow{flex:0 0 auto;margin-top:0}
+  .proj-row-head .pname{flex:1 1 auto;min-width:0;white-space:normal;line-height:1.3}
+  .proj-row-head .status{flex:0 0 auto;margin-left:auto}
+  .proj-row-head .proj-info{flex:0 0 auto;padding:4px !important;opacity:.75}
+  .proj-row > .pdesc,.proj-row .pdesc{
+    display:block;order:unset;flex:none !important;width:100% !important;max-width:none !important;
+    font-size:15.5px;line-height:1.45}
+  /* Static rows without .proj-row-head (Manifest): CSS grid stack */
+  .proj-row:not(:has(.proj-row-head)){
+    display:grid !important;grid-template-columns:1fr auto;grid-template-areas:"title status" "desc desc";
+    gap:6px 10px;align-items:start}
+  .proj-row:not(:has(.proj-row-head)) .pname{grid-area:title;white-space:normal;line-height:1.3;min-width:0}
+  .proj-row:not(:has(.proj-row-head)) .status{grid-area:status;justify-self:end}
+  .proj-row:not(:has(.proj-row-head)) .pdesc{grid-area:desc}
+  .proj-row:not(:has(.proj-row-head)) .parrow{display:none}
+  .proj-row.d0,.proj-row.d1,.proj-row.d2,.proj-row.d3{padding-left:14px}
+  /* Re-assert 2-col tiles AFTER desktop #project-status-tiles rules (cascade safety) */
+  #project-tiles,#changelog-tiles,#plans-tiles,#manifest-tiles,#project-status-tiles{
+    display:grid !important;grid-template-columns:1fr 1fr !important;gap:6px !important;
+    max-width:none !important;width:100% !important;margin:0 0 10px !important;box-sizing:border-box}
+  #project-tiles .ptile,#changelog-tiles .ptile,#plans-tiles .ptile,#manifest-tiles .ptile,#project-status-tiles .ptile{
+    flex:none !important;max-width:none !important;min-width:0 !important;width:auto !important}
+}
+/* ---- Buddy detail: iPhone readability & thumb targets (after base .bp-* rules) ---- */
+@media (max-width:639px){
+  .bp-wrap{padding:0;max-width:none}
+  .bp-sticky-head{padding:6px 0 10px;margin:0 0 8px}
+  .bp-sticky-head .bp-crumb{margin-bottom:6px}
+  .bp-sticky-head .bp-icon{font-size:34px}
+  .bp-topnav{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;margin:0 0 14px}
+  .bp-topnav .sep{display:none}
+  .bp-topnav .linkbtn{
+    flex:1 1 calc(50% - 8px);min-width:calc(50% - 8px);max-width:100%;
+    font-size:15px;font-weight:600;line-height:1.2;color:var(--accent);
+    padding:12px 10px;min-height:44px;border-radius:12px;text-align:center;
+    background:var(--panel);border:1px solid var(--border);text-decoration:none;
+    display:inline-flex;align-items:center;justify-content:center}
+  .bp-topnav .linkbtn:hover{text-decoration:none;background:var(--hover)}
+  .bp-crumb{font-size:14px;line-height:1.45;margin-bottom:14px;color:var(--muted)}
+  .bp-crumb a{font-size:inherit}
+  .bp-top{gap:12px;margin-top:2px}
+  .bp-name{font-size:26px;line-height:1.15}
+  .bp-tagline{font-size:16px;line-height:1.45;margin-top:10px}
+  .bp-sec{margin-top:26px}
+  .bp-sec>h3{font-size:14px;letter-spacing:1px;margin:0 0 14px;padding:6px 0;min-height:40px}
+  .bp-mission{font-size:16px;line-height:1.65;padding:16px}
+  .attn{flex-wrap:wrap;padding:14px 16px;gap:12px;margin-bottom:12px}
+  .attn-text{font-size:16px;line-height:1.5}
+  .attn-date{font-size:13px;margin-top:8px}
+  .seenbtn{
+    font-size:15px;font-weight:600;padding:12px 16px;min-height:44px;
+    border-radius:12px;width:100%;margin-top:2px}
+  .attn-all .seenbtn{width:100%}
+  .notes{font-size:16px;line-height:1.6;padding:14px 16px;min-height:140px}
+  .art-row{padding:14px 16px;min-height:56px;gap:12px;margin-bottom:12px}
+  .art-label{font-size:16px}
+  .art-sub{font-size:13.5px}
+  .fineprint{font-size:13.5px;line-height:1.5}
+  .bp-build{font-size:13px;margin:28px 0 10px;color:var(--muted)}
+  .bp-close-x{width:44px;height:44px;top:8px;right:8px;font-size:18px}
+  .bp-wrap .linkbtn{font-size:15px;padding:8px 6px;min-height:40px}
+  #bp-homepage-url{font-size:16px !important;padding:12px 14px !important;min-height:44px}
+  .tokenwarn,.bp-empty{font-size:15px;line-height:1.55;padding:14px 16px}
+  body.standalone #main{padding:24px 18px 72px;
+    padding-left:max(18px, env(safe-area-inset-left, 0px));
+    padding-right:max(18px, env(safe-area-inset-right, 0px))}
+}
 .grip {
   position: absolute; top: 4px; left: 4px; z-index: 2;
   cursor: grab; opacity: .45; color: var(--muted); font-size: 16px; line-height: 1;
@@ -655,7 +804,12 @@ body.standalone .sa-bar{display:flex}
 </head>
 <body>
 <div class="app">
-<button id="menu-btn" aria-label="Open menu">☰</button>
+<button id="menu-btn" type="button" aria-label="Open menu">
+  <svg class="menu-btn-icon" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
+    <path d="M4.75 6.85h8.5M4.75 11.15h8.5" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round"/>
+  </svg>
+  <span class="menu-btn-dot" aria-hidden="true"></span>
+</button>
 <div id="sb-scrim"></div>
 <aside id="sidebar"><div id="sb-tools"><button id="sb-gear" title="Settings (⌘,)" aria-label="Settings"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button id="sb-close" title="Close sidebar" aria-label="Close sidebar"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><path class="xmark-x" d="M8.8 8.8l6.4 6.4m0-6.4l-6.4 6.4" fill="none" stroke-width="2.25" stroke-linecap="round"/></svg></button></div>
 <div id="sb-resize" title="Drag left or right to resize the sidebar. Double-click to reset to default width."></div>
@@ -1187,6 +1341,11 @@ function renderNav(){
   const t = totalUnseen();
   const pill = document.getElementById('attn-pill');
   pill.textContent = t; pill.classList.toggle('zero', t === 0);
+  const menuBtn = document.getElementById('menu-btn');
+  if (menuBtn) {
+    menuBtn.classList.toggle('has-attn', t > 0);
+    menuBtn.setAttribute('aria-label', t > 0 ? 'Open menu (' + t + ' to review)' : 'Open menu');
+  }
   document.getElementById('plan-nav').innerHTML = PLANS.map(p =>
     '<button class="brow'+(S.sel==='plan:'+p.id?' sel':'')+'" data-plan="'+p.id+'" style="padding-left:8px">'
     + '<span class="bicon">'+escHtml(p.icon||'')+'</span><span class="bname">'+escHtml(p.name)+'</span></button>').join('');
@@ -1560,7 +1719,7 @@ function initPanelResize(){
   });
 }
 function tileHtml(label, num, tint, sub, fkey, sel, tip){
-  return '<div class="ptile' + (sel ? ' sel' : '') + '"' + (fkey ? ' data-tile="' + fkey + '"' : '') + (tip ? ' title="' + escHtml(tip) + '"' : '') + ' style="--tint:' + tint + ';flex:1">'
+  return '<div class="ptile' + (sel ? ' sel' : '') + '"' + (fkey ? ' data-tile="' + fkey + '"' : '') + (tip ? ' title="' + escHtml(tip) + '"' : '') + ' style="--tint:' + tint + '">'
     + '<div class="ptile-label">' + escHtml(label) + '</div>'
     + '<div class="ptile-num">' + escHtml(String(num)) + '</div>'
     + '<div class="ptile-sub">' + escHtml(sub) + '</div></div>';
@@ -1731,16 +1890,18 @@ function renderBuddy(id){
     + '<a href="https://github.com/settings/tokens" target="_blank" rel="noopener" class="linkbtn" style="text-decoration:none" title="Open GitHub token settings in a new tab">Get a token</a></div></div>'
     + '<div class="sa-bar"><span>🔖 Standalone view</span><button class="linkbtn" id="sa-full">Open full dashboard →</button></div>'
     + '<button class="bp-close-x" id="bp-close-x" title="Close">✕</button>'
-    + '<div class="bp-sticky-head">'
     + '<div class="bp-topnav"><button class="linkbtn" data-navbtn="back">← Back</button>'
     + '<button class="linkbtn" data-navbtn="prev">‹ Prev</button><button class="linkbtn" data-navbtn="next">Next ›</button>'
     + '<span class="sep">·</span><button class="linkbtn" data-view="tree">All buddies</button>'
     + '<span class="sep">·</span><button class="linkbtn" id="bp-close">✕ Close</button><span class="sep">·</span><button class="linkbtn" id="bp-desktop">💾 Save to desktop</button></div>'
+    + '<div class="bp-sticky-head">'
     + '<div class="bp-crumb">'+crumb(id)+'</div>'
-    + '<div class="bp-top"><span class="bp-icon" id="bp-icon" title="Click to change avatar" style="cursor:pointer">'+escHtml(b.icon||'')+'</span><h2 class="bp-name" id="bp-name" contenteditable="true" spellcheck="false" data-buddy="'+id+'">'+escHtml(dispName(b))+'</h2>'
+    + '<span class="bp-icon" id="bp-icon" title="Click to change avatar" style="cursor:pointer">'+escHtml(b.icon||'')+'</span>'
+    + '</div>'
+    + '<div class="bp-top"><h2 class="bp-name" id="bp-name" contenteditable="true" spellcheck="false" data-buddy="'+id+'">'+escHtml(dispName(b))+'</h2>'
     + '<span class="status '+b.statusClass+'">'+escHtml(b.status)+'</span></div>'
     + '<p class="bp-tagline">'+escHtml(b.tagline||'')+'</p>'
-    + '</div>'
+    + '<div class="bp-build">Build 20261010.1445</div>'
     + '<div class="bp-sec" data-field="ingest"><h3>Ingest<span class="info-tip" data-tip="Brain-dump anything about this buddy — raw and unfiltered. Each dump lands in the buddy’s repo (docs/ingest.md) as a timestamped entry.">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-ingest" placeholder="Dump what’s in your head about '+escHtml(dispName(b))+'…"></textarea>'
     + '<div style="margin-top:8px"><span class="fineprint" id="ingest-status"></span></div>'
@@ -1764,7 +1925,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Anybody with repo access can see this note. Saved to the buddy’s repo (docs/notes.md).">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Anybody with repo access can see this note."></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261010.0721</div>'
+    + '<div class="bp-build">Build 20261010.1445</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -2056,12 +2217,14 @@ function renderProjects(){
     const hasKids = kids.length > 0;
     const collapsed = (projFilter || statusFilter) ? false : !!S.projCollapsed[id];
     s += '<div class="proj-row d' + Math.min(depth, 3) + '" data-buddy="' + b.id + '">'
+      + '<div class="proj-row-head">'
       + (hasKids ? '<span class="parrow ' + (collapsed ? '' : 'expanded') + '" data-proj-toggle="' + b.id + '">›</span>' : '')
-      + (depth ? '<span class="dot">└</span>' : '')
       + '<span class="pname">' + iconName(b) + '</span>'
-      + '<span class="pdesc">' + escHtml(b.tagline || '') + '</span>'
       + '<span class="status ' + b.statusClass + '">' + escHtml(b.status) + '</span>'
-      + '<button class="proj-info" data-proj-info="' + b.id + '" title="Open ' + escHtml(dispName(b)) + ' details (right panel)" style="background:none;border:none;cursor:pointer;font-size:16px;padding:4px 8px;opacity:0.6" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">ⓘ</button></div>';
+      + '<button class="proj-info" data-proj-info="' + b.id + '" title="Open ' + escHtml(dispName(b)) + ' details (right panel)" aria-label="Open details" style="background:none;border:none;cursor:pointer;font-size:16px;padding:4px 8px;opacity:0.75">ⓘ</button>'
+      + '</div>'
+      + '<span class="pdesc">' + escHtml(b.tagline || '') + '</span>'
+      + '</div>';
     if (!collapsed) kids.forEach(c => walk(c.id, depth + 1));
   })('project-buddy', 0);
   s += '</div></section>';
@@ -2295,9 +2458,12 @@ function renderPlan(id){
     + '<span class="art-go">→</span></a>').join('');
   document.getElementById('buddy-home').innerHTML =
     '<div class="bp-wrap">'
+    + '<div class="bp-sticky-head">'
     + '<div class="bp-crumb"><button class="linkbtn" data-view="plans">Business Plans</button> <span style="color:var(--faint)">/</span> <b>'+escHtml(p.name)+'</b></div>'
-    + '<div class="bp-top"><span class="bp-icon">'+escHtml(p.icon||'')+'</span>'
-    + '<h2 style="font-size:32px;font-weight:700;margin:0">'+escHtml(p.name)+'</h2>'
+    + '<span class="bp-icon">'+escHtml(p.icon||'')+'</span>'
+    + '</div>'
+    + '<div class="bp-top">'
+    + '<h2 class="bp-name" style="font-size:32px;font-weight:700;margin:0">'+escHtml(p.name)+'</h2>'
     + '<span class="status '+p.statusClass+'">'+escHtml(p.status)+'</span></div>'
     + '<div class="bp-sec"><h3>What it is</h3><p class="bp-mission">'+escHtml(p.desc)+'</p></div>'
     + '<div class="bp-sec"><h3>Documents</h3>'+docs+'</div>'
@@ -2306,7 +2472,7 @@ function renderPlan(id){
     + '<p class="fineprint">Saved on this device. (For your eyes only)</p></div>'
     + '<div class="bp-sec"><h3>Shared notes<span class="info-tip" data-tip="Visible to everyone with access to this project.">\u24d8</span></h3><textarea class="notes" id="bp-shared" placeholder="Shared notes\u2026 (visible to everyone with access)">'+escHtml((S.planShared||{})[id]||'')+'</textarea>'
     + '<p class="fineprint">Shared — visible to everyone with access.</p></div>'
-    + '<div class="bp-build">Build 20261010.0721</div>'
+    + '<div class="bp-build">Build 20261010.1445</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
@@ -2475,8 +2641,19 @@ document.addEventListener('keydown', e => {
   const h = document.getElementById('sb-resize');
   let sx = null, sw = 0;
   h.addEventListener('pointerdown', e => { sx = e.clientX; sw = sb.getBoundingClientRect().width; h.setPointerCapture(e.pointerId); e.preventDefault(); });
-  h.addEventListener('pointermove', e => { if (sx === null) return; const w = Math.min(560, Math.max(220, sw + e.clientX - sx)); sb.style.width = w + 'px'; sb.style.flex = '0 0 ' + w + 'px'; });
-  const done = () => { if (sx === null) return; sx = null; S.sbWidth = Math.round(sb.getBoundingClientRect().width); save(); };
+  h.addEventListener('pointermove', e => {
+    if (sx === null) return;
+    const w = Math.min(560, Math.max(220, sw + e.clientX - sx));
+    sb.style.width = w + 'px'; sb.style.flex = '0 0 ' + w + 'px';
+    document.documentElement.style.setProperty('--sbw', w + 'px');
+  });
+  const done = () => {
+    if (sx === null) return;
+    sx = null;
+    S.sbWidth = Math.round(sb.getBoundingClientRect().width);
+    document.documentElement.style.setProperty('--sbw', S.sbWidth + 'px');
+    save();
+  };
   h.addEventListener('pointerup', done);
   h.addEventListener('pointercancel', done);
 })();
@@ -3188,7 +3365,16 @@ document.addEventListener('click', e => {
     return;
   }
   const vb = e.target.closest('[data-view]');
-  if (vb) { show('view:' + vb.dataset.view); if (window.innerWidth < 640) { const sbo=document.getElementById('sidebar'); if(sbo) sbo.classList.remove('open'); const sco=document.getElementById('sb-scrim'); if(sco) sco.classList.remove('show'); } return; }
+  if (vb) {
+    // On iPhone the buddy sheet covers the main view — dismiss it when switching views (e.g. Tree).
+    if (window.innerWidth < 640 && typeof closeDetail === 'function') closeDetail();
+    show('view:' + vb.dataset.view);
+    if (window.innerWidth < 640) {
+      const sbo=document.getElementById('sidebar'); if(sbo) sbo.classList.remove('open');
+      const sco=document.getElementById('sb-scrim'); if(sco) sco.classList.remove('show');
+    }
+    return;
+  }
   const pb = e.target.closest('[data-plan]');
   if (pb) { e.preventDefault(); show('plan:' + pb.dataset.plan); return; }
   const sb2 = document.getElementById('sidebar');
