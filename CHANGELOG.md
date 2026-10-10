@@ -9,7 +9,8 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
 - **Clickable summary tiles** (Dave's idea) — clicking a tile filters the
   list below to matching items; clicking the active tile again clears the
   filter. Works on Projects (TO REVIEW / NEW / CLEARED), Changelog
-  (change types), and Business Plans (statuses).
+  (change types), Business Plans (statuses), and Manifest (AUTOMATIC /
+  PLANNED).
 - **Business Plans tiles** (Dave's idea) — the Plans page now opens with
   per-status tiles (LIVE, ACTIVE, BRIEF REVIEW, EXPLORING, PLANNED, DRAFT).
 
