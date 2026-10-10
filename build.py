@@ -543,17 +543,13 @@ function openBuddy(id){
   const wasProjectView = S.sel === 'view:project';
   S.projectId = id; save();
   if (wasProjectView) {
-    const pb = byId[id] || {};
-    if (pb.homepage) {
-      // Homepage exists: update main area and open panel
-      show('view:project');
-      show('buddy:' + id);
-    } else {
-      // No homepage: open panel, leave main area untouched
-      show('buddy:' + id);
-      // Restore Project view selection (show() changed S.sel)
-      S.sel = 'view:project'; save();
-    }
+    // Open panel WITHOUT changing S.sel — view and buddy selections stay independent
+    const vb = document.getElementById('view-buddy');
+    vb.classList.add('active');
+    vb.classList.toggle('panel', window.innerWidth >= 640);
+    vb.classList.toggle('sheet', window.innerWidth < 640);
+    renderBuddy(id);
+    renderNav();
   } else {
     show('buddy:' + id);
   }
@@ -2332,6 +2328,7 @@ initPlansToggle();
 <div id="journal-bar"></div>
 """ + vt + vp + vpl + vm + """
 <section id="view-buddy" class="view"><div id="bp-resize" title="Drag to resize panel"></div><div id="buddy-home"></div></section>
+<section id="view-project" class="view"></section>
 <section id="view-changelog" class="view"></section>
 </main>
 </div>
