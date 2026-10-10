@@ -894,7 +894,7 @@ function openFieldSettings(){
 }
 function applyPanelWidth(){
   const vb = document.getElementById('view-buddy');
-  if (vb && S.panelWidth) vb.style.width = S.panelWidth + 'px';
+  if (vb && S.panelWidth) vb.style.width = Math.min(S.panelWidth, 560) + 'px';
 }
 function applySbWidth(){
   const sb = document.getElementById('sidebar');
@@ -913,7 +913,7 @@ function initPanelResize(){
   });
   h.addEventListener('pointermove', e => {
     if (sx === null) return;
-    const w = Math.min(window.innerWidth * 0.9, Math.max(320, sw + (sx - e.clientX)));
+    const w = Math.min(560, Math.max(320, sw + (sx - e.clientX)));
     vb.style.width = w + 'px';
   });
   h.addEventListener('pointerup', e => {
