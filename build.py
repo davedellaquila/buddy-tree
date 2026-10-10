@@ -461,16 +461,19 @@ function setTheme(t){
   if (['light', 'dark', 'system'].indexOf(t) < 0) return;
   S.theme = t; save(); applyTheme();
 }
-function initTheme(){
+function wireThemePicks(root){
+  (root || document).querySelectorAll('[data-theme-pick]').forEach(b => {
+    if (!b.dataset.tinit) { b.dataset.tinit = '1'; b.addEventListener('click', () => setTheme(b.dataset.themePick)); }
+  });
   applyTheme();
+}
+function initTheme(){
+  wireThemePicks(document);
   if (window.matchMedia) {
     window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
       if ((S.theme || 'system') === 'system') applyTheme();
     });
   }
-  document.querySelectorAll('[data-theme-pick]').forEach(b => {
-    if (!b.dataset.tinit) { b.dataset.tinit = '1'; b.addEventListener('click', () => setTheme(b.dataset.themePick)); }
-  });
 }
 function dispName(b){ let n = S.names[b.id] || b.name; if (S.hideBuddyWord) n = n.replace(/\s+Buddy$/i, ''); return n; }
 function unseenItems(b){ return (b.attention || []).filter(a => !S.seen[a.id]); }
@@ -728,7 +731,9 @@ function renderSettingChecks(){
     const val = getSetting(s.id);
     if (s.type === 'bool') return '<label style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13px;cursor:pointer"><input type="checkbox" data-setting="' + s.id + '"' + (val ? ' checked' : '') + '> ' + s.label + '</label>';
     return '';
-  }).join('');
+  }).join('') + '<div style="margin-top:12px"><div style="font-size:13px;margin-bottom:6px">Theme</div>'
+    + '<div class="theme-pick" role="group" aria-label="Theme" style="margin:0"><button data-theme-pick="light" title="Light theme">Light</button><button data-theme-pick="dark" title="Dark theme">Dark</button><button data-theme-pick="system" title="Follow system theme">System</button></div></div>';
+  wireThemePicks(sdiv);
   sdiv.querySelectorAll('[data-setting]').forEach(cb => {
     cb.addEventListener('change', () => {
       S[cb.dataset.setting] = cb.checked; save();
@@ -881,6 +886,7 @@ function openFieldSettings(){
     });
   }
   m.classList.add('show');
+  if (m._applyGeom) m._applyGeom();
 }
 function applyPanelWidth(){
   const vb = document.getElementById('view-buddy');
@@ -2177,7 +2183,6 @@ initPlansToggle();
 <aside id="sidebar"><button id="sb-gear" title="Settings"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
 <div id="sb-resize" title="Drag to resize sidebar"></div>
   <div class="brand"><div class="eyebrow">Project Buddy &middot; macro view</div><h1 id="brand-name" title="Click to rename">Buddies</h1><div class="bcount">NBUD buddies &middot; one family</div></div>
-  <div class="theme-pick" role="group" aria-label="Theme"><button data-theme-pick="light" title="Light theme">Light</button><button data-theme-pick="dark" title="Dark theme">Dark</button><button data-theme-pick="system" title="Follow system theme">System</button></div>
   <div class="nav-sec"><h3>Views</h3><div id="view-nav"></div></div>
   <div class="nav-sec">
   <div style="padding:0 10px 8px"><input type="search" id="buddy-search" placeholder="Search buddies\u2026" aria-label="Search buddies"
