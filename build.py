@@ -2370,13 +2370,13 @@ document.addEventListener('click', e => {
   }
   const projRow = e.target.closest('#view-projects .proj-row[data-buddy]');
   if (projRow) {
-    // Clicking the chevron toggles expand/collapse; clicking elsewhere opens the buddy
-    const chev = e.target.closest('[data-proj-toggle]');
-    if (chev) {
-      const bid = chev.dataset.projToggle;
+    // Whole row toggles expand/collapse (if it has children) AND opens the buddy panel
+    const pt = projRow.querySelector('[data-proj-toggle]');
+    if (pt) {
+      const bid = pt.dataset.projToggle;
       if (!S.projCollapsed || typeof S.projCollapsed !== 'object') S.projCollapsed = {};
       S.projCollapsed[bid] = !S.projCollapsed[bid];
-      save(); renderProjects(); return;
+      save(); renderProjects();
     }
     openBuddy(projRow.dataset.buddy); return;
   }
