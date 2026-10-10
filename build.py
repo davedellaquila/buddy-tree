@@ -729,12 +729,13 @@ function updateFactory(){
 function renderSettingChecks(){
   const sdiv = document.getElementById('fset-settings');
   if (!sdiv) return;
-  sdiv.innerHTML = SETTING_DEFS.map(s => {
+  sdiv.innerHTML = '<div style="margin-bottom:12px"><div style="font-size:13px;margin-bottom:6px">Theme</div>'
+    + '<div class="theme-pick" role="group" aria-label="Theme" style="margin:0"><button data-theme-pick="light" title="Light theme">Light</button><button data-theme-pick="dark" title="Dark theme">Dark</button><button data-theme-pick="system" title="Follow system theme">System</button></div></div>'
+    + SETTING_DEFS.map(s => {
     const val = getSetting(s.id);
     if (s.type === 'bool') return '<label style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13px;cursor:pointer"><input type="checkbox" data-setting="' + s.id + '"' + (val ? ' checked' : '') + '> ' + s.label + '</label>';
     return '';
-  }).join('') + '<div style="margin-top:12px"><div style="font-size:13px;margin-bottom:6px">Theme</div>'
-    + '<div class="theme-pick" role="group" aria-label="Theme" style="margin:0"><button data-theme-pick="light" title="Light theme">Light</button><button data-theme-pick="dark" title="Dark theme">Dark</button><button data-theme-pick="system" title="Follow system theme">System</button></div></div>';
+  }).join('');
   wireThemePicks(sdiv);
   sdiv.querySelectorAll('[data-setting]').forEach(cb => {
     cb.addEventListener('change', () => {
