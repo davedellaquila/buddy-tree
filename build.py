@@ -1366,7 +1366,7 @@ function renderBuddy(id){
   const hpu = document.getElementById('bp-homepage-url');
   if (hpu) {
     hpu.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); hpu.blur(); } });
-    hpu.addEventListener('blur', () => {
+    const saveHomepageUrl = () => {
       const v = hpu.value.trim();
       if (!S.homepages || typeof S.homepages !== 'object') S.homepages = {};
       const before = getHomepage(b);
@@ -1385,7 +1385,10 @@ function renderBuddy(id){
       if (S.sel === 'view:project' && S.projectId === id) {
         renderProjectView();
       }
-    });
+    };
+    hpu.addEventListener('blur', saveHomepageUrl);
+    // Update immediately on paste (don't wait for blur)
+    hpu.addEventListener('paste', () => { setTimeout(saveHomepageUrl, 0); });
     // Prevent the global click handler from re-opening the buddy when clicking the input
     hpu.addEventListener('click', e => e.stopPropagation());
   }
