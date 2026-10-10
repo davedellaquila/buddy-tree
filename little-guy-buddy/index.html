@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Little Guy Buddy — Living dossier for Little Guy</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐱</text></svg>">
+<style>
+  :root {
+    --paper: #FAF6EC;
+    --card: #FFFDF6;
+    --ink: #3A2E22;
+    --dim: #857664;
+    --line: #E7DCC4;
+    --amber: #C77E1F;
+    --amber-deep: #9A5F12;
+    --amber-soft: #FBEED7;
+    --peach: #B3541E;
+    --peach-soft: #F9E7D8;
+    --sage: #5F7A54;
+    --sage-soft: #E7EFE2;
+    --note: #FDF3D8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font-family: -apple-system, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+    line-height: 1.55; padding: 28px 20px 70px;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; }
+  .serif { font-family: Georgia, "Iowan Old Style", "Times New Roman", serif; }
+
+  header.hero {
+    background:
+      radial-gradient(circle at 12% 20%, rgba(199,126,31,.10) 0 46px, transparent 47px),
+      radial-gradient(circle at 88% 12%, rgba(179,84,30,.10) 0 60px, transparent 61px),
+      linear-gradient(135deg, #FFFBEF 0%, #F6EFD9 55%, #EFE3C8 100%);
+    border: 1px solid var(--line); border-radius: 16px;
+    padding: 34px 32px 26px; margin-bottom: 0;
+    position: relative; overflow: hidden;
+  }
+  header.hero::after {
+    content: "🐱"; position: absolute; right: 26px; top: 8px;
+    font-size: 110px; opacity: .12; transform: rotate(8deg); pointer-events: none;
+  }
+  .paws {
+    height: 14px; border-radius: 0 0 8px 8px;
+    margin-bottom: 24px; border: 1px solid var(--line); border-top: none;
+    background:
+      radial-gradient(circle at 50% 40%, var(--amber) 0 4px, transparent 5px),
+      radial-gradient(circle at 32% 68%, var(--amber) 0 2.6px, transparent 3.6px),
+      radial-gradient(circle at 68% 68%, var(--amber) 0 2.6px, transparent 3.6px),
+      radial-gradient(circle at 41% 82%, var(--amber) 0 2.2px, transparent 3.2px),
+      radial-gradient(circle at 59% 82%, var(--amber) 0 2.2px, transparent 3.2px),
+      var(--card);
+    background-size: 64px 14px;
+    opacity: .55;
+  }
+  .kicker { color: var(--amber-deep); font-size: 12px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; }
+  h1 { font-size: 40px; margin: 8px 0 6px; font-weight: 700; }
+  h1 .ico { margin-right: 10px; cursor: pointer; display: inline-block; }
+  h1 .ico:hover { animation: boop .5s ease; }
+  @keyframes boop { 25% { transform: scale(1.25) rotate(-10deg); } 60% { transform: scale(.92) rotate(6deg); } }
+  #meowline { font-size: 13.5px; color: var(--dim); font-style: italic; min-height: 22px; margin-top: 4px; }
+  .tagline { font-size: 18px; color: var(--dim); font-style: italic; }
+  .mission { margin-top: 12px; max-width: 74ch; font-size: 15px; }
+  .mission b { color: var(--amber-deep); }
+  .meta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 999px;
+    padding: 6px 14px; font-size: 13px; color: var(--ink); text-decoration: none;
+  }
+  .pill.st { background: var(--amber-soft); border-color: #E4CFA0; font-weight: 600; }
+  a.pill:hover { border-color: var(--amber); }
+
+  h2 { font-size: 21px; margin: 34px 0 6px; }
+  h2 .sub { display: block; font-family: -apple-system, "Segoe UI", Inter, sans-serif;
+            font-size: 13px; color: var(--dim); font-weight: 400; margin-top: 2px; }
+
+  .mind { border: 1px solid var(--line); border-left: 5px solid var(--peach);
+          background: var(--card); border-radius: 10px; padding: 14px 18px;
+          margin-bottom: 12px; display: flex; gap: 14px; align-items: flex-start; }
+  .mind.amber { border-left-color: var(--amber); }
+  .mind.sage { border-left-color: var(--sage); }
+  .mind .dot { font-size: 20px; line-height: 1.4; }
+  .mind .t { font-weight: 700; font-size: 15px; }
+  .mind .d { color: var(--dim); font-size: 13.5px; }
+  .mind a { color: var(--amber-deep); font-weight: 600; }
+
+  .facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-top: 14px; }
+  .fact { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .fact .e { font-size: 24px; margin-bottom: 6px; }
+  .fact .t { font-weight: 700; font-size: 14.5px; }
+  .fact .d { color: var(--dim); font-size: 13px; margin-top: 4px; }
+  .fact.unknown { background: var(--amber-soft); border-color: #E4CFA0; border-style: dashed; }
+  .fact a { color: var(--amber-deep); font-weight: 600; }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; margin-top: 14px; }
+  .card .row { display: flex; gap: 12px; align-items: flex-start; padding: 10px 2px; border-bottom: 1px solid var(--line); font-size: 14.5px; }
+  .card .row:last-child { border-bottom: none; }
+  .empty { color: var(--dim); font-style: italic; font-size: 14px; padding: 12px 2px; }
+  .empty .cta { font-style: normal; font-weight: 600; color: var(--amber-deep); }
+
+  .photostrip { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px; }
+  .fb-card { display: flex; flex-direction: column; justify-content: center; align-items: center;
+             min-height: 190px; min-width: 250px; flex: 1 1 250px; max-width: 340px;
+             background: var(--amber-soft); border: 2px dashed #E0C391; border-radius: 12px;
+             text-align: center; padding: 22px 16px; transform: rotate(-1deg); }
+  .fb-card .ico { font-size: 44px; margin-bottom: 8px; }
+  .fb-card .t { font-weight: 700; font-size: 15px; color: var(--amber-deep); }
+  .fb-card .d { font-size: 12.5px; color: var(--dim); margin-top: 6px; }
+
+  footer { margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line);
+           color: var(--dim); font-size: 13px; display: flex; gap: 16px; flex-wrap: wrap; }
+  footer a { color: var(--amber-deep); }
+  @media (max-width: 640px) { h1 { font-size: 30px; } header.hero::after { font-size: 70px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">Family Buddy · child</div>
+    <h1 class="serif"><span class="ico" id="catboop" title="boop the snoot">🐱</span>Little Guy Buddy</h1>
+    <div id="meowline" aria-live="polite"></div>
+    <div class="tagline serif">Living dossier for Little Guy — one of Dave's three cats.</div>
+    <p class="mission">Little Guy Buddy is the one place for everything Dave needs to <b>remember, track, and do</b> regarding Little Guy — key facts, vet visits and medical notes, and reminders like flea treatment and vet appointments. The file is brand new, so it's mostly honest blank space for now: <b>unknowns stay unknown</b> until Dave fills them in.</p>
+    <div class="meta">
+      <span class="pill st">📝 Brief review</span>
+      <a class="pill" href="https://docs.google.com/document/d/1DsPDePEL2FooO-foNZcENbhl63F2DTaYw3V6e3WaSXg/edit" target="_blank" rel="noopener">📄 Product brief</a>
+      <a class="pill" href="https://github.com/davedellaquila/little-guy-buddy" target="_blank" rel="noopener">💻 little-guy-buddy repo</a>
+      <a class="pill" href="https://github.com/davedellaquila/marley-buddy" target="_blank" rel="noopener">🐈 Marley (Mars)</a>
+      <a class="pill" href="https://github.com/davedellaquila/rocky-buddy" target="_blank" rel="noopener">🐈 Rocky</a>
+      <span class="pill">🏠 Parent: Family Buddy</span>
+    </div>
+  </header>
+  <div class="paws"></div>
+
+  <h2 class="serif">On my mind <span class="sub">What needs Dave's attention</span></h2>
+  <div class="mind amber">
+    <div class="dot">📄</div>
+    <div><div class="t">Brief ready for review</div>
+    <div class="d">The <a href="https://docs.google.com/document/d/1DsPDePEL2FooO-foNZcENbhl63F2DTaYw3V6e3WaSXg/edit" target="_blank" rel="noopener">product brief</a> is in — looks good, edits, or defer? The open questions below are the whole review.</div></div>
+  </div>
+  <div class="mind">
+    <div class="dot">❓</div>
+    <div><div class="t">Still getting to know him</div>
+    <div class="d">Age, breed, vet history, and which house he lives at are all <b>flagged, not guessed</b>. One chat with Dave fills in the file — the most important one being where the little guy sleeps at night.</div></div>
+  </div>
+  <div class="mind sage">
+    <div class="dot">📸</div>
+    <div><div class="t">No photo yet</div>
+    <div class="d">Share a photo of Little Guy and he'll get his own photostrip, like the rest of the family dossiers.</div></div>
+  </div>
+
+  <h2 class="serif">Who Little Guy is <span class="sub">Only what's known — unknowns stay unknown</span></h2>
+  <div class="facts">
+    <div class="fact"><div class="e">🐱</div><div class="t">One of three cats</div><div class="d">Dave's trio: Marley (Mars), Rocky, and Little Guy.</div></div>
+    <div class="fact"><div class="e">🐈</div><div class="t">Siblings: Marley &amp; Rocky</div><div class="d">Each has their own dossier — <a href="https://github.com/davedellaquila/marley-buddy" target="_blank" rel="noopener">Marley (Mars)</a> and <a href="https://github.com/davedellaquila/rocky-buddy" target="_blank" rel="noopener">Rocky</a> live in their own repos.</div></div>
+    <div class="fact unknown"><div class="e">❓</div><div class="t">Age &amp; breed unknown</div><div class="d">Not on record yet. Flagged, not guessed.</div></div>
+    <div class="fact unknown"><div class="e">🏠</div><div class="t">Which house? Unknown</div><div class="d">Fiddletown cabin or Lenwood — nobody's said yet.</div></div>
+    <div class="fact unknown"><div class="e">🩺</div><div class="t">Vet history unknown</div><div class="d">No visits on record. First one goes here when it happens.</div></div>
+    <div class="fact"><div class="e">📋</div><div class="t">Living dossier</div><div class="d">Key facts, vet notes, and reminders — the file grows as Dave reports in.</div></div>
+  </div>
+
+  <h2 class="serif">Vet &amp; medical notes <span class="sub">Visits and medical history</span></h2>
+  <div class="card">
+    <div class="empty">No vet visits on record yet. When the first visit happens, it lands here — date, vet, what was done, what's next. <span class="cta">The file is ready when the cat is.</span></div>
+  </div>
+
+  <h2 class="serif">Reminders <span class="sub">Flea treatment, vet appointments, the rhythms</span></h2>
+  <div class="card">
+    <div class="empty">Nothing scheduled. Flea treatment cadence, upcoming vet appointments, medication rhythms — <span class="cta">say the word and I'll keep the beat.</span></div>
+  </div>
+
+  <h2 class="serif">Photos <span class="sub">Little Guy, in the fur</span></h2>
+  <div class="photostrip">
+    <div class="fb-card">
+      <div class="ico">🐱</div>
+      <div class="t">Photo pending</div>
+      <div class="d">No photos of Little Guy yet. Send one Dave's way and it goes right here.</div>
+    </div>
+  </div>
+
+  <footer>
+    <span>🐾 Little Guy Buddy · a living dossier</span>
+    <a href="https://docs.google.com/document/d/1DsPDePEL2FooO-foNZcENbhl63F2DTaYw3V6e3WaSXg/edit" target="_blank" rel="noopener">Product brief</a>
+    <a href="https://github.com/davedellaquila/little-guy-buddy" target="_blank" rel="noopener">little-guy-buddy repo</a>
+    <span>Built for Dave · Oct 2026</span>
+  </footer>
+
+</div>
+<script>
+  (function () {
+    var lines = [
+      "Little Guy has entered the chat.",
+      "Boop acknowledged. Purring intensifies.",
+      "Current status: napping on the unknown-which-house couch.",
+      "Fact-check in progress… still a cat.",
+      "Reminder set: be adorable. (Already done.)",
+      "Vet history: classified. The cat isn't talking."
+    ];
+    var i = 0, el = document.getElementById("meowline");
+    document.getElementById("catboop").addEventListener("click", function () {
+      el.textContent = "🐾 " + lines[i % lines.length];
+      i++;
+    });
+  })();
+</script>
+</body>
+</html>
