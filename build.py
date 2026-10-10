@@ -1018,7 +1018,10 @@ function openFieldSettings(){
       order.splice(to, 0, moved);
       S.fieldOrder = order; save();
       openFieldSettings();
-      const mm = S.sel.match(/^buddy:(.+)$/); if (mm) renderBuddy(mm[1]);
+      const vb2 = document.getElementById('view-buddy');
+      if (vb2 && vb2.classList.contains('active') && S.projectId && byId[S.projectId]) {
+        renderBuddy(S.projectId);
+      }
     });
   });
   list.querySelectorAll('[data-vis]').forEach(cb => {
@@ -1026,7 +1029,11 @@ function openFieldSettings(){
       if (!S.fieldHidden) S.fieldHidden = {};
       S.fieldHidden[cb.dataset.vis] = !cb.checked;
       save();
-      const mm = S.sel.match(/^buddy:(.+)$/); if (mm) renderBuddy(mm[1]);
+      // Re-render the panel immediately if it's open (use S.projectId, not S.sel)
+      const vb = document.getElementById('view-buddy');
+      if (vb && vb.classList.contains('active') && S.projectId && byId[S.projectId]) {
+        renderBuddy(S.projectId);
+      }
     });
   });
   const vlist = document.getElementById('vset-list');
