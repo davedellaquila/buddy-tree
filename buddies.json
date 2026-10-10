@@ -114,7 +114,9 @@
    "statusClass": "st-brief",
    "tagline": "Career goals, skill growth, job-search readiness",
    "icon": "💼",
-   "photos": []
+   "photos": [],
+   "homepage": "career-buddy/",
+   "homepageSynced": "2026-10-10"
   },
   {
    "attention": [],
@@ -589,7 +591,8 @@
    "statusClass": "st-brief",
    "tagline": "Tech inventory + gadget tutor",
    "icon": "🤖",
-   "photos": []
+   "photos": [],
+   "homepage": "tech-buddy/"
   },
   {
    "attention": [
@@ -677,7 +680,8 @@
    "statusClass": "st-brief",
    "tagline": "Feedback to outside parties",
    "icon": "📣",
-   "photos": []
+   "photos": [],
+   "homepage": "feedback-buddy/"
   },
   {
    "id": "quentin-buddy",

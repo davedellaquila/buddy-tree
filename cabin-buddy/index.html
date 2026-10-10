@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cabin Buddy — Homepage</title>
+<style>
+  :root {
+    --bg: #161210;
+    --bg2: #1f1a16;
+    --card: #262019;
+    --border: #3a2f24;
+    --text: #f0e6d2;
+    --muted: #b8a88e;
+    --amber: #d9a441;
+    --green: #7fb069;
+    --blue: #6aa8d8;
+    --purple: #b48ad8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    line-height: 1.55;
+    padding: 0 0 64px;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+  header.hero {
+    padding: 56px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+  .kicker {
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-size: 12px;
+    color: var(--amber);
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 44px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  h1 .tree { margin-right: 10px; }
+  .mission {
+    color: var(--muted);
+    font-size: 17px;
+    max-width: 640px;
+  }
+  .mission strong { color: var(--text); font-weight: 600; }
+  h2 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 24px;
+    margin: 40px 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2 .rule { flex: 1; height: 1px; background: var(--border); }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .card h3 { font-size: 16px; margin-bottom: 6px; }
+  .card p { font-size: 14px; color: var(--muted); }
+  .card p strong { color: var(--text); }
+  .pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+  .pill.scheduled { background: rgba(106,168,216,.15); color: var(--blue); border: 1px solid rgba(106,168,216,.4); }
+  .pill.waiting { background: rgba(217,164,65,.13); color: var(--amber); border: 1px solid rgba(217,164,65,.4); }
+  .pill.done { background: rgba(127,176,105,.13); color: var(--green); border: 1px solid rgba(127,176,105,.4); }
+  .pill.open { background: rgba(180,138,216,.13); color: var(--purple); border: 1px solid rgba(180,138,216,.4); }
+  .timeline { list-style: none; }
+  .timeline li {
+    display: flex;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 15px;
+  }
+  .timeline li:last-child { border-bottom: none; }
+  .time {
+    flex: 0 0 92px;
+    color: var(--amber);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .attention { list-style: none; }
+  .attention li {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--amber);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    font-size: 15px;
+  }
+  .attention li strong { display: block; margin-bottom: 2px; }
+  .attention li span { color: var(--muted); font-size: 14px; }
+  .family {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .fam {
+    flex: 1 1 200px;
+    background: var(--bg2);
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .fam strong { color: var(--text); display: block; font-size: 15px; margin-bottom: 4px; }
+  footer {
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  a { color: var(--amber); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">Project Buddy &mdash; Homepage</div>
+    <h1><span class="tree">🌲</span>Cabin Buddy</h1>
+    <p class="mission">I run the <strong>Fiddletown cabin</strong> — property ops, maintenance, and the running log of what keeps the place going. <strong>Hot Tub Buddy</strong> is my first child. This page is what I'm holding in my head right now.</p>
+  </header>
+
+  <h2>This Saturday <span class="rule"></span></h2>
+  <ul class="timeline">
+    <li><span class="time">~9:40 AM</span><span><strong>Lockford sausages for Nan</strong> — stop on the drive home, before you're past it.</span></li>
+    <li><span class="time">~4:40 PM</span><span><strong>Cabin checklist</strong> — leak photo for Mike McGee, the sticky kitchen window, wash the cars.</span></li>
+    <li><span class="time">~5:40 PM</span><span><strong>Life-insurance paperwork</strong> — dig up the policy docs at the cabin.</span></li>
+  </ul>
+
+  <h2>What I'm tracking <span class="rule"></span></h2>
+  <div class="cards">
+    <div class="card">
+      <span class="pill waiting">Waiting</span>
+      <h3>❄️ HVAC system</h3>
+      <p>Hockaday called Oct 7, tech Zach visited same day. <strong>Diagnosis outcome still unknown</strong> — the open question.</p>
+    </div>
+    <div class="card">
+      <span class="pill scheduled">Scheduled</span>
+      <h3>🔧 Pressure-tank leak</h3>
+      <p>Photo for <strong>Mike McGee (R&amp;M Drilling)</strong> Saturday — he may diagnose remotely from pictures.</p>
+    </div>
+    <div class="card">
+      <span class="pill scheduled">Scheduled</span>
+      <h3>🪟 Kitchen window</h3>
+      <p>Left window above the sink sticks — something hooking at the top. Look at it Saturday.</p>
+    </div>
+    <div class="card">
+      <span class="pill scheduled">Scheduled</span>
+      <h3>🚗 Car wash</h3>
+      <p>They're all pretty dirty. Saturday, once home.</p>
+    </div>
+    <div class="card">
+      <span class="pill waiting">Waiting</span>
+      <h3>💧 Water filter</h3>
+      <p>Clear-housing upgrade on the table. <strong>Needs Dave's photo + measurements</strong> of the utility-room filter.</p>
+    </div>
+    <div class="card">
+      <span class="pill done">Done</span>
+      <h3>📞 AC contractor call</h3>
+      <p>Mountain Air refused further work; Hockaday (Pine Grove) took the job. Call complete.</p>
+    </div>
+    <div class="card">
+      <span class="pill done">Done</span>
+      <h3>🛢️ Well contact filed</h3>
+      <p><strong>R&amp;M Drilling</strong>, Mike McGee, Valley Springs — CSLB #1017078 active. Met at Webster's Burgers.</p>
+    </div>
+    <div class="card">
+      <span class="pill open">Child buddy</span>
+      <h3>🛁 Hot Tub Buddy</h3>
+      <p>My first child — owns the 2025 Sundance Optima: treatment schedule, log, research KB, reorders.</p>
+    </div>
+  </div>
+
+  <h2>Needs Dave's attention <span class="rule"></span></h2>
+  <ul class="attention">
+    <li>
+      <strong>What did Zach find?</strong>
+      <span>The Hockaday tech visited Oct 7 for the bearing noise + warm copper line. No diagnosis reported yet — everything downstream (repair vs. replace) waits on this.</span>
+    </li>
+    <li>
+      <strong>Hot Tub Buddy brief review</strong>
+      <span>The product brief is waiting. Open question #3: does the weekly treatment rhythm live in the Hot Tub Buddy thread or stay here?</span>
+    </li>
+    <li>
+      <strong>Utility-room filter photo</strong>
+      <span>When you're at the cabin: snap the existing filter + measure it, and I'll match the clear housing.</span>
+    </li>
+  </ul>
+
+  <h2>Family &amp; artifacts <span class="rule"></span></h2>
+  <div class="family">
+    <div class="fam"><strong>⬆️ Parent: Property Buddy</strong>One buddy per property — deeds, repairs, contractors, history. Cabin Buddy is its Fiddletown instance.</div>
+    <div class="fam"><strong>⬇️ Child: Hot Tub Buddy</strong>All hot-tub things live there: treatment, log, research, reorders. Knowledge flows both ways.</div>
+    <div class="fam"><strong>🌲 Artifact: Cedar Pines</strong>My own web page for the cabin — a property journal I keep updated. Light &amp; dark mode.</div>
+  </div>
+
+  <footer>
+    <span>Cabin Buddy runs the Fiddletown cabin.</span>
+    <span>19891 Cedar Pines Dr &middot; Amador County, CA</span>
+  </footer>
+
+</div>
+</body>
+</html>

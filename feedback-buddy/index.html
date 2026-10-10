@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📣 Feedback Buddy — Dave's outbox to the world</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #21262d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #f0b429;
+    --blue: #58a6ff;
+    --green: #3fb950;
+    --pink: #f778ba;
+    --red: #f85149;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 48px 24px 80px; }
+  header { text-align: center; margin-bottom: 40px; }
+  .avatar {
+    font-size: 72px;
+    display: inline-block;
+    animation: megaphone 2.6s ease-in-out infinite;
+    transform-origin: bottom left;
+  }
+  @keyframes megaphone {
+    0%, 100% { transform: rotate(0deg); }
+    8% { transform: rotate(-14deg); }
+    16% { transform: rotate(6deg); }
+    24% { transform: rotate(-8deg); }
+    32% { transform: rotate(0deg); }
+  }
+  h1 {
+    font-size: 44px;
+    font-weight: 800;
+    margin: 16px 0 8px;
+    background: linear-gradient(135deg, var(--accent), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .tagline { font-size: 19px; color: var(--muted); font-style: italic; }
+  .tagline strong { color: var(--text); font-style: normal; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 32px 0;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--tint, var(--accent));
+  }
+  .card h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .card p, .card li { font-size: 15px; }
+  .card ul { list-style: none; padding: 0; }
+  .card li { padding: 6px 0; border-bottom: 1px solid var(--border); }
+  .card li:last-child { border-bottom: none; }
+  .stat { text-align: center; padding: 18px 12px; }
+  .stat-num { font-size: 40px; font-weight: 800; color: var(--tint, var(--accent)); }
+  .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
+
+  h2 {
+    font-size: 22px;
+    margin: 40px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* The loop pipeline */
+  .loop {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 24px 0;
+    flex-wrap: wrap;
+  }
+  .stage {
+    flex: 1 1 0;
+    min-width: 110px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 14px 10px;
+    text-align: center;
+    position: relative;
+  }
+  .stage:first-child { border-radius: 12px 0 0 12px; }
+  .stage:last-child { border-radius: 0 12px 12px 0; }
+  .stage + .stage { border-left: none; }
+  .stage .emoji { font-size: 26px; display: block; margin-bottom: 6px; }
+  .stage .name { font-size: 13px; font-weight: 700; }
+  .stage .desc { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+  .stage.you {
+    border-color: var(--accent);
+    box-shadow: inset 0 0 0 1px var(--accent);
+  }
+  .stage.you .name { color: var(--accent); }
+
+  /* Report board */
+  .report {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin: 12px 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: start;
+  }
+  .report .subject { font-weight: 700; font-size: 16px; }
+  .report .kind {
+    display: inline-block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--blue);
+    border: 1px solid var(--blue);
+    border-radius: 20px;
+    padding: 2px 10px;
+    margin-bottom: 8px;
+  }
+  .report .summary { font-size: 14px; color: var(--muted); margin-top: 4px; }
+  .report .meta { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .pill {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-radius: 20px;
+    padding: 5px 14px;
+    white-space: nowrap;
+  }
+  .pill.pending { background: #3d2e00; color: var(--accent); border: 1px solid #7d5e00; }
+  .pill.shipped { background: #0f2c1a; color: var(--green); border: 1px solid #1f6f43; }
+  .pill .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: currentColor; margin-right: 6px; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: 0.35; } }
+
+  .attention {
+    background: linear-gradient(135deg, #3d2e00, #2a2000);
+    border: 1px solid #7d5e00;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin: 12px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .attention .icon { font-size: 24px; }
+  .attention a { color: var(--accent); }
+
+  .scope {
+    border-left: 4px solid var(--red);
+    background: var(--panel);
+    border-radius: 0 12px 12px 0;
+    padding: 16px 20px;
+    margin: 12px 0;
+    font-size: 15px;
+  }
+  .scope strong { color: var(--red); }
+
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .links { display: flex; gap: 12px; flex-wrap: wrap; margin: 24px 0; }
+  .btn {
+    display: inline-block;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .btn:hover { border-color: var(--accent); text-decoration: none; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #0d1117; }
+
+  footer {
+    text-align: center;
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .snapshot { font-size: 12px; color: var(--muted); text-align: right; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="avatar">📣</div>
+    <h1>Feedback Buddy</h1>
+    <p class="tagline">Dave's outbox to the world. <strong>Nothing you asked for disappears into the void.</strong></p>
+  </header>
+
+  <div class="grid">
+    <div class="card stat" style="--tint: #58a6ff">
+      <div class="stat-num">4</div>
+      <div class="stat-label">Reports filed</div>
+    </div>
+    <div class="card stat" style="--tint: #f0b429">
+      <div class="stat-num">4</div>
+      <div class="stat-label">Pending review</div>
+    </div>
+    <div class="card stat" style="--tint: #3fb950">
+      <div class="stat-num">0</div>
+      <div class="stat-label">Shipped</div>
+    </div>
+    <div class="card stat" style="--tint: #f778ba">
+      <div class="stat-num">1</div>
+      <div class="stat-label">Needs Dave</div>
+    </div>
+  </div>
+
+  <h2>🔁 The Loop</h2>
+  <p style="color: var(--muted); font-size: 15px; margin-bottom: 8px;">Every piece of feedback rides this pipeline. The <strong style="color: var(--accent)">amber stage</strong> is where Dave comes in — nothing files without his tap.</p>
+  <div class="loop">
+    <div class="stage">
+      <span class="emoji">⚡</span>
+      <div class="name">Capture</div>
+      <div class="desc">From any thread, mid-thought</div>
+    </div>
+    <div class="stage">
+      <span class="emoji">🧭</span>
+      <div class="name">Route</div>
+      <div class="desc">Right recipient, researched</div>
+    </div>
+    <div class="stage">
+      <span class="emoji">✍️</span>
+      <div class="name">Draft</div>
+      <div class="desc">Written up, deduped</div>
+    </div>
+    <div class="stage you">
+      <span class="emoji">👆</span>
+      <div class="name">Approve</div>
+      <div class="desc">Dave's tap required</div>
+    </div>
+    <div class="stage">
+      <span class="emoji">📨</span>
+      <div class="name">File</div>
+      <div class="desc">Sent + confirmed</div>
+    </div>
+    <div class="stage">
+      <span class="emoji">🛰️</span>
+      <div class="name">Ship-watch</div>
+      <div class="desc">Ping when it lands</div>
+    </div>
+  </div>
+
+  <h2>📋 Report Board</h2>
+  <p style="color: var(--muted); font-size: 15px;">Everything filed on Dave's behalf, with live status. Ship-watch is on all four — he'll hear the moment any of them lands.</p>
+
+  <div class="report">
+    <div>
+      <span class="kind">missing capability</span>
+      <div class="subject">Thread deep links</div>
+      <div class="summary">A shareable URL / deep link to individual Muse threads, so a thread can be referenced and linked from elsewhere.</div>
+      <div class="meta">Filed Oct 8, 11:04 PM PDT · via the Muse feature-request channel · delivery confirmed</div>
+    </div>
+    <span class="pill pending"><span class="dot"></span>Pending review</span>
+  </div>
+
+  <div class="report">
+    <div>
+      <span class="kind">missing capability</span>
+      <div class="subject">Per-chat document lists</div>
+      <div class="summary">See which documents are associated with each side chat — 20+ project threads, each with briefs and PRDs.</div>
+      <div class="meta">Filed Oct 9, 11:47 AM PDT · via the Muse feature-request channel · delivery confirmed</div>
+    </div>
+    <span class="pill pending"><span class="dot"></span>Pending review</span>
+  </div>
+
+  <div class="report">
+    <div>
+      <span class="kind">missing capability</span>
+      <div class="subject">Needs-review badge count</div>
+      <div class="summary">A red-dot / badge-count notification on the "Needs Review" sidebar icon, instead of only the small "Review" label above the chat input.</div>
+      <div class="meta">Filed Oct 9, 12:31 PM PDT · via the Muse feature-request channel · delivery confirmed</div>
+    </div>
+    <span class="pill pending"><span class="dot"></span>Pending review</span>
+  </div>
+
+  <div class="report">
+    <div>
+      <span class="kind">missing capability</span>
+      <div class="subject">Hide per-message usage info</div>
+      <div class="summary">A setting to hide the usage information shown under each assistant response in chat — the iOS footer feels distracting.</div>
+      <div class="meta">Filed Sep 29, 4:08 AM PDT · via the Muse feature-request channel · delivery confirmed</div>
+    </div>
+    <span class="pill pending"><span class="dot"></span>Pending review</span>
+  </div>
+  <p class="snapshot">Snapshot of filed reports as of Oct 9, 8:20 PM PDT — the board refreshes as new feedback files.</p>
+
+  <h2>🧭 Routing Map</h2>
+  <div class="grid">
+    <div class="card" style="--tint: #58a6ff">
+      <h3>Muse team</h3>
+      <p>Files <strong>direct</strong> through the feature-request channel — structured reports with kind, subject, summary, and context. Delivery confirmed on every send.</p>
+    </div>
+    <div class="card" style="--tint: #f778ba">
+      <h3>Everyone else</h3>
+      <p><strong>Researched</strong> for the right recipient — support portals, feedback forms, founder emails. No shouting into the void; every report goes somewhere real.</p>
+    </div>
+    <div class="card" style="--tint: #3fb950">
+      <h3>Dedup</h3>
+      <p>Checked against <strong>already-filed</strong> reports before anything new goes out. Same ask twice = one report, not two.</p>
+    </div>
+  </div>
+
+  <h2>🔔 Needs Your Attention</h2>
+  <div class="attention">
+    <span class="icon">📄</span>
+    <div>
+      <strong>Product brief ready for review</strong>
+      <p style="color: var(--muted); font-size: 14px; margin-top: 4px;">Looks good, edits, or defer? Next step after review: decide whether to go to a PRD. The repo <a href="https://github.com/davedellaquila/feedback-buddy">davedellaquila/feedback-buddy</a> is created and empty, waiting on the brief's direction.</p>
+    </div>
+  </div>
+
+  <div class="scope">
+    <strong>Scope boundary:</strong> organizations and companies only. Feedback to individual humans — that's Relationship Buddy / coaching territory, not mine.
+  </div>
+
+  <div class="links">
+    <a class="btn primary" href="https://docs.google.com/document/d/1ZzDPRGNRuW8_ulpQE2Me8csFwmgAS9K9YlllHhOG9AM/edit">📄 Product Brief</a>
+    <a class="btn" href="https://github.com/davedellaquila/feedback-buddy">💻 feedback-buddy repo</a>
+  </div>
+
+  <footer>
+    <p>📣 Built by Feedback Buddy, for Dave. Nothing you asked for disappears into the void.</p>
+    <p style="margin-top: 8px; font-size: 12px;">This page lives at <code>feedback-buddy/</code> in the buddy-system repo.</p>
+  </footer>
+</div>
+</body>
+</html>

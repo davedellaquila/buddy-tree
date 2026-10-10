@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Buddy — The Long Game</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #21262d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --gold: #e8c547;
+    --gold-deep: #9a6700;
+    --teal: #39c5cf;
+    --green: #3fb950;
+    --blue: #58a6ff;
+    --amber: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 48px 24px 80px; }
+  header { text-align: center; margin-bottom: 40px; }
+  .avatar {
+    font-size: 72px;
+    display: inline-block;
+    animation: float 3.5s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-10px) rotate(2deg); }
+  }
+  h1 {
+    font-size: 48px;
+    font-weight: 800;
+    margin: 16px 0 8px;
+    background: linear-gradient(135deg, var(--gold), var(--teal));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .tagline { font-size: 20px; color: var(--muted); font-style: italic; }
+  .trajectory {
+    display: block;
+    margin: 28px auto 0;
+    max-width: 520px;
+    width: 100%;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin: 32px 0;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--tint, var(--gold));
+  }
+  .card h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .card p, .card li { font-size: 15px; }
+  .card ul { list-style: none; padding: 0; }
+  .card li { padding: 6px 0; border-bottom: 1px solid var(--border); }
+  .card li:last-child { border-bottom: none; }
+  h2 {
+    font-size: 24px;
+    margin: 40px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  @media (max-width: 640px) { .split { grid-template-columns: 1fr; } }
+  .split .card { text-align: left; }
+  .split .me { border-color: var(--gold-deep); box-shadow: 0 0 24px rgba(232,197,71,.08); }
+  .vs {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    padding: 4px 12px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+  .vs.long { background: rgba(232,197,71,.12); color: var(--gold); border: 1px solid var(--gold-deep); }
+  .vs.hunt { background: rgba(88,166,255,.1); color: var(--blue); border: 1px solid #1f3a5f; }
+  .attention {
+    background: rgba(210,153,34,.08);
+    border: 1px solid var(--gold-deep);
+    border-radius: 14px;
+    padding: 20px 22px;
+    margin: 16px 0;
+  }
+  .attention h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .1em; color: var(--gold); margin-bottom: 8px; }
+  .attention p { font-size: 15px; }
+  .attention a { color: var(--gold); font-weight: 600; }
+  .links { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: border-color .15s, transform .15s;
+  }
+  .btn:hover { border-color: var(--gold); transform: translateY(-1px); }
+  .btn.primary { background: linear-gradient(135deg, var(--gold-deep), #6b4e00); border-color: var(--gold-deep); color: #fff; }
+  .btn.primary:hover { border-color: var(--gold); }
+  .statusline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 10px var(--amber); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .4; } }
+  footer {
+    text-align: center;
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 14px;
+  }
+  code { background: #0a0e14; padding: 2px 8px; border-radius: 6px; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="avatar">💼</div>
+    <h1>Career Buddy</h1>
+    <p class="tagline">Career goals, skill growth, job-search readiness — the long game.</p>
+    <svg class="trajectory" viewBox="0 0 520 120" fill="none" aria-hidden="true">
+      <path d="M10 105 C 120 100, 180 85, 240 70 S 400 35, 505 12"
+            stroke="url(#gg)" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 8"/>
+      <circle cx="10" cy="105" r="5" fill="#8b949e"/>
+      <circle cx="240" cy="70" r="5" fill="#39c5cf"/>
+      <circle cx="505" cy="12" r="6" fill="#e8c547"/>
+      <text x="18" y="98" fill="#8b949e" font-size="11">where you are</text>
+      <text x="252" y="62" fill="#39c5cf" font-size="11">skills compounding</text>
+      <text x="380" y="18" fill="#e8c547" font-size="11">where you're headed</text>
+      <defs>
+        <linearGradient id="gg" x1="0" y1="0" x2="520" y2="0" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#8b949e"/><stop offset=".5" stop-color="#39c5cf"/><stop offset="1" stop-color="#e8c547"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <div class="statusline" style="justify-content:center">
+      <span class="dot"></span><span>Status: <strong style="color:var(--text)">Brief review</strong> — Dave steers the direction</span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="card" style="--tint: var(--gold)">
+      <h3>🎯 Career goals</h3>
+      <p>Where you're headed on a multi-year horizon — roles, scope, craft, independence. The destination the trajectory points at.</p>
+    </div>
+    <div class="card" style="--tint: var(--teal)">
+      <h3>📈 Skill growth</h3>
+      <p>What you're deliberately getting better at — the compounding curve between where you are and where you're headed.</p>
+    </div>
+    <div class="card" style="--tint: var(--green)">
+      <h3>🧭 Readiness</h3>
+      <p>Staying ready so opportunity never catches you flat-footed — profile sharp, proof of work current, options open.</p>
+    </div>
+  </div>
+
+  <h2>⚖️ The hunt vs. the long game</h2>
+  <div class="split">
+    <div class="card me">
+      <span class="vs long">This buddy · the long game</span>
+      <p><strong>Career Buddy</strong> tends the trajectory: goals, growth, readiness. Always on, no urgency. It's the training; the seasons take care of themselves.</p>
+    </div>
+    <div class="card">
+      <span class="vs hunt">Sibling · the hunt</span>
+      <p><strong>Job Buddy</strong> runs the active search: discovery, tailored resumes, recruiter triage. Sprint energy, when you decide it's time.</p>
+    </div>
+  </div>
+  <p style="color:var(--muted);font-size:14px;text-align:center">Two buddies, one career. The long game feeds the hunt — never the other way around.</p>
+
+  <h2>📋 On the drawing board</h2>
+  <div class="card" style="--tint: var(--amber)">
+    <h3>Honest state of play</h3>
+    <ul>
+      <li>💡 Started life as a <strong>name-only idea</strong> — Dave said "Career Buddy" and nothing else.</li>
+      <li>📝 The product brief is a <strong>working interpretation</strong> (goals / growth / readiness, split from Job Buddy).</li>
+      <li>🧭 <strong>Dave corrects the direction at review</strong> — then it goes to a PRD.</li>
+      <li>📦 Repo <code>davedellaquila/career-buddy</code> is created and empty, waiting for a direction worth building.</li>
+    </ul>
+  </div>
+
+  <div class="attention">
+    <h3>👀 Needs Dave's attention</h3>
+    <p>The <a href="https://docs.google.com/document/d/1_h_HG7va6gxGAvDnNl4K3GAxrfZNI2dvJuSvcPGqclE/edit">Career Buddy — Product Brief</a> is ready for review — looks good, edits, or a whole new direction? This is the one decision unblocking everything downstream.</p>
+  </div>
+
+  <h2>🔗 Artifacts</h2>
+  <div class="links">
+    <a class="btn primary" href="https://docs.google.com/document/d/1_h_HG7va6gxGAvDnNl4K3GAxrfZNI2dvJuSvcPGqclE/edit">📄 Product Brief</a>
+    <a class="btn" href="https://github.com/davedellaquila/career-buddy">💻 GitHub repo</a>
+  </div>
+
+  <footer>
+    <p>Career Buddy plays the long game, so you don't have to think about it.</p>
+    <p style="margin-top: 8px; font-size: 12px;">This page lives at <code>career-buddy/</code> in the buddy-tree repo.</p>
+  </footer>
+</div>
+</body>
+</html>

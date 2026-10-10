@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relationship Buddy — Keeping the important people from going quiet</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💞</text></svg>">
+<style>
+  :root {
+    --bg: #171219;
+    --panel: #201823;
+    --card: #262029;
+    --border: #3b2f40;
+    --text: #f4eae5;
+    --muted: #bda9b6;
+    --rose: #f27ba7;
+    --rose-deep: #c14e7c;
+    --gold: #e2ac63;
+    --green: #93d193;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: radial-gradient(1200px 600px at 50% -10%, #2b1e2e 0%, var(--bg) 60%) fixed, var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+    padding-bottom: 72px;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+  header.hero { text-align: center; padding: 60px 0 36px; }
+  .kicker {
+    text-transform: uppercase; letter-spacing: 3px; font-size: 11px;
+    color: var(--gold); margin-bottom: 18px;
+  }
+  .heart { font-size: 76px; display: inline-block; animation: beat 2.4s ease-in-out infinite; }
+  @keyframes beat {
+    0%, 100% { transform: scale(1); }
+    12% { transform: scale(1.12); }
+    24% { transform: scale(1); }
+    36% { transform: scale(1.08); }
+    48% { transform: scale(1); }
+  }
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 46px; font-weight: 600; letter-spacing: -0.5px;
+    margin: 14px 0 6px;
+    background: linear-gradient(120deg, var(--rose), var(--gold));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .tagline { font-size: 19px; color: var(--muted); font-style: italic; margin-bottom: 14px; }
+  .mission { max-width: 620px; margin: 0 auto 20px; color: var(--text); opacity: 0.92; }
+  .pills { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .pill {
+    font-size: 13px; padding: 6px 14px; border-radius: 999px;
+    background: rgba(242, 123, 167, 0.14); border: 1px solid var(--rose-deep); color: var(--rose);
+  }
+  .pill.dim { background: transparent; border-color: var(--border); color: var(--muted); }
+  section { margin: 40px 0; }
+  h2 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 24px; font-weight: 600; margin-bottom: 4px;
+  }
+  h2 .sub { font-family: -apple-system, "Segoe UI", sans-serif; font-size: 14px; font-weight: 400; color: var(--muted); margin-left: 8px; }
+  .sec-desc { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 18px 20px;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .card:hover { transform: translateY(-2px); border-color: var(--rose-deep); }
+  .card .date {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--gold); margin-bottom: 6px;
+  }
+  .card strong { font-size: 16px; }
+  .card p { color: var(--muted); font-size: 14px; margin-top: 6px; }
+  .card.hot {
+    border-color: var(--rose-deep);
+    background: linear-gradient(135deg, rgba(242,123,167,0.10), var(--card));
+    display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-block; white-space: nowrap;
+    background: linear-gradient(120deg, var(--rose-deep), var(--rose));
+    color: #fff; text-decoration: none; font-weight: 600; font-size: 14px;
+    padding: 10px 20px; border-radius: 999px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(242,123,167,0.35); }
+  .btn.ghost {
+    background: transparent; border: 1px solid var(--border); color: var(--text);
+  }
+  .btn.ghost:hover { border-color: var(--rose-deep); box-shadow: none; }
+  .circle { margin-bottom: 22px; }
+  .circle h3 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 2px;
+    color: var(--gold); margin-bottom: 10px;
+  }
+  .people { display: flex; flex-wrap: wrap; gap: 10px; }
+  .person {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 999px; padding: 6px 14px 6px 6px;
+    transition: border-color 0.15s ease;
+  }
+  .person:hover { border-color: var(--rose-deep); }
+  .avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: #fff;
+    background: linear-gradient(135deg, var(--rose-deep), var(--gold));
+    flex-shrink: 0;
+  }
+  .person .who { line-height: 1.25; }
+  .person .who b { display: block; font-size: 14px; }
+  .person .who span { font-size: 12px; color: var(--muted); }
+  .note {
+    margin-top: 14px; font-size: 13px; color: var(--muted);
+    border-left: 3px solid var(--rose-deep); padding-left: 12px; font-style: italic;
+  }
+  .feat { font-size: 30px; margin-bottom: 8px; display: block; }
+  .links { display: flex; gap: 12px; flex-wrap: wrap; }
+  footer {
+    margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--border);
+    text-align: center; color: var(--muted); font-size: 13px;
+  }
+  @media (max-width: 600px) {
+    h1 { font-size: 34px; }
+    .card.hot { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">Personal Buddy · Buddy family</div>
+    <div class="heart">💞</div>
+    <h1>Relationship Buddy</h1>
+    <p class="tagline">Keeping the important people from going quiet.</p>
+    <p class="mission">Your companion for maintaining healthy relationships — the people who matter, stay-in-touch nudges, notes, and milestones.</p>
+    <div class="pills">
+      <span class="pill">Brief review</span>
+      <span class="pill dim">v1: nudges · notes · milestones</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>Needs Dave's attention</h2>
+    <p class="sec-desc">One thing standing between this buddy and its build.</p>
+    <div class="card hot">
+      <div>
+        <strong>Product brief ready for review</strong>
+        <p>Looks good, edits, or defer? After review: decide whether to go to a PRD.</p>
+      </div>
+      <a class="btn" href="https://docs.google.com/document/d/1BdS9TfXY0Mceg7dQ68EvPK38Qo5wqAQrSC_AkS5uX_I/edit">Read the brief</a>
+    </div>
+  </section>
+
+  <section>
+    <h2>On my mind</h2>
+    <p class="sec-desc">The relationship moments that matter right now.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="date">Today · Oct 9</div>
+        <strong>Family rent discussion</strong>
+        <p>Quentin, Amanda &amp; Sawyer — the rent conversation and the home-ownership talk, in person in San Jose.</p>
+      </div>
+      <div class="card">
+        <div class="date">Jan 7, 2027</div>
+        <strong>New rent takes effect</strong>
+        <p>Quentin &amp; Amanda move to $2,000/mo. A milestone worth noting, not just a date on a notice.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Circles <span class="sub">the people who matter</span></h2>
+    <p class="sec-desc">The relationships this buddy exists to keep warm.</p>
+
+    <div class="circle">
+      <h3>Family</h3>
+      <div class="people">
+        <div class="person"><div class="avatar">Q</div><div class="who"><b>Quentin</b><span>Son · San Jose house</span></div></div>
+        <div class="person"><div class="avatar">S</div><div class="who"><b>Sawyer</b><span>Son · San Jose house</span></div></div>
+        <div class="person"><div class="avatar">A</div><div class="who"><b>Amanda</b><span>Quentin's partner</span></div></div>
+        <div class="person"><div class="avatar">E</div><div class="who"><b>Emile</b><span>Brother · Morgan Hill sale</span></div></div>
+        <div class="person"><div class="avatar">N</div><div class="who"><b>Nancy “Nan”</b><span>Meals &amp; groceries</span></div></div>
+        <div class="person"><div class="avatar">P</div><div class="who"><b>Pops</b><span>Visited in September</span></div></div>
+      </div>
+    </div>
+
+    <div class="circle">
+      <h3>Work</h3>
+      <div class="people">
+        <div class="person"><div class="avatar">C</div><div class="who"><b>Connie Ko</b><span>STIX teammate</span></div></div>
+        <div class="person"><div class="avatar">S</div><div class="who"><b>Sparsh</b><span>STIX teammate</span></div></div>
+        <div class="person"><div class="avatar">S</div><div class="who"><b>Shreya</b><span>Manager</span></div></div>
+      </div>
+    </div>
+
+    <div class="circle">
+      <h3>Friends &amp; neighbors</h3>
+      <div class="people">
+        <div class="person"><div class="avatar">C+J</div><div class="who"><b>Carol &amp; Joe</b><span>Cedar Pines neighbors</span></div></div>
+        <div class="person"><div class="avatar">J</div><div class="who"><b>Jeremy</b><span>Friend · first tester</span></div></div>
+      </div>
+    </div>
+
+    <div class="circle">
+      <h3>Business</h3>
+      <div class="people">
+        <div class="person"><div class="avatar">R</div><div class="who"><b>Ron</b><span>Morgan Hill co-seller</span></div></div>
+        <div class="person"><div class="avatar">K</div><div class="who"><b>Kay Korbel</b><span>Listing agent</span></div></div>
+      </div>
+    </div>
+
+    <p class="note">Per-person cadences and quiet-radar nudges go live with v1 — these are the circles I'll watch.</p>
+  </section>
+
+  <section>
+    <h2>What I'll track</h2>
+    <p class="sec-desc">The four jobs, from the brief.</p>
+    <div class="grid">
+      <div class="card"><span class="feat">🧑‍🤝‍🧑</span><strong>People profiles</strong><p>Who matters, how you're connected, what you know about them.</p></div>
+      <div class="card"><span class="feat">🔔</span><strong>Stay-in-touch nudges</strong><p>Gentle prompts before someone goes quiet — never guilt, just timing.</p></div>
+      <div class="card"><span class="feat">📝</span><strong>Notes</strong><p>The little things people mention, remembered for next time.</p></div>
+      <div class="card"><span class="feat">🎉</span><strong>Milestones</strong><p>Birthdays, moves, new jobs, anniversaries — never miss the moment.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Links</h2>
+    <div class="links">
+      <a class="btn" href="https://docs.google.com/document/d/1BdS9TfXY0Mceg7dQ68EvPK38Qo5wqAQrSC_AkS5uX_I/edit">Product Brief</a>
+      <a class="btn ghost" href="https://github.com/davedellaquila/relationship-buddy">GitHub repo</a>
+    </div>
+  </section>
+
+  <footer>Designed by Relationship Buddy · part of the Buddy family 💞</footer>
+
+</div>
+</body>
+</html>
