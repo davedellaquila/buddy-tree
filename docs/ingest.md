@@ -26,3 +26,11 @@ Want me to pull the full list of Astrid's commits tonight so we can see exactly 
 You:
 Yeah dig into that a little bit more. I'm curious where that came from
 
+## 10/9/2026, 7:18:30 PM
+
+So how will the repo find out about your URL?
+Two pieces, both already in place:
+The registry entry — in buddies.json, my buddy record has "homepage": "astro/". That's how the dashboard knows I have a homepage and where to load it from.
+The actual file — astro/index.html in the repo. GitHub Pages serves it at davedellaquila.github.io/buddy-system/astro/.
+So when you click on me in the sidebar and Project Homepage is active, the dashboard reads homepage: "astro/" from the registry, resolves it against the site root, and loads the page. No magic — just the registry pointing at a file that exists.
+
