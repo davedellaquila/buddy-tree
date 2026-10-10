@@ -131,6 +131,13 @@
   .btn:hover { background: var(--heritage-deep); }
   .empty { color: var(--dim); font-style: italic; font-size: 14px; padding: 10px 2px; }
 
+  .photostrip { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px; }
+  .photo { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px; max-width: 250px;
+           box-shadow: 0 3px 10px rgba(35,43,61,.08); transform: rotate(-1deg); }
+  .photo:nth-child(even) { transform: rotate(1deg); }
+  .photo img { width: 100%; border-radius: 8px; display: block; }
+  .photo figcaption { font-size: 12px; color: var(--dim); margin-top: 8px; text-align: center; }
+
   footer { margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line);
            color: var(--dim); font-size: 13px; display: flex; gap: 16px; flex-wrap: wrap; }
   footer a { color: var(--heritage); }
@@ -166,8 +173,8 @@
   </div>
   <div class="mind">
     <div class="dot">🎂</div>
-    <div><div class="t">Ron's birthday isn't on record</div>
-    <div class="d">Birthdate, occupation, where he lives, kids, interests — all unknown, flagged not guessed. First things to learn the next time you talk.</div></div>
+    <div><div class="t">Birthday found: March 14 (year unknown)</div>
+    <div class="d">Pulled from his Facebook page on Oct 9 — along with Santa Clara, his photography work, and San Francisco State. Still unknown: kids, interests, birth year.</div></div>
   </div>
 
   <h2 class="serif">Who Ron is <span class="sub">Only what's known — unknowns stay unknown</span></h2>
@@ -175,8 +182,21 @@
     <div class="fact"><div class="e">👨‍🦳</div><div class="t">Eldest brother</div><div class="d">Oldest of the three Dell'Aquila brothers — Ron, then Emile (middle), then Dave.</div></div>
     <div class="fact"><div class="e">🏠</div><div class="t">Morgan Hill co-seller</div><div class="d">Co-selling 18231 Llagas Creek Dr with Dave and Emile. Listing agent: Kay Korbel. All three must agree before approving any spend.</div></div>
     <div class="fact"><div class="e">💍</div><div class="t">Married to Mei-ying</div><div class="d">Ron's wife — she has her own buddy now too.</div></div>
-    <div class="fact unknown"><div class="e">❓</div><div class="t">Not yet on record</div><div class="d">Birthday, occupation, where he lives, kids, interests — every one of them unknown. They'll fill in as Dave learns them.</div></div>
+    <div class="fact"><div class="e">🎂</div><div class="t">Birthday: March 14</div><div class="d">Year not listed. Found on his Facebook page, Oct 9, 2026.</div></div>
+    <div class="fact"><div class="e">📍</div><div class="t">Santa Clara, California</div><div class="d">His current city, per Facebook — same town as Mei-ying.</div></div>
+    <div class="fact"><div class="e">📷</div><div class="t">Photographer</div><div class="d">Work lists "Ron Dell'Aquila, Photography" plus the Pacific Art League. Ex-Lawrence Livermore National Laboratory database administrator — left in 2002.</div></div>
+    <div class="fact"><div class="e">🎓</div><div class="t">San Francisco State University</div><div class="d">His school, per his Facebook profile.</div></div>
+    <div class="fact unknown"><div class="e">❓</div><div class="t">Still not on record</div><div class="d">Kids, interests, birth year — unknown. They'll fill in as Dave learns them.</div></div>
   </div>
+
+  <h2 class="serif">Photos <span class="sub">From Ron's Facebook</span></h2>
+  <div class="photostrip">
+    <figure class="photo">
+      <img src="photos/profile.jpg" alt="Ron's Facebook profile photo">
+      <figcaption>Profile photo · Facebook</figcaption>
+    </figure>
+  </div>
+  <p class="empty">He posts photos with no captions — a photographer who lets the images talk. New photos land here as they surface.</p>
 
   <h2 class="serif">The sale, from Ron's side <span class="sub">Where he stands in the Morgan Hill timeline</span></h2>
   <div class="card tl">
@@ -243,7 +263,8 @@ if (!localStorage.getItem(KEY)) {
     { text: "Mayra Vera staging proposal ($4,250 design/styling; excludes painting, wallpaper removal, cleaning, repairs, hauling) sent to all three Sep 29 — Dave drafted questions for Kay; Ron's take still unknown.", when: "2026-10-09" },
     { text: "HomeGuard termite-repair DocuSign went to Ron and Emile Oct 5; Dave dropped the HomeGuard thread Oct 7 — closed, no follow-ups.", when: "2026-10-09" },
     { text: "Rodent-proofing Estimate #787 ($5,800, Julio Arciga / Silicon Valley Rodent Proofers) sent Oct 7 — needs Ron + Emile + Dave approval.", when: "2026-10-09" },
-    { text: "Oldest of the three brothers; married to Mei-ying. Birthdate, occupation, location, kids, interests — all still unknown, flagged not guessed.", when: "2026-10-09" }
+    { text: "Oldest of the three brothers; married to Mei-ying. Kids, interests, birth year still unknown.", when: "2026-10-09" },
+    { text: "Facebook (facebook.com/ron.dellaquila, checked Oct 9): birthday March 14 (no year), lives in Santa Clara CA, San Francisco State University. Photographer — 'Ron Dell'Aquila, Photography' + Pacific Art League; ex-LLNL database administrator (left 2002). Posts photos with no captions.", when: "2026-10-09" }
   ];
   store.reminders = [
     { text: "Get Ron's birthday (and the other basics) on record next time you talk", done: false },
