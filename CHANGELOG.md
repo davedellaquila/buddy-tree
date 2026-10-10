@@ -33,7 +33,9 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
 - **Dismiss button** — the journal sticky bar's small ✕ is now a labeled
   "Dismiss" button on the right edge.
 - **Right detail-panel resize +1px** — hit area 12→13px and gripper
-  7→8px wide.
+  7→8px wide. (The left sidebar gripper was briefly widened to 10px by
+  an automated commit; restored to its original 7px — only the right
+  side was requested to grow.)
 
 ### Fixed
 - **Settings panel was completely broken** — it threw on open

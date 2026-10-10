@@ -216,7 +216,7 @@ body{padding:0}
 #zoomfit:hover{color:#e6edf3;border-color:#8b949e}
 body.light #zoombar{background:#ffffff;border-color:#d0d7de}
 #sb-resize{position:absolute;top:0;right:-6px;width:12px;height:100%;cursor:ew-resize;z-index:20;display:flex;align-items:center;justify-content:center}
-#sb-resize::after{content:'';width:10px;height:56px;border-radius:3px;background:#6e7681}
+#sb-resize::after{content:'';width:7px;height:56px;border-radius:3px;background:#6e7681}
 #sb-resize:hover::after{background:#58a6ff}
 #sb-resize:hover{background:rgba(31,111,235,.1)}
 @media (max-width:900px){#sb-resize{display:none}}
@@ -1174,7 +1174,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Saved to the buddy’s repo (docs/notes.md) — visible to everyone with repo access.">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Shared notes…"></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261009.1722</div>'
+    + '<div class="bp-build">Build 20261009.1723</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -1620,7 +1620,7 @@ function renderPlan(id){
     + '<p class="fineprint">Saved on this device. (For your eyes only)</p></div>'
     + '<div class="bp-sec"><h3>Shared notes<span class="info-tip" data-tip="Visible to everyone with access to this project.">\u24d8</span></h3><textarea class="notes" id="bp-shared" placeholder="Shared notes\u2026 (visible to everyone with access)">'+escHtml((S.planShared||{})[id]||'')+'</textarea>'
     + '<p class="fineprint">Shared — visible to everyone with access.</p></div>'
-    + '<div class="bp-build">Build 20261009.1722</div>'
+    + '<div class="bp-build">Build 20261009.1723</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
