@@ -1805,11 +1805,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Anybody with repo access can see this note. Saved to the buddy’s repo (docs/notes.md).">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Anybody with repo access can see this note."></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-<<<<<<< HEAD
     + '<div class="bp-build">Build 20261010.1936</div>'
-=======
-    + '<div class="bp-build">Build 20261010.1118</div>'
->>>>>>> origin/master
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -2351,11 +2347,7 @@ function renderPlan(id){
     + '<p class="fineprint">Saved on this device. (For your eyes only)</p></div>'
     + '<div class="bp-sec"><h3>Shared notes<span class="info-tip" data-tip="Visible to everyone with access to this project.">\u24d8</span></h3><textarea class="notes" id="bp-shared" placeholder="Shared notes\u2026 (visible to everyone with access)">'+escHtml((S.planShared||{})[id]||'')+'</textarea>'
     + '<p class="fineprint">Shared — visible to everyone with access.</p></div>'
-<<<<<<< HEAD
     + '<div class="bp-build">Build 20261010.1936</div>'
-=======
-    + '<div class="bp-build">Build 20261010.1118</div>'
->>>>>>> origin/master
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
