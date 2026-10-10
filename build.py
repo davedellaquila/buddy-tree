@@ -262,6 +262,7 @@ body.standalone .sa-bar{display:flex}
 /* ---- buddy homepage ---- */
 .bp-wrap{max-width:880px;margin:0 auto;padding:6px 4px}
 .bp-crumb{font-size:12.5px;color:#8b949e;margin-bottom:10px}
+.bp-crumb .reposlug{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:600}
 .bp-crumb b{color:#e6edf3;font-weight:600}
 .bp-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .bp-name{font-size:32px;font-weight:700;margin:0;outline:none;border-bottom:2px dashed transparent;
@@ -429,7 +430,7 @@ function crumb(id){
   while (b) { chain.unshift(b); const p = effParent(b); b = p ? byId[p] : null; }
   return chain.map((c,i) => i < chain.length-1
     ? '<a href="#" data-goto="'+c.id+'" style="color:#8b949e">'+escHtml(dispName(c))+'</a>'
-    : '<b>'+escHtml(dispName(c))+'</b>').join(' <span style="color:#6e7681">/</span> ');
+    : '<b class="reposlug" title="'+escHtml(c.repo ? 'GitHub repo: davedellaquila/'+c.repo : 'No repo linked')+'">'+escHtml(c.repo || 'no repo linked')+'</b>').join(' <span style="color:#6e7681">/</span> ');
 }
 function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function renderNav(){

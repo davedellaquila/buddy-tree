@@ -15,6 +15,13 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
   buddy page and in field settings.
 
 ### Added
+- **Repo slug eyebrow** — the small label above the buddy name on the
+  detail page now shows the buddy's true Git repo slug from the registry
+  (e.g. `buddy-tree`), in monospace with a tooltip naming the full
+  `davedellaquila/<repo>` path. Buddies with no repo linked honestly show
+  "no repo linked" instead of a name-derived guess. (Previously it showed
+  the display name, which reads as "Project" with the Hide-"Buddy" setting
+  on.)
 - **Per-dump actions** — every ingest dump tile now has edit (✏️) and
   delete (🗑️) buttons in its upper-right corner (trash on the far right,
   pencil to its left). Edit opens the full text inline and auto-saves as
