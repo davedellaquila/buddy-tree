@@ -128,6 +128,8 @@ body{padding:0}
 .cl-day:first-child{margin-top:0}
 .cl-group{display:flex;flex-direction:column;gap:4px}
 .cl-row{display:flex;gap:14px;align-items:flex-start;padding:12px 8px;border-radius:12px}
+.cl-row[data-buddy]{cursor:pointer}
+.cl-row[data-buddy]:hover{background:var(--hover)}
 .cl-row:hover{background:var(--ghost)}
 .cl-ic{font-size:18px;line-height:1;flex:0 0 auto;width:44px;height:44px;border-radius:12px;background:var(--wash2);display:flex;align-items:center;justify-content:center}
 .cl-body{flex:1;min-width:0;padding-top:2px}
@@ -669,7 +671,7 @@ function renderChangelog(){
       const d = new Date(c.t);
       const ic = CHANGE_ICONS[c.type] || '•';
       const diff = changeDiff(c);
-      return '<div class="cl-row">'
+      return '<div class="cl-row"' + (c.buddy ? ' data-buddy="' + escHtml(c.buddy) + '"' : '') + '>'
         + '<span class="cl-ic" aria-hidden="true">' + ic + '</span>'
         + '<div class="cl-body">'
         + '<div class="cl-title">' + escHtml(c.desc) + '</div>'
