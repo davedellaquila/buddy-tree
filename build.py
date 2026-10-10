@@ -83,6 +83,9 @@ body{padding:0}
 .navbtn:hover{background:var(--hover)}
 .navbtn.sel{background:var(--active);box-shadow:inset 2px 0 0 var(--accent)}
 .navbtn .nic{width:20px;text-align:center;color:var(--muted)}
+/* Views always stack vertically (desktop + iPad); phone keeps the same */
+#view-nav{display:flex;flex-direction:column;gap:2px}
+#view-nav .navbtn{flex:none;width:100%}
 .brow{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:0;
   color:var(--text);font:inherit;font-size:13.5px;padding:6px 10px 6px 8px;border-radius:8px;cursor:pointer}
 .brow:hover{background:var(--hover)}
@@ -322,11 +325,9 @@ body.standalone .sa-bar{display:flex}
   .proj-row .pname{font-size:15px}
   /* Changelog entries */
   .cl-entry{padding:14px 12px}
-  /* View nav: horizontal scroll */
-  #view-nav{display:flex;gap:6px;overflow-x:auto;padding:4px 2px;-webkit-overflow-scrolling:touch;
-    scrollbar-width:none}
-  #view-nav::-webkit-scrollbar{display:none}
-  #view-nav .navbtn{flex:none;padding:10px 16px;font-size:14px;border-radius:12px;min-height:44px}
+  /* View nav: vertical list with larger touch targets */
+  #view-nav{display:flex;flex-direction:column;gap:2px;overflow:visible;padding:0}
+  #view-nav .navbtn{flex:none;width:100%;padding:10px 12px;font-size:15px;border-radius:12px;min-height:44px}
   /* Buddy list in sidebar */
   #buddy-nav .brow{min-height:52px;padding:10px 12px;border-radius:12px;font-size:15px}
   /* Search: full width, proper size */
@@ -352,10 +353,6 @@ body.standalone .sa-bar{display:flex}
     z-index:40;background:var(--bg)}
   #main{flex:1;min-width:0;padding:28px 22px 64px;position:relative;z-index:1}
   #main.homepage-mode{padding:0}
-  /* Vertical view list (same as desktop) — not a horizontal pill strip */
-  #view-nav{display:flex;flex-direction:column;gap:2px;background:transparent;border:none;
-    border-radius:0;padding:0}
-  #view-nav .navbtn{flex:none;width:100%}
   .node{width:172px}
   #view-buddy.panel{position:fixed;top:0;right:0;bottom:0;width:min(380px,calc(100vw - 250px));z-index:30;
     background:var(--bg);border-left:1px solid var(--border);overflow-y:auto;overflow-x:hidden;
