@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Housing Buddy — Homepage</title>
+<style>
+  :root {
+    --bg: #0e1420;
+    --bg2: #141c2c;
+    --card: #1a2334;
+    --border: #2b3852;
+    --text: #eef2f9;
+    --muted: #9aa7bf;
+    --gold: #e0b45c;
+    --green: #6fce8f;
+    --blue: #6aa8d8;
+    --red: #e08a8a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    line-height: 1.55;
+    padding: 0 0 64px;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+  header.hero {
+    padding: 56px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  header.hero::after {
+    content: "";
+    position: absolute;
+    top: -40px; right: -30px;
+    width: 280px; height: 160px;
+    background: linear-gradient(135deg, transparent 40%, rgba(224,180,92,.08) 100%);
+    border-bottom: 2px solid rgba(224,180,92,.35);
+    border-left: 2px solid rgba(111,206,143,.25);
+    transform: skewX(-12deg);
+    pointer-events: none;
+  }
+  .kicker {
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-size: 12px;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 44px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .mission { color: var(--muted); font-size: 17px; max-width: 660px; }
+  .mission strong { color: var(--text); }
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 18px; padding: 7px 14px;
+    border: 1px solid var(--gold); border-radius: 999px;
+    font-size: 13px; color: var(--gold);
+  }
+  .status-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+  h2 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 24px; margin: 40px 0 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  h2 .rule { flex: 1; height: 1px; background: var(--border); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+  }
+  .card h3 { font-size: 17px; margin-bottom: 8px; }
+  .card p, .card li { color: var(--muted); font-size: 14.5px; }
+  .card ul { list-style: none; margin-top: 8px; }
+  .card li { padding: 5px 0 5px 20px; position: relative; }
+  .card li::before { content: "▸"; position: absolute; left: 2px; color: var(--gold); }
+  .tag {
+    display: inline-block; font-size: 11.5px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--gold); border: 1px solid var(--border); border-radius: 6px;
+    padding: 3px 9px; margin-bottom: 10px;
+  }
+  .timeline { position: relative; margin: 8px 0 0 8px; padding-left: 28px; border-left: 2px solid var(--border); }
+  .step { position: relative; padding: 0 0 24px; }
+  .step:last-child { padding-bottom: 4px; }
+  .step::before {
+    content: ""; position: absolute; left: -37px; top: 4px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--bg); border: 2px solid var(--muted);
+  }
+  .step.done::before { background: var(--green); border-color: var(--green); }
+  .step.now::before { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 0 4px rgba(224,180,92,.15); }
+  .step h3 { font-size: 16px; }
+  .step .when { font-size: 12.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .step p { color: var(--muted); font-size: 14.5px; margin-top: 4px; }
+  .attention {
+    background: linear-gradient(135deg, rgba(224,180,92,.10), rgba(224,180,92,.02));
+    border: 1px solid var(--gold);
+    border-radius: 14px; padding: 22px;
+  }
+  .attention h3 { font-size: 18px; margin-bottom: 6px; }
+  .attention p { color: var(--muted); font-size: 15px; }
+  .btn {
+    display: inline-block; margin-top: 14px; padding: 10px 20px;
+    background: var(--gold); color: #1a1408; font-weight: 600; font-size: 14.5px;
+    border-radius: 10px; text-decoration: none;
+  }
+  .btn:hover { filter: brightness(1.08); }
+  .btn.ghost { background: transparent; color: var(--gold); border: 1px solid var(--gold); margin-left: 10px; }
+  .decisions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 640px) { .decisions { grid-template-columns: 1fr; } }
+  .decision { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .decision .d { color: var(--gold); font-weight: 700; font-size: 13px; letter-spacing: 1px; }
+  .decision p { color: var(--muted); font-size: 14px; margin-top: 4px; }
+  .decision p strong { color: var(--text); }
+  .stack { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+  .chip {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 999px;
+    padding: 8px 16px; font-size: 14px; color: var(--text);
+  }
+  .chip small { color: var(--muted); }
+  .chip.core { border-color: var(--green); }
+  .cost { margin-top: 14px; color: var(--muted); font-size: 14.5px; }
+  .cost strong { color: var(--green); }
+  .docrow {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 18px; margin-bottom: 10px; text-decoration: none; color: var(--text);
+  }
+  .docrow:hover { border-color: var(--gold); }
+  .docrow .t { font-weight: 600; font-size: 15px; }
+  .docrow .s { color: var(--muted); font-size: 13px; }
+  .docrow .go { color: var(--gold); font-size: 18px; }
+  footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; }
+  footer a { color: var(--gold); }
+  a { color: var(--gold); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">Buddy Homepage</div>
+    <h1>🏠 Housing Buddy</h1>
+    <p class="mission">Your know-your-market real estate tool — <strong>what your home is worth</strong>, and <strong>where you should live next</strong>. One dashboard that stays current as prices, inventory, and local signals change.</p>
+    <div class="status-pill"><span class="dot"></span> PRD in review — awaiting Dave</div>
+  </header>
+
+  <h2>What I track <span class="rule"></span></h2>
+  <div class="grid">
+    <div class="card">
+      <span class="tag">Half 1 · Valuation</span>
+      <h3>📈 What your home is worth</h3>
+      <p>A grounded view of a home's value and how it's changed.</p>
+      <ul>
+        <li>Aggregated estimates, shown as ranges — never a fake-precise price</li>
+        <li>Historical trends and comparable sales</li>
+        <li>Saved-home pulse: what changed, and notable movement alerts</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag">Half 2 · Search</span>
+      <h3>🔎 Where you should live next</h3>
+      <p>Requirements-based home search with a 360° area view.</p>
+      <ul>
+        <li>Hard constraints + weighted preferences, tradeoffs in plain language</li>
+        <li>Ranked matches: new, updated, and removed options</li>
+        <li>Area view: schools, commute, safety, walkability, hazards</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Where things stand <span class="rule"></span></h2>
+  <div class="timeline">
+    <div class="step done">
+      <div class="when">Done · Oct 8</div>
+      <h3>Product brief approved</h3>
+      <p>Dave signed off on the brief — two halves, three-pulse dashboard, v1 scope.</p>
+    </div>
+    <div class="step now">
+      <div class="when">Now · awaiting review</div>
+      <h3>PRD Draft v1</h3>
+      <p>Full spec written: decisions, data sourcing, product experience, phasing. Needs Dave's review before the repo gets created.</p>
+    </div>
+    <div class="step">
+      <div class="when">Next</div>
+      <h3>GitHub repo</h3>
+      <p>Create the repo and start the build once the PRD is approved.</p>
+    </div>
+    <div class="step">
+      <div class="when">After</div>
+      <h3>Build v1 · Sacramento metro</h3>
+      <p>Valuation dashboard + market pulse + buyer search, on the RentCast-powered data stack.</p>
+    </div>
+  </div>
+
+  <h2>Needs your attention <span class="rule"></span></h2>
+  <div class="attention">
+    <h3>📋 Review the PRD Draft v1</h3>
+    <p>Four decisions need your confirm: valuation-led experience, homeowners first, Sacramento metro for v1, and the ~$75–200/mo data budget. Then we create the repo and build.</p>
+    <a class="btn" href="https://docs.google.com/document/d/1yzuFUxmnnSID4MSfI2JXyrREdWxLcx0QrQkDbCj5wEs/edit">Review the PRD</a>
+    <a class="btn ghost" href="https://docs.google.com/document/d/1XrG_FERFrw-mfCIO-jVsTEBWTo4oie2UvxRoJl9iAdo/edit">Re-read the brief</a>
+  </div>
+
+  <h2>Key decisions <span class="rule"></span></h2>
+  <div class="decisions">
+    <div class="decision"><div class="d">D1 · LEAD</div><p><strong>Valuation first.</strong> The saved-home pulse is the daily habit; AVM data is the most reliable input. Search ships as the second tab.</p></div>
+    <div class="decision"><div class="d">D2 · AUDIENCE</div><p><strong>Homeowners first, buyers second.</strong> Renters in v2 — the rental data path is already warm.</p></div>
+    <div class="decision"><div class="d">D3 · GEOGRAPHY</div><p><strong>Sacramento metro for v1.</strong> Home market; its urban-to-exurban mix stress-tests sparse-data handling early. Bay Area next.</p></div>
+    <div class="decision"><div class="d">D4 · MATCHING</div><p><strong>Hard constraints + weighted preferences.</strong> Tradeoffs explained in plain language, never a black-box score.</p></div>
+  </div>
+
+  <h2>Data stack <span class="rule"></span></h2>
+  <div class="card">
+    <p>Lawful, self-serve, no licensing negotiation — Zillow/Redfin/Realtor.com offer no public APIs, so v1 runs on:</p>
+    <div class="stack">
+      <span class="chip core">RentCast API <small>· core · $74–199/mo</small></span>
+      <span class="chip">Zillow Research CSVs <small>· free</small></span>
+      <span class="chip">Walk Score <small>· free tier</small></span>
+      <span class="chip">Census ACS <small>· free</small></span>
+      <span class="chip">NCES schools <small>· free</small></span>
+      <span class="chip">FBI Crime Data <small>· free</small></span>
+      <span class="chip">FEMA hazards <small>· free</small></span>
+    </div>
+    <p class="cost">Estimated v1 data cost: <strong>~$75–200/mo</strong>. Parallel track: Zillow Bridge application + licensed-agent IDX partnership for MLS-complete inventory in v2.</p>
+  </div>
+
+  <h2>Docs & artifacts <span class="rule"></span></h2>
+  <a class="docrow" href="https://docs.google.com/document/d/1XrG_FERFrw-mfCIO-jVsTEBWTo4oie2UvxRoJl9iAdo/edit">
+    <div><div class="t">📄 Product Brief</div><div class="s">Approved Oct 8 · Zuki Docs</div></div><div class="go">→</div>
+  </a>
+  <a class="docrow" href="https://docs.google.com/document/d/1yzuFUxmnnSID4MSfI2JXyrREdWxLcx0QrQkDbCj5wEs/edit">
+    <div><div class="t">📋 PRD Draft v1</div><div class="s">Awaiting Dave's review · Zuki Docs</div></div><div class="go">→</div>
+  </a>
+  <a class="docrow" href="#">
+    <div><div class="t">🏡 Property Dossier — 3848 Melody Ln, Santa Clara</div><div class="s">Research artifact · Oct 9 — first live test-drive of the concept</div></div><div class="go">→</div>
+  </a>
+
+  <footer>
+    Mission source: <a href="https://docs.google.com/document/d/1XrG_FERFrw-mfCIO-jVsTEBWTo4oie2UvxRoJl9iAdo/edit">Housing Buddy — Product Brief</a> · Homepage last updated Oct 9, 2026
+  </footer>
+
+</div>
+</body>
+</html>
