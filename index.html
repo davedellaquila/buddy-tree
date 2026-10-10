@@ -940,13 +940,11 @@ function openBuddy(id){
   const b = byId[id];
   // Project Homepage view: clicking a buddy loads its homepage in the main view
   // (if it has one) AND opens the right-side detail panel.
-  // No homepage -> leave the main view exactly as it was, but still open the panel.
+  // In Project Homepage view: every buddy has a homepage (custom URL or auto-generated)
   if (S.view === 'project') {
-    if (getHomepage(b)) {
-      S.projectId = id; save();
-      renderProjectView();
-      renderNav();
-    }
+    S.projectId = id; save();
+    renderProjectView();
+    renderNav();
     // Fall through to open the right-side panel below
   }
   const inView = (S.sel || '').startsWith('view:');
@@ -1407,18 +1405,69 @@ function applyPlanFilter(){
     t.classList.toggle('sel', t.dataset.tile === planFilter);
   });
 }
+function buddyHomepageHtml(b){
+  const kids = (b.children || []).map(cid => byId[cid]).filter(Boolean);
+  const arts = b.artifacts || [];
+  const plans = (typeof PLANS !== 'undefined' && PLANS[b.id]) || [];
+  const attnItems = (b.attention || []).filter(a => !S.seen[b.id + ':' + (a.id || a.text)]);
+  let h = '<div style="max-width:800px;margin:0 auto;padding:40px 24px;font-family:inherit">';
+  // Header
+  h += '<div style="text-align:center;margin-bottom:36px">';
+  h += '<div style="font-size:64px;margin-bottom:12px">' + (b.icon || '🤖') + '</div>';
+  h += '<h1 style="font-size:32px;margin:0 0 8px">' + escHtml(dispName(b)) + '</h1>';
+  if (b.tagline) h += '<p style="color:var(--muted);font-size:16px;margin:0">' + escHtml(b.tagline) + '</p>';
+  h += '</div>';
+  // Mission
+  if (b.mission) {
+    h += '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px">';
+    h += '<h3 style="margin:0 0 12px;font-size:14px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">About</h3>';
+    h += '<p style="margin:0;line-height:1.6">' + escHtml(b.mission) + '</p></div>';
+  }
+  // Attention
+  if (attnItems.length) {
+    h += '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px">';
+    h += '<h3 style="margin:0 0 12px;font-size:14px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Needs attention (' + attnItems.length + ')</h3>';
+    attnItems.slice(0, 5).forEach(a => {
+      h += '<div style="padding:8px 0;border-bottom:1px solid var(--border)"><span style="color:#f0a35e">●</span> ' + escHtml(a.text || a) + '</div>';
+    });
+    h += '</div>';
+  }
+  // Children
+  if (kids.length) {
+    h += '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px">';
+    h += '<h3 style="margin:0 0 12px;font-size:14px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Sub-buddies (' + kids.length + ')</h3>';
+    h += '<div style="display:flex;flex-wrap:wrap;gap:8px">';
+    kids.forEach(k => {
+      h += '<span style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:14px">' + (k.icon || '🤖') + ' ' + escHtml(dispName(k)) + '</span>';
+    });
+    h += '</div></div>';
+  }
+  // Artifacts
+  if (arts.length) {
+    h += '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px">';
+    h += '<h3 style="margin:0 0 12px;font-size:14px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Artifacts (' + arts.length + ')</h3>';
+    arts.slice(0, 6).forEach(a => {
+      h += '<div style="padding:6px 0"><a href="' + escHtml(a.url || '#') + '" target="_blank" style="color:var(--accent);text-decoration:none">' + escHtml(a.title || a.name || 'Artifact') + '</a></div>';
+    });
+    h += '</div>';
+  }
+  h += '<p style="text-align:center;color:var(--muted);font-size:12px;margin-top:32px">Auto-generated homepage — set a custom URL in the Homepage URL field to override.</p>';
+  h += '</div>';
+  return h;
+}
 function renderProjectView(){
   const pv = document.getElementById('view-project');
   if (!pv) return;
   const b = byId[projectId()] || {};
   pv.innerHTML = '';
   const hp = getHomepage(b);
+  document.getElementById('main').classList.add('homepage-mode');
+  const bar2 = document.getElementById('journal-bar');
+  if (bar2) bar2.classList.remove('show');
+  const wrap = document.createElement('div');
+  wrap.id = 'homepage-wrap';
   if (hp) {
-    document.getElementById('main').classList.add('homepage-mode');
-    const bar2 = document.getElementById('journal-bar');
-    if (bar2) bar2.classList.remove('show');
-    const wrap = document.createElement('div');
-    wrap.id = 'homepage-wrap';
+    // Custom homepage URL: load in iframe
     const open = document.createElement('a');
     open.id = 'homepage-open';
     open.href = b.homepageSource || hp;
@@ -1441,14 +1490,20 @@ function renderProjectView(){
       } catch (err) {}
     });
     wrap.appendChild(frame);
-    pv.appendChild(wrap);
   } else {
-    document.getElementById('main').classList.remove('homepage-mode');
-    const empty = document.createElement('div');
-    empty.style.cssText = 'display:flex;align-items:center;justify-content:center;height:40vh;color:var(--muted);font-size:15px';
-    empty.textContent = 'No homepage for this project.';
-    pv.appendChild(empty);
+    // No custom URL: auto-generate homepage
+    const open = document.createElement('span');
+    open.id = 'homepage-open';
+    open.style.cssText = 'cursor:default;opacity:0.6';
+    open.textContent = 'Auto-generated homepage';
+    wrap.appendChild(open);
+    const content = document.createElement('div');
+    content.id = 'homepage-frame';
+    content.style.cssText = 'width:100%;height:100%;overflow:auto;background:var(--bg)';
+    content.innerHTML = buddyHomepageHtml(b);
+    wrap.appendChild(content);
   }
+  pv.appendChild(wrap);
 }
 function renderBuddy(id){
   const b = byId[id]; if(!b) return;
@@ -1527,7 +1582,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Anybody with repo access can see this note. Saved to the buddy’s repo (docs/notes.md).">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Anybody with repo access can see this note."></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261009.2010</div>'
+    + '<div class="bp-build">Build 20261009.2017</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -2049,7 +2104,7 @@ function renderPlan(id){
     + '<p class="fineprint">Saved on this device. (For your eyes only)</p></div>'
     + '<div class="bp-sec"><h3>Shared notes<span class="info-tip" data-tip="Visible to everyone with access to this project.">\u24d8</span></h3><textarea class="notes" id="bp-shared" placeholder="Shared notes\u2026 (visible to everyone with access)">'+escHtml((S.planShared||{})[id]||'')+'</textarea>'
     + '<p class="fineprint">Shared — visible to everyone with access.</p></div>'
-    + '<div class="bp-build">Build 20261009.2010</div>'
+    + '<div class="bp-build">Build 20261009.2017</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
@@ -2742,7 +2797,7 @@ function initGear(){
 // has a newer build than the one currently loaded (helps Safari web apps
 // and other containers without a hard-refresh shortcut).
 function initVersionCheck(){
-  const myBuild = '20261009.2010';
+  const myBuild = '20261009.2017';
   async function check(){
     try {
       const r = await fetch('version.txt?_=' + Date.now(), {cache: 'no-store'});
