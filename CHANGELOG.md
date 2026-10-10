@@ -24,6 +24,13 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
   right to the last. The view buttons (Tree, Projects, Plans, Manifest,
   Changelog) are reached with number keys 1–9 instead of sharing the
   arrow-key list.
+- **Theme picker moved to settings** — the Light/Dark/System switch now
+  lives in the settings panel (where settings belong), not under the
+  sidebar brand.
+- **Settings panel upgrades** — footer buttons (Reset/Update/Done) are now
+  sticky (always visible while the field list scrolls); the panel is
+  draggable by its header and resizable from the bottom-right corner, with
+  position and size persisted per device.
 
 ### Added
 - **Light / Dark / System theme** — a three-way segmented picker under
