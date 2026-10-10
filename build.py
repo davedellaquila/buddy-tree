@@ -78,7 +78,7 @@ body{padding:0}
 #zoomfit:hover{color:#e6edf3;border-color:#8b949e}
 body.light #zoombar{background:#ffffff;border-color:#d0d7de}
 #sb-resize{position:absolute;top:0;right:-6px;width:12px;height:100%;cursor:ew-resize;z-index:20;display:flex;align-items:center;justify-content:center}
-#sb-resize::after{content:'';width:7px;height:56px;border-radius:3px;background:#6e7681}
+#sb-resize::after{content:'';width:8px;height:56px;border-radius:3px;background:#6e7681}
 #sb-resize:hover::after{background:#58a6ff}
 #sb-resize:hover{background:rgba(31,111,235,.1)}
 @media (max-width:900px){#sb-resize{display:none}}
@@ -89,6 +89,7 @@ body.light #zoombar{background:#ffffff;border-color:#d0d7de}
 #journal-bar ul{margin:8px 0 4px;padding-left:18px;display:none}
 #journal-bar.open ul{display:block}
 #journal-bar li{margin:3px 0;color:#c9d1d9}
+.jchg{color:#8b949e;font-size:12px;margin:0 8px}
 #journal-bar .jtime{color:#6e7681;font-size:11px;margin-left:6px}
 .pdrop{border:2px dashed #30363d;border-radius:12px;padding:20px;text-align:center;color:#8b949e;font-size:13px;margin-top:10px;cursor:pointer}
 .pdrop.over{border-color:#1f6feb;background:#0d1a30;color:#e6edf3}
@@ -137,9 +138,9 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
   cursor:pointer;display:flex;align-items:center;justify-content:center}
 .bp-close-x:hover{color:#e6edf3}
 #buddy-home{position:relative}
-#bp-resize{position:absolute;left:-8px;top:0;bottom:0;width:12px;cursor:ew-resize;z-index:20;
+#bp-resize{position:absolute;left:-8px;top:0;bottom:0;width:13px;cursor:ew-resize;z-index:20;
   display:flex;align-items:center;justify-content:center}
-#bp-resize::after{content:'';width:7px;height:56px;border-radius:3px;background:#6e7681}
+#bp-resize::after{content:'';width:8px;height:56px;border-radius:3px;background:#6e7681}
 #bp-resize:hover::after{background:#58a6ff}
 #bp-resize:hover{background:rgba(31,111,235,.1)}
 #view-buddy.active:not(.panel):not(.sheet) #bp-resize{display:none}
@@ -435,8 +436,61 @@ function crumb(id){
     : '<b class="reposlug" title="'+escHtml(c.repo ? 'GitHub repo: davedellaquila/'+c.repo : 'No repo linked')+'">'+escHtml(c.repo || 'no repo linked')+'</b>').join(' <span style="color:#6e7681">/</span> ');
 }
 function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+const VIEW_DEFS = [
+  ['tree','Tree','▦'],
+  ['projects','Projects','☰'],
+  ['plans','Plans','💼'],
+  ['manifest','Manifest','✓'],
+  ['project','Project','🏠'],
+  ['changelog','Changelog','🕘'],
+];
+function getViewOrder(){
+  const ids = VIEW_DEFS.map(v => v[0]);
+  if (!Array.isArray(S.viewOrder)) S.viewOrder = ids.slice();
+  const clean = S.viewOrder.filter(id => ids.indexOf(id) >= 0);
+  ids.forEach(id => { if (clean.indexOf(id) < 0) clean.push(id); });
+  S.viewOrder = clean;
+  return clean;
+}
+function projectId(){
+  const id = S.projectId;
+  return (id && byId[id]) ? id : 'project-buddy';
+}
+function selectProject(id){
+  if (!byId[id]) return;
+  S.projectId = id; save();
+  show('view:project');
+}
+function shortVal(v){
+  if (v == null || v === '') return '(empty)';
+  const s = String(v);
+  return escHtml(s.length > 90 ? s.slice(0, 90) + '…' : s);
+}
+function changeOldNew(c){
+  let b = c.before, a = c.after;
+  if (c.type === 'move') {
+    b = b ? (((byId[b] || {}).name) || b) : '(top level)';
+    a = a ? (((byId[a] || {}).name) || a) : '(top level)';
+  }
+  if (b == null && a == null) return '';
+  return ' <span class="jchg">' + shortVal(b) + ' → ' + shortVal(a) + '</span>';
+}
+function renderChangelog(){
+  const el = document.getElementById('view-changelog');
+  if (!el) return;
+  const js = (S.journal || []).slice().reverse();
+  let h = '<section class="projects-view" style="margin-top:24px"><h2>Changelog</h2>'
+    + '<p class="sub">Every change made in this dashboard, newest first.</p>';
+  if (!js.length) h += '<p class="fineprint">No changes yet.</p>';
+  else h += '<div class="proj-list">' + js.map(c =>
+    '<div class="proj-row"><span class="pname">' + escHtml(c.desc) + '</span>'
+    + '<span class="pdesc">' + changeOldNew(c) + '</span>'
+    + '<span class="attn-date">' + escHtml(new Date(c.t).toLocaleString()) + '</span></div>'
+  ).join('') + '</div>';
+  el.innerHTML = h + '</section>';
+}
 function renderNav(){
-  const views = [['tree','Tree','▦'],['projects','Projects','☰'],['plans','Plans','💼'],['manifest','Manifest','✓']];
+  const views = getViewOrder().map(id => VIEW_DEFS.find(v => v[0] === id)).filter(Boolean);
   document.getElementById('view-nav').innerHTML = views.map(([v,l,ic]) =>
     '<button class="navbtn'+(S.sel==='view:'+v?' sel':'')+'" data-view="'+v+'"><span class="nic">'+ic+'</span>'+l+'</button>').join('');
   const q = (document.getElementById('buddy-search').value || '').toLowerCase().trim();
@@ -452,7 +506,7 @@ function renderNav(){
     if (words.length && !matches(b)) { (kidsOf[id] || []).forEach(c => row(c.id, depth+1)); return; }
     const un = descUnseen(id);
     const kind = b.kind === 'root' ? 'root' : (b.parent === 'project-buddy' ? 'direct' : b.kind);
-    h += '<button class="brow'+(S.sel==='buddy:'+id?' sel':'')+(un?' has-unseen':'')+'" data-buddy="'+id+'"'
+    h += '<button class="brow'+((S.sel==='buddy:'+id || (S.sel==='view:project' && projectId()===id))?' sel':'')+(un?' has-unseen':'')+'" data-buddy="'+id+'"'
       + ' draggable="'+(id==='project-buddy'?'false':'true')+'"'
       + ' style="padding-left:'+(8+depth*16)+'px" title="'+escHtml(b.tagline||'')+'">'
       + '<span class="bdot"></span><span class="bicon">'+escHtml(b.icon||'')+'</span><span class="bname">'+escHtml(dispName(b))+'</span>'
@@ -544,42 +598,79 @@ function isFieldVisible(fid){
   if (!S.fieldHidden) S.fieldHidden = {};
   return !S.fieldHidden[fid];
 }
+const SETTING_DEFS = [
+  {id:'hideBuddyWord', label:'Hide the word “Buddy” in names', type:'bool', def:false},
+];
+function getSetting(id){
+  const def = SETTING_DEFS.find(s => s.id === id);
+  if (S[id] === undefined) return def ? !!def.def : undefined;
+  return S[id];
+}
+function snapshotSettable(){
+  return {
+    hideBuddyWord: !!S.hideBuddyWord,
+    fieldOrder: getFieldOrder().slice(),
+    fieldHidden: Object.assign({}, S.fieldHidden || {}),
+    viewOrder: getViewOrder().slice(),
+  };
+}
+function resetToFactory(){
+  const f = S.factory || {};
+  S.hideBuddyWord = !!f.hideBuddyWord;
+  if (Array.isArray(f.fieldOrder) && f.fieldOrder.length) S.fieldOrder = f.fieldOrder.slice();
+  if (f.fieldHidden && typeof f.fieldHidden === 'object') S.fieldHidden = Object.assign({}, f.fieldHidden);
+  if (Array.isArray(f.viewOrder) && f.viewOrder.length) S.viewOrder = f.viewOrder.slice();
+  save();
+}
+function updateFactory(){
+  S.factory = snapshotSettable();
+  save();
+}
+function renderSettingChecks(){
+  const sdiv = document.getElementById('fset-settings');
+  if (!sdiv) return;
+  sdiv.innerHTML = SETTING_DEFS.map(s => {
+    const val = getSetting(s.id);
+    if (s.type === 'bool') return '<label style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13px;cursor:pointer"><input type="checkbox" data-setting="' + s.id + '"' + (val ? ' checked' : '') + '> ' + s.label + '</label>';
+    return '';
+  }).join('');
+  sdiv.querySelectorAll('[data-setting]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      S[cb.dataset.setting] = cb.checked; save();
+      show(S.sel, false);
+    });
+  });
+}
 function openFieldSettings(){
   let m = document.getElementById('field-settings');
   if (!m) {
     m = document.createElement('div'); m.id = 'field-settings';
     m.innerHTML = '<h3>Buddy fields</h3><p class="fineprint" style="margin-bottom:12px">Drag to reorder. Uncheck to hide.</p><div id="fset-list"></div>'
+      + '<h3 style="margin-top:18px">Main views</h3><p class="fineprint" style="margin-bottom:12px">Drag to reorder. Number keys 1–9 follow this order.</p><div id="vset-list"></div>'
       + '<div id="fset-settings" style="margin-top:12px"></div>'
       + '<div style="margin-top:12px;display:flex;gap:8px;justify-content:space-between;align-items:center">'
       + '<div style="display:flex;gap:8px"><button class="linkbtn" id="fset-reset" title="Restore all settings to factory defaults">Reset to Factory Defaults</button>'
       + '<button class="linkbtn" id="fset-update" title="Save current settings as the new factory defaults">Update Factory Defaults</button></div>'
       + '<button class="linkbtn" id="fset-close">Done</button></div>';
-    document.getElementById('fset-close').addEventListener('click', () => m.classList.remove('show'));
-    const sdiv = document.getElementById('fset-settings');
-    sdiv.innerHTML = SETTING_DEFS.map(s => {
-      const val = getSetting(s.id);
-      if (s.type === 'bool') return '<label style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13px;cursor:pointer"><input type="checkbox" data-setting="' + s.id + '"' + (val ? ' checked' : '') + '> ' + s.label + '</label>';
-      return '';
-    }).join('');
-    sdiv.querySelectorAll('[data-setting]').forEach(cb => {
-      cb.addEventListener('change', () => {
-        S[cb.dataset.setting] = cb.checked; save();
-        renderNav(); const mm2 = S.sel.match(/^buddy:(.+)$/); if (mm2) renderBuddy(mm2[1]); if (S.sel === 'view:tree') renderTree();
-      });
-    });
-    document.getElementById('fset-reset').addEventListener('click', () => {
+    document.body.appendChild(m);
+    m.querySelector('#fset-close').addEventListener('click', () => m.classList.remove('show'));
+    renderSettingChecks();
+    m.querySelector('#fset-reset').addEventListener('click', () => {
       if (!confirm('Reset all settings to factory defaults?')) return;
-      resetToFactory(); openFieldSettings();
-      renderNav(); const mm3 = S.sel.match(/^buddy:(.+)$/); if (mm3) renderBuddy(mm3[1]); if (S.sel === 'view:tree') renderTree();
+      resetToFactory(); renderSettingChecks(); openFieldSettings();
+      show(S.sel, false);
     });
-    document.getElementById('fset-update').addEventListener('click', () => {
+    m.querySelector('#fset-update').addEventListener('click', () => {
       if (!confirm('Save current settings as the new factory defaults?')) return;
       updateFactory(); toast('Factory defaults updated.');
     });
   }
-  document.addEventListener('keydown', function escClose(e){
-    if (e.key === 'Escape') { const fm = document.getElementById('field-settings'); if (fm) fm.classList.remove('show'); }
-  });
+  if (!window._fsetEscBound) {
+    window._fsetEscBound = true;
+    document.addEventListener('keydown', function escClose(e){
+      if (e.key === 'Escape') { const fm = document.getElementById('field-settings'); if (fm) fm.classList.remove('show'); }
+    });
+  }
   const list = document.getElementById('fset-list');
   list.innerHTML = getFieldOrder().map(fid => {
     const def = FIELD_DEFS.find(f => f.id === fid);
@@ -616,6 +707,33 @@ function openFieldSettings(){
       const mm = S.sel.match(/^buddy:(.+)$/); if (mm) renderBuddy(mm[1]);
     });
   });
+  const vlist = document.getElementById('vset-list');
+  if (vlist) {
+    vlist.innerHTML = getViewOrder().map(vid => {
+      const def = VIEW_DEFS.find(v => v[0] === vid);
+      if (!def) return '';
+      return '<div class="fset-row" draggable="true" data-vid="' + vid + '">'
+        + '<span class="fh">☰</span><span class="fl">' + def[1] + '</span></div>';
+    }).join('');
+    let vdragEl = null;
+    vlist.querySelectorAll('.fset-row').forEach(row => {
+      row.addEventListener('dragstart', e => { vdragEl = row; row.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
+      row.addEventListener('dragend', () => row.classList.remove('dragging'));
+      row.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+      row.addEventListener('drop', e => {
+        e.preventDefault();
+        if (!vdragEl || vdragEl === row) return;
+        const ids = Array.from(vlist.querySelectorAll('.fset-row')).map(r => r.dataset.vid);
+        const from = ids.indexOf(vdragEl.dataset.vid), to = ids.indexOf(row.dataset.vid);
+        const order = getViewOrder();
+        const moved = order.splice(from, 1)[0];
+        order.splice(to, 0, moved);
+        S.viewOrder = order; save();
+        renderNav();
+        openFieldSettings();
+      });
+    });
+  }
   m.classList.add('show');
 }
 function applyPanelWidth(){
@@ -932,8 +1050,8 @@ let treeHTML0 = null, projHTML0 = null;
 function refreshViews(){
   const tz = document.getElementById('treezoom'), vp = document.getElementById('view-projects');
   if (treeHTML0 === null) { treeHTML0 = tz.innerHTML; projHTML0 = vp.innerHTML; }
-  if (Object.keys(S.parents).length) { renderOrgTree(); renderProjects(); }
-  else { tz.innerHTML = treeHTML0; vp.innerHTML = projHTML0; }
+  if (Object.keys(S.parents).length) { renderOrgTree(); } else { tz.innerHTML = treeHTML0; }
+  renderProjects();
 }
 function applyZoom(){
   const tz = document.getElementById('treezoom');
@@ -1184,16 +1302,14 @@ document.addEventListener('keydown', e => {
     if (btn && btn.dataset.view) { show('view:' + btn.dataset.view); e.preventDefault(); }
   }
 });
-let curBuddyMode = 'overlay';
-function show(sel, push, mode){
+function show(sel, push){
   if (push !== false && S.sel && sel !== S.sel) { navHist.push(S.sel); if (navHist.length > 60) navHist.shift(); }
   S.sel = sel; save();
   const h = hashFor(sel);
   try { if (typeof location !== 'undefined' && location.hash !== h) location.hash = h; } catch (e) {}
   document.body.classList.toggle('standalone', isStandalone());
   const vb = document.getElementById('view-buddy');
-  if (sel.startsWith('buddy:') && mode) curBuddyMode = mode;
-  const asOverlay = sel.startsWith('buddy:') && !isStandalone() && curBuddyMode !== 'center';
+  const asOverlay = sel.startsWith('buddy:') && !isStandalone();
   if (asOverlay) {
     vb.classList.add('active');
     vb.classList.toggle('panel', window.innerWidth >= 640);
@@ -1201,14 +1317,19 @@ function show(sel, push, mode){
     renderBuddy(sel.slice(6));
   } else {
     document.querySelectorAll('#main .view').forEach(v => v.classList.remove('active', 'panel', 'sheet'));
-    if (sel.startsWith('view:')) {
-      document.getElementById('view-' + sel.slice(5)).classList.add('active');
+    if (sel === 'view:project') {
+      vb.classList.add('active');
+      vb.style.width = '';
+      renderBuddy(projectId());
+    } else if (sel.startsWith('view:')) {
+      const ev = document.getElementById('view-' + sel.slice(5));
+      if (ev) ev.classList.add('active');
+      if (sel === 'view:changelog') renderChangelog();
     } else if (sel.startsWith('plan:')) {
       vb.classList.add('active');
       renderPlan(sel.slice(5));
     } else {
       vb.classList.add('active');
-      vb.style.width = '';
       renderBuddy(sel.slice(6));
     }
   }
@@ -1216,10 +1337,16 @@ function show(sel, push, mode){
   document.getElementById('main').scrollTop = 0;
   window.scrollTo(0,0);
   setIcon(sel.startsWith('plan:') ? ((planById[sel.slice(5)] || {}).icon)
+    : sel === 'view:project' ? ((byId[projectId()] || {}).icon)
     : sel.startsWith('buddy:') ? ((byId[sel.slice(6)] || {}).icon) : byId['project-buddy'].icon);
 }
 /* ---------- keyboard nav ---------- */
 document.addEventListener('keydown', e => {
+  if (e.target && e.target.id === 'buddy-search' && e.key === 'ArrowDown') {
+    const first = document.querySelector('#buddy-nav [data-buddy]');
+    if (first) { e.preventDefault(); e.target.blur(); selectProject(first.dataset.buddy); }
+    return;
+  }
   if (e.target && e.target.matches && e.target.matches('input, textarea, [contenteditable="true"]')) return;
   if (e.key === 'Escape') { closeDetail(); return; }
   if (e.key === '/' && !e.target.matches('input, textarea, [contenteditable="true"]')) { e.preventDefault(); const bs = document.getElementById('buddy-search'); if (bs) bs.focus(); return; }
@@ -1227,17 +1354,21 @@ document.addEventListener('keydown', e => {
   if (e.key === '-' || e.key === '_') { S.zoom = Math.max(50, (S.zoom || 100) - 5); save(); applyZoom(); return; }
   if (e.key === '0') { zoomToFit(); return; }
   if (!['ArrowDown','ArrowUp','ArrowLeft','ArrowRight'].includes(e.key)) return;
-  const items = Array.from(document.querySelectorAll('#buddy-nav [data-buddy]'));
-  if (!items.length) return;
+  const vbtns = Array.from(document.querySelectorAll('#view-nav .navbtn[data-view]'));
+  const rows = Array.from(document.querySelectorAll('#buddy-nav [data-buddy]'));
+  const total = vbtns.length + rows.length;
+  if (!total) return;
   e.preventDefault();
-  const curId = (S.sel || '').startsWith('buddy:') ? S.sel.slice(6) : null;
-  let idx = items.findIndex(el => el.dataset.buddy === curId);
-  if (e.key === 'ArrowDown') idx = idx + 1;
-  else if (e.key === 'ArrowUp') idx = idx - 1;
-  else if (e.key === 'ArrowLeft') idx = 0;
-  else if (e.key === 'ArrowRight') idx = items.length - 1;
-  idx = Math.max(0, Math.min(items.length - 1, idx));
-  show('buddy:' + items[idx].dataset.buddy, true, 'center');
+  let pos = -1;
+  const sel = S.sel || '';
+  if (sel.startsWith('view:')) pos = vbtns.findIndex(b => b.dataset.view === sel.slice(5));
+  else if (sel.startsWith('buddy:')) { const ri = rows.findIndex(r => r.dataset.buddy === sel.slice(6)); if (ri >= 0) pos = vbtns.length + ri; }
+  if (e.key === 'ArrowDown') pos = (pos + 1 + total) % total;
+  else if (e.key === 'ArrowUp') pos = (pos - 1 + total) % total;
+  else if (e.key === 'ArrowLeft') pos = 0;
+  else if (e.key === 'ArrowRight') pos = total - 1;
+  if (pos < vbtns.length) show('view:' + vbtns[pos].dataset.view);
+  else selectProject(rows[pos - vbtns.length].dataset.buddy);
 });
 /* ---------- sidebar resize ---------- */
 (function initSbResize(){
@@ -1268,18 +1399,26 @@ function logChange(type, buddyId, desc, before, after){
 }
 function renderJournal(){
   const bar = document.getElementById('journal-bar'); if (!bar) return;
+  if (!Array.isArray(S.journal)) S.journal = [];
+  const unseen = S.journal.filter(c => !c.seen);
+  if (!unseen.length) { bar.classList.remove('show'); bar.innerHTML = ''; return; }
   const n = S.journal.length;
-  if (!n) { bar.classList.remove('show'); bar.innerHTML = ''; return; }
-  const items = S.journal.map(c => '<li>' + escHtml(c.desc) + '<span class="jtime">' + new Date(c.t).toLocaleString() + '</span></li>').join('');
+  const items = unseen.map(c => '<li>' + escHtml(c.desc) + changeOldNew(c)
+    + '<span class="jtime">' + escHtml(new Date(c.t).toLocaleString()) + '</span></li>').join('');
   bar.innerHTML = '<button class="linkbtn" id="j-revert">Revert (' + n + ')</button>'
     + '<button class="linkbtn" id="j-toggle">What changed?</button>'
     + '<ul>' + items + '</ul>'
-    + '<button class="linkbtn" id="j-dismiss" title="Dismiss" style="margin-left:auto">\\u2715</button>';
+    + '<button class="linkbtn" id="j-dismiss" style="margin-left:auto">Dismiss</button>';
   bar.classList.add('show');
-  document.getElementById('j-dismiss').addEventListener('click', () => {
-    bar.classList.remove('show');
+  document.getElementById('j-toggle').addEventListener('click', () => {
+    const isOpen = bar.classList.toggle('open');
+    if (isOpen) markJournalSeen();
+    else renderJournal();
   });
+  document.getElementById('j-dismiss').addEventListener('click', () => { markJournalSeen(); renderJournal(); });
+  document.getElementById('j-revert').addEventListener('click', () => { revertJournal(); });
 }
+function markJournalSeen(){ (S.journal || []).forEach(c => { c.seen = true; }); save(); }
 function applyBrand(){
   const bn = document.getElementById('brand-name'); const name = S.appName || 'Buddies';
   if (bn && document.activeElement !== bn) bn.textContent = name;
@@ -1841,7 +1980,7 @@ document.addEventListener('click', e => {
   const sb2 = document.getElementById('sidebar');
   if (sb2) sb2.classList.remove('open');
   const bb = e.target.closest('[data-buddy]');
-  if (bb) { show('buddy:' + bb.dataset.buddy, true, e.target.closest('#buddy-nav') ? 'center' : 'overlay'); return; }
+  if (bb) { if (e.target.closest('#buddy-nav')) selectProject(bb.dataset.buddy); else show('buddy:' + bb.dataset.buddy); return; }
   const sb = e.target.closest('[data-seen]');
   if (sb) { S.seen[sb.dataset.seen] = Date.now(); save(); renderBuddy(S.sel.slice(6)); renderNav(); return; }
   const sa = e.target.closest('[data-seen-all]');
@@ -1850,8 +1989,6 @@ document.addEventListener('click', e => {
   if (gt) { e.preventDefault(); show('buddy:' + gt.dataset.goto); return; }
   const nb = e.target.closest('[data-navbtn]');
   if (nb) { const k = nb.dataset.navbtn; if (k === 'back') goBack(); else stepBuddy(k === 'next' ? 1 : -1); return; }
-  if (e.target.closest('#j-revert')) { revertJournal(); return; }
-  if (e.target.closest('#j-toggle')) { document.getElementById('journal-bar').classList.toggle('open'); return; }
   const rp = e.target.closest('#reset-parents');
   if (rp) { S.parents = {}; save(); buildKids(); renderNav(); refreshViews();
     if (S.sel.startsWith('buddy:')) renderBuddy(S.sel.slice(6));
@@ -1909,6 +2046,7 @@ initPlansToggle();
 <div id="journal-bar"></div>
 """ + vt + vp + vpl + vm + """
 <section id="view-buddy" class="view"><div id="bp-resize" title="Drag to resize panel"></div><div id="buddy-home"></div></section>
+<section id="view-changelog" class="view"></section>
 </main>
 </div>
 <script>
