@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ron Buddy — Living dossier for Dave's eldest brother</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👨‍🦳</text></svg>">
+<style>
+  :root {
+    --paper: #F4F1E7;
+    --card: #FFFEF9;
+    --ink: #232B3D;
+    --dim: #6F7482;
+    --line: #DED7C0;
+    --heritage: #2C3E66;
+    --heritage-deep: #1B2745;
+    --heritage-soft: #E2E7F2;
+    --gold: #B8862F;
+    --gold-soft: #F6ECD4;
+    --note: #FDF6DC;
+    --amber: #B3541E;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font-family: -apple-system, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+    line-height: 1.55; padding: 28px 20px 70px;
+    background-image: radial-gradient(var(--line) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; }
+  .serif { font-family: Georgia, "Iowan Old Style", "Times New Roman", serif; }
+
+  header.hero {
+    background: linear-gradient(135deg, #131C33 0%, var(--heritage-deep) 45%, var(--heritage) 100%);
+    color: #F2F0E6; border: 1px solid #101A30; border-radius: 16px;
+    padding: 34px 32px 26px; margin-bottom: 24px;
+    position: relative; overflow: hidden;
+    box-shadow: 0 10px 30px rgba(27,39,69,.30);
+  }
+  header.hero::after {
+    content: "👨‍🦳"; position: absolute; right: 20px; top: 2px;
+    font-size: 120px; opacity: .14; transform: rotate(-4deg); pointer-events: none;
+  }
+  .kicker { color: var(--gold); font-size: 12px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; }
+  h1 { font-size: 40px; margin: 8px 0 6px; font-weight: 700; color: #FFFDF4; }
+  h1 .ico { margin-right: 10px; }
+  .tagline { font-size: 18px; color: #C9CFDE; font-style: italic; }
+  .mission { margin-top: 12px; max-width: 74ch; font-size: 15px; color: #E7E4D4; }
+  .mission b { color: #F2D98B; }
+  .meta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.22); border-radius: 999px;
+    padding: 6px 14px; font-size: 13px; color: #F2F0E6; text-decoration: none;
+  }
+  .pill.st { background: rgba(184,134,47,.22); border-color: rgba(184,134,47,.65); font-weight: 600; color: #F2D98B; }
+  a.pill:hover { border-color: var(--gold); color: #F2D98B; }
+
+  h2 { font-size: 21px; margin: 34px 0 6px; }
+  h2 .sub { display: block; font-family: -apple-system, "Segoe UI", Inter, sans-serif;
+            font-size: 13px; color: var(--dim); font-weight: 400; margin-top: 2px; }
+
+  .mind { border: 1px solid var(--line); border-left: 5px solid var(--gold);
+          background: var(--card); border-radius: 10px; padding: 14px 18px;
+          margin-bottom: 12px; display: flex; gap: 14px; align-items: flex-start; }
+  .mind.amber { border-left-color: var(--amber); }
+  .mind .dot { font-size: 20px; line-height: 1.4; }
+  .mind .t { font-weight: 700; font-size: 15px; }
+  .mind .d { color: var(--dim); font-size: 13.5px; }
+
+  .facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-top: 14px; }
+  .fact { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .fact .e { font-size: 24px; margin-bottom: 6px; }
+  .fact .t { font-weight: 700; font-size: 14.5px; }
+  .fact .d { color: var(--dim); font-size: 13px; margin-top: 4px; }
+  .fact.unknown { background: var(--heritage-soft); border-color: #B9C4DC; border-style: dashed; }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; margin-top: 14px; }
+
+  .tl { margin-top: 14px; }
+  .tl-item { display: flex; gap: 14px; padding: 12px 2px; border-bottom: 1px solid var(--line); font-size: 14.5px; align-items: flex-start; }
+  .tl-item:last-child { border-bottom: none; }
+  .tl-item .when { flex: 0 0 86px; font-size: 12.5px; font-weight: 700; color: var(--heritage); padding-top: 2px; }
+  .tl-item .what b { display: block; font-size: 14.5px; }
+  .tl-item .what span { color: var(--dim); font-size: 13px; }
+  .tl-item.closed { opacity: .62; }
+  .tl-item.closed .when { color: var(--dim); }
+
+  .board { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; margin-top: 14px; }
+  .note {
+    background: var(--note); border-radius: 4px; padding: 16px 16px 12px;
+    box-shadow: 0 3px 10px rgba(35,43,61,.10); position: relative;
+    transform: rotate(-.6deg); transition: transform .15s;
+  }
+  .note:nth-child(even) { transform: rotate(.7deg); background: #FBF3D8; }
+  .note:hover { transform: rotate(0) scale(1.02); }
+  .note::before { content: ""; position: absolute; top: -8px; left: 50%; transform: translateX(-50%) rotate(2deg);
+                  width: 64px; height: 18px; background: rgba(44,62,102,.30); border-radius: 2px; }
+  .note .x { position: absolute; top: 6px; right: 8px; border: none; background: none; cursor: pointer;
+             color: var(--dim); font-size: 15px; }
+  .note .x:hover { color: #B3402E; }
+  .note p { font-size: 14px; margin-top: 6px; white-space: pre-wrap; }
+  .note .when { font-size: 11px; color: var(--dim); margin-top: 8px; }
+
+  .list-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 2px; border-bottom: 1px solid var(--line); font-size: 14.5px; }
+  .list-item:last-child { border-bottom: none; }
+  .list-item .x { margin-left: auto; border: none; background: none; cursor: pointer; color: var(--dim); font-size: 15px; }
+  .list-item .x:hover { color: #B3402E; }
+  .list-item.done .txt { text-decoration: line-through; color: var(--dim); }
+  .list-item input[type=checkbox] { margin-top: 5px; accent-color: var(--heritage); width: 16px; height: 16px; }
+  .list-item .when { font-size: 11px; color: var(--dim); }
+
+  .gift { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; position: relative; }
+  .gift .g { font-size: 22px; }
+  .gift .t { font-weight: 700; font-size: 15px; margin: 6px 0 2px; }
+  .gift .d { color: var(--dim); font-size: 13px; }
+  .gift .x { position: absolute; top: 8px; right: 10px; border: none; background: none; cursor: pointer; color: var(--dim); font-size: 15px; }
+  .gift .x:hover { color: #B3402E; }
+
+  .addrow { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .addrow input, .addrow textarea {
+    flex: 1 1 220px; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+    font-size: 14px; font-family: inherit; background: #fff; color: var(--ink);
+  }
+  .addrow input:focus, .addrow textarea:focus { outline: 2px solid var(--heritage-soft); border-color: var(--heritage); }
+  .btn {
+    border: none; border-radius: 8px; padding: 10px 18px; font-size: 14px; font-weight: 700;
+    background: var(--heritage); color: #fff; cursor: pointer;
+  }
+  .btn:hover { background: var(--heritage-deep); }
+  .empty { color: var(--dim); font-style: italic; font-size: 14px; padding: 10px 2px; }
+
+  footer { margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line);
+           color: var(--dim); font-size: 13px; display: flex; gap: 16px; flex-wrap: wrap; }
+  footer a { color: var(--heritage); }
+  @media (max-width: 640px) { h1 { font-size: 30px; } header.hero::after { font-size: 70px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">Family Buddy · child</div>
+    <h1 class="serif"><span class="ico">👨‍🦳</span>Ron Buddy</h1>
+    <div class="tagline serif">Living dossier for Dave's eldest brother.</div>
+    <p class="mission">The one place for everything Dave needs to <b>remember, track, and do</b> regarding Ron — key facts, important dates, notes, reminders, and gift ideas. The active thread right now is the family business: co-selling the Morgan Hill house with Dave and Emile.</p>
+    <div class="meta">
+      <span class="pill st">📝 Brief review</span>
+      <a class="pill" href="https://docs.google.com/document/d/1gTz9dlWEqVtoRWXrAfY3f70jPE7PdDLo0ThHcA-rZlo/edit" target="_blank" rel="noopener">📄 Product brief</a>
+      <a class="pill" href="https://github.com/davedellaquila/ron-buddy" target="_blank" rel="noopener">💻 ron-buddy repo</a>
+      <span class="pill">🏠 Parent: Family Buddy</span>
+    </div>
+  </header>
+
+  <h2 class="serif">On my mind <span class="sub">What needs Dave's attention</span></h2>
+  <div class="mind amber">
+    <div class="dot">🛋️</div>
+    <div><div class="t">Staging proposal needs all three sellers</div>
+    <div class="d">Mayra Vera's $4,250 design/styling fee — painting, wallpaper removal, cleaning, repairs, and hauling NOT included. Dave drafted questions for Kay Korbel on Sep 29; Ron's take is still unknown.</div></div>
+  </div>
+  <div class="mind amber">
+    <div class="dot">🐭</div>
+    <div><div class="t">Rodent-proofing estimate waiting on all three sellers</div>
+    <div class="d">Julio Arciga (Silicon Valley Rodent Proofers) sent Estimate #787 on Oct 7 — $5,800 to screen roof vents, plumbing stacks, and eaves, plus re-screen damaged attic vents. Needs Ron + Emile + Dave approval.</div></div>
+  </div>
+  <div class="mind">
+    <div class="dot">🎂</div>
+    <div><div class="t">Ron's birthday isn't on record</div>
+    <div class="d">Birthdate, occupation, where he lives, kids, interests — all unknown, flagged not guessed. First things to learn the next time you talk.</div></div>
+  </div>
+
+  <h2 class="serif">Who Ron is <span class="sub">Only what's known — unknowns stay unknown</span></h2>
+  <div class="facts">
+    <div class="fact"><div class="e">👨‍🦳</div><div class="t">Eldest brother</div><div class="d">Oldest of the three Dell'Aquila brothers — Ron, then Emile (middle), then Dave.</div></div>
+    <div class="fact"><div class="e">🏠</div><div class="t">Morgan Hill co-seller</div><div class="d">Co-selling 18231 Llagas Creek Dr with Dave and Emile. Listing agent: Kay Korbel. All three must agree before approving any spend.</div></div>
+    <div class="fact"><div class="e">💍</div><div class="t">Married to Mei-ying</div><div class="d">Ron's wife — she has her own buddy now too.</div></div>
+    <div class="fact unknown"><div class="e">❓</div><div class="t">Not yet on record</div><div class="d">Birthday, occupation, where he lives, kids, interests — every one of them unknown. They'll fill in as Dave learns them.</div></div>
+  </div>
+
+  <h2 class="serif">The sale, from Ron's side <span class="sub">Where he stands in the Morgan Hill timeline</span></h2>
+  <div class="card tl">
+    <div class="tl-item"><div class="when">Sep 29</div><div class="what"><b>Staging proposal lands with all three sellers</b><span>Kay sends Mayra Vera's $4,250 proposal to Ron, Emile, and Dave. Approval needs all three to agree; Dave drafts questions for Kay.</span></div></div>
+    <div class="tl-item"><div class="when">Oct 5</div><div class="what"><b>Termite-repair authorization via DocuSign</b><span>HomeGuard sends the authorization to Ron and Emile — signature needed by end of day Oct 6 to hold the Oct 9 repair start.</span></div></div>
+    <div class="tl-item closed"><div class="when">Oct 7</div><div class="what"><b>HomeGuard thread dropped</b><span>Dave calls it off — "don't worry about HomeGuard." No more follow-ups on the termite authorization or repair schedule.</span></div></div>
+    <div class="tl-item"><div class="when">Oct 7</div><div class="what"><b>Rodent-proofing estimate #787 arrives</b><span>Julio Arciga quotes $5,800. Pending approval by Ron, Emile, and Dave.</span></div></div>
+  </div>
+
+  <h2 class="serif">Notes <span class="sub">Pinned as they come up — saved on this device</span></h2>
+  <div class="board" id="notes"></div>
+  <div class="addrow">
+    <textarea id="noteInput" rows="2" placeholder="Pin a note about Ron…"></textarea>
+    <button class="btn" onclick="addNote()">Pin it</button>
+  </div>
+
+  <h2 class="serif">Reminders <span class="sub">Things to do for or about Ron</span></h2>
+  <div class="card" style="margin-top:14px" id="reminders"></div>
+  <div class="addrow">
+    <input id="reminderInput" placeholder="Add a reminder…">
+    <button class="btn" onclick="addReminder()">Add</button>
+  </div>
+
+  <h2 class="serif">Important dates <span class="sub">Birthdays, anniversaries, the things you can't forget</span></h2>
+  <div class="card" style="margin-top:14px">
+    <div class="list-item"><span style="font-size:18px">❓</span>
+      <span class="txt"><b>Birthday</b> — not on record</span>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px" id="dates"></div>
+  <div class="addrow">
+    <input id="dateName" placeholder="Occasion (e.g. Ron's birthday)">
+    <input id="dateWhen" placeholder="When (e.g. March 14)">
+    <button class="btn" onclick="addDate()">Add date</button>
+  </div>
+
+  <h2 class="serif">Gift ideas <span class="sub">Because the good ones evaporate if you don't write them down</span></h2>
+  <div class="board" id="gifts"></div>
+  <div class="addrow">
+    <input id="giftName" placeholder="Gift idea…">
+    <input id="giftWhy" placeholder="Why he'd love it (optional)">
+    <button class="btn" onclick="addGift()">Add idea</button>
+  </div>
+
+  <footer>
+    <span>👨‍🦳 Ron Buddy · child of <b>Family Buddy</b></span>
+    <span><a href="https://docs.google.com/document/d/1gTz9dlWEqVtoRWXrAfY3f70jPE7PdDLo0ThHcA-rZlo/edit" target="_blank" rel="noopener">Product brief</a></span>
+    <span><a href="https://github.com/davedellaquila/ron-buddy" target="_blank" rel="noopener">davedellaquila/ron-buddy</a></span>
+  </footer>
+</div>
+
+<script>
+const KEY = "ron-buddy-v1";
+const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+let store = { notes: [], reminders: [], dates: [], gifts: [] };
+try {
+  const raw = localStorage.getItem(KEY);
+  if (raw) store = Object.assign(store, JSON.parse(raw));
+} catch (e) {}
+// Seed verified notes on first run
+if (!localStorage.getItem(KEY)) {
+  store.notes = [
+    { text: "Co-selling 18231 Llagas Creek Dr, Morgan Hill with Dave and Emile (Kay Korbel listing). Every spend needs all three sellers' sign-off.", when: "2026-10-09" },
+    { text: "Mayra Vera staging proposal ($4,250 design/styling; excludes painting, wallpaper removal, cleaning, repairs, hauling) sent to all three Sep 29 — Dave drafted questions for Kay; Ron's take still unknown.", when: "2026-10-09" },
+    { text: "HomeGuard termite-repair DocuSign went to Ron and Emile Oct 5; Dave dropped the HomeGuard thread Oct 7 — closed, no follow-ups.", when: "2026-10-09" },
+    { text: "Rodent-proofing Estimate #787 ($5,800, Julio Arciga / Silicon Valley Rodent Proofers) sent Oct 7 — needs Ron + Emile + Dave approval.", when: "2026-10-09" },
+    { text: "Oldest of the three brothers; married to Mei-ying. Birthdate, occupation, location, kids, interests — all still unknown, flagged not guessed.", when: "2026-10-09" }
+  ];
+  store.reminders = [
+    { text: "Get Ron's birthday (and the other basics) on record next time you talk", done: false },
+    { text: "Confirm Ron's stance on the $4,250 staging proposal", done: false },
+    { text: "Confirm Ron's stance on the $5,800 rodent-proofing estimate", done: false }
+  ];
+}
+const save = () => localStorage.setItem(KEY, JSON.stringify(store));
+const today = () => new Date().toISOString().slice(0, 10);
+
+function renderNotes() {
+  const el = document.getElementById("notes");
+  el.innerHTML = store.notes.length ? store.notes.map((n, i) =>
+    `<div class="note"><button class="x" onclick="delNote(${i})" title="Remove">✕</button><p>${esc(n.text)}</p><div class="when">${esc(n.when || "")}</div></div>`
+  ).join("") : `<div class="empty">No notes pinned yet.</div>`;
+}
+function addNote() {
+  const t = document.getElementById("noteInput").value.trim();
+  if (!t) return;
+  store.notes.unshift({ text: t, when: today() });
+  document.getElementById("noteInput").value = "";
+  save(); renderNotes();
+}
+function delNote(i) { store.notes.splice(i, 1); save(); renderNotes(); }
+
+function renderReminders() {
+  const el = document.getElementById("reminders");
+  el.innerHTML = store.reminders.length ? store.reminders.map((r, i) =>
+    `<div class="list-item ${r.done ? "done" : ""}">
+       <input type="checkbox" ${r.done ? "checked" : ""} onchange="toggleReminder(${i})">
+       <span class="txt">${esc(r.text)}</span>
+       <button class="x" onclick="delReminder(${i})" title="Remove">✕</button>
+     </div>`
+  ).join("") : `<div class="empty">Nothing on the list — add the first reminder whenever something comes up.</div>`;
+}
+function addReminder() {
+  const t = document.getElementById("reminderInput").value.trim();
+  if (!t) return;
+  store.reminders.push({ text: t, done: false });
+  document.getElementById("reminderInput").value = "";
+  save(); renderReminders();
+}
+function toggleReminder(i) { store.reminders[i].done = !store.reminders[i].done; save(); renderReminders(); }
+function delReminder(i) { store.reminders.splice(i, 1); save(); renderReminders(); }
+
+function renderDates() {
+  const el = document.getElementById("dates");
+  el.innerHTML = store.dates.length ? store.dates.map((d, i) =>
+    `<div class="list-item"><span style="font-size:18px">📅</span>
+       <span class="txt"><b>${esc(d.name)}</b> — ${esc(d.when)}</span>
+       <button class="x" onclick="delDate(${i})" title="Remove">✕</button>
+     </div>`
+  ).join("") : `<div class="empty">No user-added dates yet — Ron's birthday goes here the moment Dave learns it.</div>`;
+}
+function addDate() {
+  const n = document.getElementById("dateName").value.trim();
+  const w = document.getElementById("dateWhen").value.trim();
+  if (!n || !w) return;
+  store.dates.push({ name: n, when: w });
+  document.getElementById("dateName").value = "";
+  document.getElementById("dateWhen").value = "";
+  save(); renderDates();
+}
+function delDate(i) { store.dates.splice(i, 1); save(); renderDates(); }
+
+function renderGifts() {
+  const el = document.getElementById("gifts");
+  el.innerHTML = store.gifts.length ? store.gifts.map((g, i) =>
+    `<div class="gift"><button class="x" onclick="delGift(${i})" title="Remove">✕</button>
+       <div class="g">🎁</div><div class="t">${esc(g.name)}</div>
+       ${g.why ? `<div class="d">${esc(g.why)}</div>` : ""}
+     </div>`
+  ).join("") : `<div class="empty">The gift vault is empty — stash ideas here the moment they occur to you.</div>`;
+}
+function addGift() {
+  const n = document.getElementById("giftName").value.trim();
+  const w = document.getElementById("giftWhy").value.trim();
+  if (!n) return;
+  store.gifts.push({ name: n, why: w });
+  document.getElementById("giftName").value = "";
+  document.getElementById("giftWhy").value = "";
+  save(); renderGifts();
+}
+function delGift(i) { store.gifts.splice(i, 1); save(); renderGifts(); }
+
+renderNotes(); renderReminders(); renderDates(); renderGifts();
+</script>
+</body>
+</html>

@@ -184,6 +184,29 @@
     {
       "attention": [
         {
+          "id": "rocky-buddy-brief",
+          "date": "2026-10-09",
+          "text": "Product brief ready for review \u2014 looks good, edits, or defer? Open: age, breed, vet history, which house he lives at \u2014 all flagged, not guessed."
+        }
+      ],
+      "brief": "https://docs.google.com/document/d/1Xm6mqiOZQxw7DqThK2NFjVh0deZEzK4r_EgpHxytjdM/edit",
+      "docs": [],
+      "id": "rocky-buddy",
+      "kind": "family",
+      "mission": "Rocky Buddy is the living dossier for Rocky \u2014 one of Dave's three cats, alongside Marley (Mars) and Little Guy. Key facts, vet visits and medical notes, and reminders (flea treatment, vet appointments) live here.",
+      "name": "Rocky Buddy",
+      "parent": "family-buddy",
+      "repo": "rocky-buddy",
+      "status": "Brief review",
+      "statusClass": "st-brief",
+      "tagline": "Living dossier for the cat Rocky",
+      "icon": "\ud83d\udc08",
+      "photos": [],
+      "homepage": "rocky-buddy/"
+    },
+    {
+      "attention": [
+        {
           "date": "2026-10-09",
           "id": "property-buddy-brief",
           "text": "Product brief ready for review \u2014 looks good, edits, or defer? Open: one app vs. separate instances, who gets access, how deeds are secured, which property goes first."
@@ -807,6 +830,7 @@
       "icon": "\ud83e\uddd4",
       "photos": [],
       "homepage": "emile-buddy/"
+    },
     {
       "id": "ron-buddy",
       "name": "Ron Buddy",
@@ -829,7 +853,6 @@
       "icon": "\ud83d\udc68\u200d\ud83e\uddb3",
       "photos": [],
       "homepage": "ron-buddy/"
-    },
     },
     {
       "id": "nancy-buddy",
