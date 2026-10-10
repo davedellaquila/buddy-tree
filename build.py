@@ -563,6 +563,14 @@ function dispName(b){
   return n;
 }
 function getHomepage(b){ return (S.homepages && S.homepages[b.id]) || b.homepage || ''; }
+function homepageUrl(b){
+  const hp = getHomepage(b);
+  if (!hp) return '';
+  // If it's already a full URL, use as-is. Otherwise resolve against the site origin.
+  if (/^https?:\/\//i.test(hp)) return hp;
+  const base = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/');
+  return base + hp.replace(/^\//, '');
+}
 function unseenItems(b){ return (b.attention || []).filter(a => !S.seen[a.id]); }
 function descUnseen(id){
   let n = 0;
@@ -1262,7 +1270,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="mission"><h3>About<span class="info-tip" data-tip="The mission is the brief\\u2019s executive summary \\u2014 tweak it through the buddy\\u2019s chat thread and it updates everywhere.">\\u24d8</span></h3><p class="bp-mission">'+escHtml(b.mission)+'</p></div>'
     + '<div class="bp-sec" data-field="homepage"><h3>Homepage URL</h3>'
     + '<div style="display:flex;align-items:center;gap:8px">'
-    + '<input type="url" id="bp-homepage-url" value="'+escHtml(getHomepage(b))+'" placeholder="Paste homepage URL here…" style="flex:1;min-width:0;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text)" title="The full URL for this buddy\u2019s homepage. Paste a URL and click away to save.">'
+    + '<input type="url" id="bp-homepage-url" value="'+escHtml(homepageUrl(b))+'" placeholder="Paste homepage URL here…" style="flex:1;min-width:0;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text)" title="The full URL for this buddy\u2019s homepage. Paste a URL and click away to save.">'
     + '<button class="linkbtn" id="bp-homepage-copy" title="Copy homepage URL to clipboard" style="flex-shrink:0">Copy</button>'
     + '</div></div>'
     + (unseenCount > 0 ? '<div class="bp-sec" data-field="attention"><h3>Needs your attention</h3>'+attn+'</div>' : '')
@@ -1299,7 +1307,14 @@ function renderBuddy(id){
       const v = hpu.value.trim();
       if (!S.homepages || typeof S.homepages !== 'object') S.homepages = {};
       const before = getHomepage(b);
-      if (v && v !== b.homepage) S.homepages[id] = v; else delete S.homepages[id];
+      // Don't save if the value matches the current resolved URL (no change)
+      // or if it's empty (clear the override)
+      const currentResolved = homepageUrl(b);
+      if (!v || v === currentResolved || v === b.homepage) {
+        delete S.homepages[id];
+      } else {
+        S.homepages[id] = v;
+      }
       const after = getHomepage(b);
       if (before !== after) logChange('homepage', id, 'Homepage URL \u2192 ' + (after || '(cleared)'), before || null, after || null);
       save();
@@ -1850,6 +1865,16 @@ document.addEventListener('keydown', e => {
     const btns = Array.from(document.querySelectorAll('#sidebar .navbtn[data-view]'));
     const btn = btns[idx];
     if (btn && btn.dataset.view) { show('view:' + btn.dataset.view); e.preventDefault(); }
+  }
+  // I toggles the right-side detail panel for the selected buddy
+  if (e.key === 'i' || e.key === 'I') {
+    const vb = document.getElementById('view-buddy');
+    if (vb && vb.classList.contains('active')) {
+      closeDetail();
+    } else if (S.projectId && byId[S.projectId]) {
+      openBuddy(S.projectId);
+    }
+    e.preventDefault();
   }
 });
 function show(sel, push){
