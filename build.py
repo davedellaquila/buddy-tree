@@ -523,7 +523,7 @@ const VIEW_DEFS = [
   ['projects','Projects','☰'],
   ['plans','Plans','💼'],
   ['manifest','Manifest','✓'],
-  ['project','Project','🏠'],
+  ['project','Project Homepage','🏠'],
   ['changelog','Changelog','🕘'],
 ];
 function getViewOrder(){
