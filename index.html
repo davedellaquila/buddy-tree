@@ -120,6 +120,8 @@
   .proj-row .parrow { font-size: 18px; color: #8b949e; cursor: pointer; display: inline-block; line-height: 1; transition: transform .15s; user-select: none; }
   .proj-row .parrow.expanded { transform: rotate(90deg); }
   .proj-row .parrow.leaf { visibility: hidden; }
+  .proj-path { font-size: 12px; color: var(--muted); line-height: 1.3; margin: 0 0 2px; width: 100%; }
+  .proj-row.filter-hit { /* matching row when a tile filter is active */ }
   .status {
     font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
     padding: 3px 10px; border-radius: 999px; white-space: nowrap;
@@ -448,10 +450,13 @@ body.standalone .sa-bar{display:flex}
 .sa-bar .linkbtn{font-size:13px}
 
 /* ============ RESPONSIVE ============ */
-/* Muse-style floating open control (shown when sidebar collapsed / mobile drawer) */
+/* Mobile topbar: real flex row wrapping Muse menu + page title (sticky) */
+#mobile-topbar{display:none}
+#mobile-topbar-title{display:none}
+/* Muse-style open control (desktop collapsed sidebar = floating; mobile = in topbar) */
 #menu-btn{
   display:none;align-items:center;justify-content:center;position:fixed;top:14px;left:14px;z-index:90;
-  width:44px;height:44px;padding:0;margin:0;border-radius:50%;cursor:pointer;
+  width:44px;height:44px;padding:0;margin:0;border-radius:50%;cursor:pointer;flex:none;
   color:#c9d1d9;background:rgba(22,27,34,.72);border:1px solid rgba(255,255,255,.08);
   -webkit-backdrop-filter:blur(16px) saturate(1.25);backdrop-filter:blur(16px) saturate(1.25);
   box-shadow:0 6px 22px rgba(0,0,0,.42),0 1px 3px rgba(0,0,0,.28);
@@ -468,12 +473,42 @@ html.light #menu-btn{
   box-shadow:0 6px 22px rgba(0,0,0,.14),0 1px 3px rgba(0,0,0,.08)}
 html.light #menu-btn:hover{background:rgba(255,255,255,.9)}
 html.light #menu-btn .menu-btn-dot{box-shadow:0 0 0 2px rgba(255,255,255,.85)}
+/* Desktop: collapsed sidebar still uses floating Muse button */
+@media (min-width:640px){
+  body.sb-closed #mobile-topbar{
+    display:block;position:fixed;top:0;left:0;width:0;height:0;overflow:visible;
+    padding:0;margin:0;border:0;background:transparent;box-shadow:none;z-index:90}
+  body.sb-closed #menu-btn{display:flex}
+  body.sb-closed #mobile-topbar-title{display:none}
+}
 /* ---- Small: <640px (iPhone) ---- */
 @media (max-width:639px){
   .app{display:block}
   /* Prevent iOS auto-zoom on input focus */
   input, textarea, select{font-size:16px !important}
-  #menu-btn{display:flex}
+  /* One shared sticky bar: [menu] [title] — at rest and while scrolling */
+  #mobile-topbar{
+    display:flex;align-items:center;gap:10px;
+    position:sticky;top:0;z-index:92;
+    box-sizing:border-box;min-height:56px;width:100%;
+    padding:max(6px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) 8px max(10px, env(safe-area-inset-left, 0px));
+    background:var(--bg);border-bottom:1px solid var(--border);
+    box-shadow:0 8px 16px -12px rgba(0,0,0,.5)}
+  #menu-btn{
+    display:flex;position:static;top:auto;left:auto;z-index:auto;
+    flex:0 0 auto;margin:0}
+  #mobile-topbar-title{
+    display:block;flex:1 1 auto;min-width:0;
+    font-size:20px;font-weight:700;line-height:1.2;color:var(--text);
+    text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    /* Balance the 44px menu so the title reads centered in the bar */
+    padding-right:44px}
+  #mobile-topbar:not(.has-title) #mobile-topbar-title{display:none}
+  /* In-page h2 mirrored into the topbar — hide duplicate on mobile */
+  .projects-view h2,.standalones h2,#view-changelog h2,.changelog h2{
+    position:absolute !important;width:1px !important;height:1px !important;padding:0 !important;margin:-1px !important;
+    overflow:hidden !important;clip:rect(0,0,0,0) !important;white-space:nowrap !important;border:0 !important;
+    box-shadow:none !important;background:transparent !important}
   /* Sidebar drawer with scrim */
   #sidebar{position:fixed;left:0;top:0;bottom:0;z-index:95;height:100vh;height:100dvh;
     transform:translateX(-105%);transition:transform .28s cubic-bezier(.32,.72,.35,1);width:min(85vw,340px);flex:none}
@@ -481,9 +516,9 @@ html.light #menu-btn .menu-btn-dot{box-shadow:0 0 0 2px rgba(255,255,255,.85)}
   #sb-resize{display:none}
   #sb-scrim{display:none;position:fixed;inset:0;z-index:94;background:rgba(0,0,0,.45);opacity:0;transition:opacity .25s}
   #sb-scrim.show{display:block;opacity:1}
-  /* Side gutters for metric tiles + main content (safe-area aware) */
+  /* Side gutters — topbar is in normal flow, so no extra top pad for a floating menu */
   #main{
-    padding:72px 18px 60px;
+    padding:12px 18px 60px;
     padding-left:max(18px, env(safe-area-inset-left, 0px));
     padding-right:max(18px, env(safe-area-inset-right, 0px));
   }
@@ -699,14 +734,8 @@ html.light #menu-btn .menu-btn-dot{box-shadow:0 0 0 2px rgba(255,255,255,.85)}
   .ptile-sub{font-size:10px;line-height:1.2;margin-top:1px;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .ptile-label,.ptile-sub{overflow-wrap:normal;word-break:normal;hyphens:none}
-  /* Business Plans / list page body type — above iOS comfort minimum */
-  .projects-view h2,.standalones h2{
-    font-size:22px;position:sticky;z-index:7;background:var(--bg);
-    /* Sit below the floating Muse menu button */
-    top:max(58px, calc(env(safe-area-inset-top, 0px) + 52px));
-    padding:10px 8px 8px;margin:0 0 6px;
-    box-shadow:0 8px 16px -12px rgba(0,0,0,.5)}
   .projects-view p.sub,.standalones p.sub{font-size:16px;line-height:1.45;margin-bottom:16px}
+  .proj-path{font-size:13px;color:var(--muted);line-height:1.35;margin:0 0 2px}
   .plan-card{padding:14px 16px;margin-bottom:12px;border-radius:12px}
   .plan-card-head{margin-bottom:8px;gap:8px}
   .plan-card-icon{font-size:22px}
@@ -804,12 +833,15 @@ html.light #menu-btn .menu-btn-dot{box-shadow:0 0 0 2px rgba(255,255,255,.85)}
 </head>
 <body>
 <div class="app">
-<button id="menu-btn" type="button" aria-label="Open menu">
-  <svg class="menu-btn-icon" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
-    <path d="M4.75 6.85h8.5M4.75 11.15h8.5" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round"/>
-  </svg>
-  <span class="menu-btn-dot" aria-hidden="true"></span>
-</button>
+<header id="mobile-topbar" aria-label="Page header">
+  <button id="menu-btn" type="button" aria-label="Open menu">
+    <svg class="menu-btn-icon" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
+      <path d="M4.75 6.85h8.5M4.75 11.15h8.5" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round"/>
+    </svg>
+    <span class="menu-btn-dot" aria-hidden="true"></span>
+  </button>
+  <div id="mobile-topbar-title"></div>
+</header>
 <div id="sb-scrim"></div>
 <aside id="sidebar"><div id="sb-tools"><button id="sb-gear" title="Settings (⌘,)" aria-label="Settings"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button id="sb-close" title="Close sidebar" aria-label="Close sidebar"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><path class="xmark-x" d="M8.8 8.8l6.4 6.4m0-6.4l-6.4 6.4" fill="none" stroke-width="2.25" stroke-linecap="round"/></svg></button></div>
 <div id="sb-resize" title="Drag left or right to resize the sidebar. Double-click to reset to default width."></div>
@@ -1157,6 +1189,42 @@ const VIEW_DEFS = [
   ['project','Project Homepage','🏠'],
   ['changelog','Changelog','🕘'],
 ];
+/* Mobile topbar titles (may differ from short nav labels) */
+const VIEW_TOPBAR_TITLES = {
+  tree: 'Tree',
+  projects: 'Projects by Buddy',
+  plans: 'Business Plans',
+  manifest: 'New-Project Manifest',
+  project: 'Project Homepage',
+  changelog: 'Changelog',
+};
+function setMobileTopbarTitle(text){
+  const bar = document.getElementById('mobile-topbar');
+  const el = document.getElementById('mobile-topbar-title');
+  if (!el || !bar) return;
+  const t = (text || '').trim();
+  el.textContent = t;
+  bar.classList.toggle('has-title', !!t);
+}
+function syncMobileTopbarTitle(sel){
+  sel = sel || S.sel || '';
+  if (sel.indexOf('view:') === 0) {
+    const id = sel.slice(5);
+    setMobileTopbarTitle(VIEW_TOPBAR_TITLES[id] || ((VIEW_DEFS.find(v => v[0] === id) || [])[1]) || '');
+    return;
+  }
+  if (sel.indexOf('plan:') === 0) {
+    const p = planById[sel.slice(5)];
+    setMobileTopbarTitle(p ? p.name : 'Business Plans');
+    return;
+  }
+  if (sel.indexOf('buddy:') === 0) {
+    const b = byId[sel.slice(6)];
+    setMobileTopbarTitle(b ? dispName(b) : '');
+    return;
+  }
+  setMobileTopbarTitle('');
+}
 const VIEW_TIPS = {
   tree: 'Tree view — visual hierarchy of all buddies. Click a node to open its details. Drag the background to pan, scroll to zoom. Drag a node by its grip handle to reparent it.',
   projects: 'Projects list — every buddy in hierarchy order with status. Click a tile to filter by attention status. Click the chevron to expand/collapse sections.',
@@ -1901,7 +1969,7 @@ function renderBuddy(id){
     + '<div class="bp-top"><h2 class="bp-name" id="bp-name" contenteditable="true" spellcheck="false" data-buddy="'+id+'">'+escHtml(dispName(b))+'</h2>'
     + '<span class="status '+b.statusClass+'">'+escHtml(b.status)+'</span></div>'
     + '<p class="bp-tagline">'+escHtml(b.tagline||'')+'</p>'
-    + '<div class="bp-build">Build 20261010.1445</div>'
+    + '<div class="bp-build">Build 20261010.1728</div>'
     + '<div class="bp-sec" data-field="ingest"><h3>Ingest<span class="info-tip" data-tip="Brain-dump anything about this buddy — raw and unfiltered. Each dump lands in the buddy’s repo (docs/ingest.md) as a timestamped entry.">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-ingest" placeholder="Dump what’s in your head about '+escHtml(dispName(b))+'…"></textarea>'
     + '<div style="margin-top:8px"><span class="fineprint" id="ingest-status"></span></div>'
@@ -1925,7 +1993,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Anybody with repo access can see this note. Saved to the buddy’s repo (docs/notes.md).">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Anybody with repo access can see this note."></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261010.1445</div>'
+    + '<div class="bp-build">Build 20261010.1728</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -2184,39 +2252,50 @@ function renderProjects(){
     + '<div id="project-status-tiles" style="margin-top:12px">'
     + statusOrder.map(st => tileHtml(st.toUpperCase(), statusCounts[st], statusTints[st] || '#8b949e', st + ' projects', 'status:' + st, statusFilter === st, 'Click to filter by ' + st + ' status. Click again to clear.')).join('')
     + '</div>'
-    + '<h2>Projects by Buddy</h2>'
-    + '<p class="sub">Every buddy, in hierarchy order, with its current status.</p><div class="proj-list">';
-  // When a tile filter is active, show matching buddies plus their ancestors
-  let showIds = null;
-  if (projFilter) {
-    const matches = b => (b.attention || []).some(a => {
-      const seen = !!S.seen[a.id];
-      if (projFilter === 'unseen') return !seen;
-      if (projFilter === 'cleared') return seen;
-      const t = Date.parse(a.date || '');
-      return t && t >= weekAgo;
-    });
-    showIds = {};
+    + '<h2>Projects by Buddy</h2>';
+  // Tile filters: show ONLY matching buddies (tile count = row count).
+  // Ancestors used to be injected for nesting and appeared as extra "records"
+  // with the wrong status — instead render matches flat with a path crumb.
+  const matchIds = {};
+  let filterMode = null; // 'status' | 'attention' | null
+  if (statusFilter) {
+    filterMode = 'status';
     Object.values(byId).forEach(b => {
-      if (!matches(b)) return;
-      let x = b;
-      while (x) { showIds[x.id] = true; const p = effParent(x); x = p ? byId[p] : null; }
+      if ((b.status || 'Unknown') === statusFilter) matchIds[b.id] = true;
     });
-  } else if (statusFilter) {
-    showIds = {};
+  } else if (projFilter) {
+    filterMode = 'attention';
     Object.values(byId).forEach(b => {
-      if ((b.status || 'Unknown') !== statusFilter) return;
-      let x = b;
-      while (x) { showIds[x.id] = true; const p = effParent(x); x = p ? byId[p] : null; }
+      const hit = (b.attention || []).some(a => {
+        const seen = !!S.seen[a.id];
+        if (projFilter === 'unseen') return !seen;
+        if (projFilter === 'cleared') return seen;
+        const t = Date.parse(a.date || '');
+        return t && t >= weekAgo;
+      });
+      if (hit) matchIds[b.id] = true;
     });
   }
-  (function walk(id, depth){
-    const b = byId[id]; if (!b) return;
-    if (showIds && !showIds[id]) return;
-    const kids = kidsOf[id] || [];
-    const hasKids = kids.length > 0;
-    const collapsed = (projFilter || statusFilter) ? false : !!S.projCollapsed[id];
-    s += '<div class="proj-row d' + Math.min(depth, 3) + '" data-buddy="' + b.id + '">'
+  const matchCount = Object.keys(matchIds).length;
+  const sub = filterMode === 'status'
+    ? (matchCount === 1
+        ? 'Showing the 1 buddy with status “' + statusFilter + '”.'
+        : 'Showing ' + matchCount + ' buddies with status “' + statusFilter + '”.')
+    : filterMode === 'attention'
+      ? (matchCount === 1
+          ? 'Showing 1 matching buddy.'
+          : 'Showing ' + matchCount + ' matching buddies.')
+      : 'Every buddy, in hierarchy order, with its current status.';
+  s += '<p class="sub">' + escHtml(sub) + '</p><div class="proj-list">';
+
+  function projRowHtml(b, depth, opts){
+    opts = opts || {};
+    const kids = kidsOf[b.id] || [];
+    const hasKids = !opts.flat && kids.length > 0;
+    const collapsed = opts.flat ? false : !!S.projCollapsed[b.id];
+    const path = opts.path || [];
+    return '<div class="proj-row d' + Math.min(depth, 3) + (opts.flat ? ' filter-hit' : '') + '" data-buddy="' + b.id + '">'
+      + (path.length ? '<div class="proj-path">' + path.map(escHtml).join(' · ') + '</div>' : '')
       + '<div class="proj-row-head">'
       + (hasKids ? '<span class="parrow ' + (collapsed ? '' : 'expanded') + '" data-proj-toggle="' + b.id + '">›</span>' : '')
       + '<span class="pname">' + iconName(b) + '</span>'
@@ -2225,8 +2304,44 @@ function renderProjects(){
       + '</div>'
       + '<span class="pdesc">' + escHtml(b.tagline || '') + '</span>'
       + '</div>';
-    if (!collapsed) kids.forEach(c => walk(c.id, depth + 1));
-  })('project-buddy', 0);
+  }
+  function ancestorNames(b){
+    const parts = [];
+    let p = effParent(b);
+    while (p) {
+      const pb = byId[p];
+      if (!pb) break;
+      parts.unshift(dispName(pb));
+      p = effParent(pb);
+    }
+    return parts;
+  }
+
+  if (filterMode) {
+    const ordered = [];
+    const seen = {};
+    (function collect(id){
+      const b = byId[id]; if (!b) return;
+      if (matchIds[b.id] && !seen[b.id]) { ordered.push(b); seen[b.id] = true; }
+      (kidsOf[id] || []).forEach(c => collect(c.id));
+    })('project-buddy');
+    Object.values(byId).forEach(b => {
+      if (matchIds[b.id] && !seen[b.id]) { ordered.push(b); seen[b.id] = true; }
+    });
+    if (!ordered.length) {
+      s += '<p class="fineprint">No matching buddies.</p>';
+    } else {
+      ordered.forEach(b => { s += projRowHtml(b, 0, { flat: true, path: ancestorNames(b) }); });
+    }
+  } else {
+    (function walk(id, depth){
+      const b = byId[id]; if (!b) return;
+      const kids = kidsOf[id] || [];
+      const collapsed = !!S.projCollapsed[id];
+      s += projRowHtml(b, depth, { flat: false });
+      if (!collapsed) kids.forEach(c => walk(c.id, depth + 1));
+    })('project-buddy', 0);
+  }
   s += '</div></section>';
   const vp = document.getElementById('view-projects');
   vp.innerHTML = s;
@@ -2472,7 +2587,7 @@ function renderPlan(id){
     + '<p class="fineprint">Saved on this device. (For your eyes only)</p></div>'
     + '<div class="bp-sec"><h3>Shared notes<span class="info-tip" data-tip="Visible to everyone with access to this project.">\u24d8</span></h3><textarea class="notes" id="bp-shared" placeholder="Shared notes\u2026 (visible to everyone with access)">'+escHtml((S.planShared||{})[id]||'')+'</textarea>'
     + '<p class="fineprint">Shared — visible to everyone with access.</p></div>'
-    + '<div class="bp-build">Build 20261010.1445</div>'
+    + '<div class="bp-build">Build 20261010.1728</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
@@ -2584,6 +2699,7 @@ function show(sel, push){
     }
   }
   renderNav();
+  syncMobileTopbarTitle(sel);
   document.getElementById('main').scrollTop = 0;
   window.scrollTo(0,0);
   setIcon(sel.startsWith('plan:') ? ((planById[sel.slice(5)] || {}).icon)
