@@ -26,6 +26,11 @@ Build: `build.py` generates `index.html` from `buddies.json` + `plans.json`.
 - **Drop targets** — tree nodes and Projects rows accept drops from the
   sidebar and from tile grippers to assign/change parents.
 
+## Appearance
+
+- **Light / Dark / System theme** — segmented picker under the sidebar
+  brand; per-device localStorage (default System, follows the OS live).
+
 ## Sidebar
 
 - **Main views** — Tree, Projects, Plans, Manifest, Project, Changelog;

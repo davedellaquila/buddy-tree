@@ -3,6 +3,19 @@
 All notable changes to the Buddies dashboard and buddy system. Newest first.
 `FEATURES.md` describes the current state; this file describes how it got there.
 
+## 2026-10-10 (Theme setting)
+
+### Added
+- **Light / Dark / System theme** — a three-way segmented picker under
+  the sidebar brand. Persisted per device in localStorage (default:
+  System). System follows the OS setting live via matchMedia, and a
+  pre-paint script applies the theme before first render (no flash).
+- **CSS-variable theming** — all 34 dashboard colors are now semantic
+  variables (`:root` = dark, `html.light` = GitHub-light palette);
+  every view (tree, projects, plans, manifest, buddy pages, changelog,
+  sidebar, sheets, toasts) themes consistently. The old partial
+  `prefers-color-scheme` media query was replaced.
+
 ## 2026-10-10 (Changelog restyle)
 
 ### Changed
