@@ -596,9 +596,26 @@ function dayLabel(d){
 function renderChangelog(){
   const el = document.getElementById('view-changelog');
   if (!el) return;
-  const js = (S.journal || []).slice().reverse();
-  let h = '<section class="changelog" style="margin:24px auto 0;max-width:760px"><h2>Changelog</h2>'
+  // Global attention summary tiles
+  let unseen = 0, fresh = 0, cleared = 0;
+  const weekAgo = Date.now() - 7 * 864e5;
+  Object.values(byId).forEach(b => {
+    (b.attention || []).forEach(a => {
+      if (S.seen[a.id]) cleared++;
+      else unseen++;
+      const t = Date.parse(a.date || '');
+      if (t && t >= weekAgo) fresh++;
+    });
+  });
+  let h = '<section class="changelog" style="margin:24px auto 0;max-width:760px">'
+    + '<div id="changelog-tiles" style="display:flex;gap:12px;margin-bottom:20px">'
+    + tileHtml('TO REVIEW', unseen, '#d43d2a', 'Needs your attention')
+    + tileHtml('NEW', fresh, '#d97a1f', 'Added in the last 7 days')
+    + tileHtml('CLEARED', cleared, '#2f9e44', 'Reviewed & cleared')
+    + '</div>'
+    + '<h2>Changelog</h2>'
     + '<p class="sub">Every change made in this dashboard, newest first.</p>';
+  const js = (S.journal || []).slice().reverse();
   if (!js.length) { el.innerHTML = h + '<p class="fineprint">No changes yet.</p></section>'; return; }
   const groups = [];
   js.forEach(c => {
@@ -970,8 +987,7 @@ function initPanelResize(){
 function projTile(label, num, tint, sub){
   const t = document.createElement('div');
   t.className = 'ptile';
-  t.style.setProperty('--tint', tint);
-  const l = document.createElement('div');
+  t.style.setProperty('--tint', tint);  const l = document.createElement('div');
   l.className = 'ptile-label';
   l.textContent = label;
   const n = document.createElement('div');
@@ -983,22 +999,17 @@ function projTile(label, num, tint, sub){
   t.appendChild(l); t.appendChild(n); t.appendChild(s);
   return t;
 }
+function tileHtml(label, num, tint, sub){
+  return '<div class="ptile" style="--tint:' + tint + ';flex:1">'
+    + '<div class="ptile-label">' + escHtml(label) + '</div>'
+    + '<div class="ptile-num">' + escHtml(String(num)) + '</div>'
+    + '<div class="ptile-sub">' + escHtml(sub) + '</div></div>';
+}
 function renderProjectView(){
   const pv = document.getElementById('view-project');
   if (!pv) return;
   const b = byId[projectId()] || {};
   pv.innerHTML = '';
-  const attn = b.attention || [];
-  const unseen = attn.filter(a => !S.seen[a.id]).length;
-  const weekAgo = Date.now() - 7 * 864e5;
-  const fresh = attn.filter(a => { const t = Date.parse(a.date || ''); return t && t >= weekAgo; }).length;
-  const cleared = attn.filter(a => S.seen[a.id]).length;
-  const tiles = document.createElement('div');
-  tiles.id = 'project-tiles';
-  tiles.appendChild(projTile('TO REVIEW', unseen, '#d43d2a', 'Needs your attention'));
-  tiles.appendChild(projTile('NEW', fresh, '#d97a1f', 'Added in the last 7 days'));
-  tiles.appendChild(projTile('CLEARED', cleared, '#2f9e44', 'Reviewed & cleared'));
-  pv.appendChild(tiles);
   if (b.homepage) {
     const bar2 = document.getElementById('journal-bar');
     if (bar2) bar2.classList.remove('show');
