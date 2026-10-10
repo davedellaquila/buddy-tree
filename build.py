@@ -2691,12 +2691,28 @@ document.addEventListener('click', e => {
   const buddyInfo = e.target.closest('[data-buddy-info]');
   if (buddyInfo) {
     e.stopPropagation(); e.preventDefault();
-    openBuddy(buddyInfo.dataset.buddyInfo); return;
+    const bid = buddyInfo.dataset.buddyInfo;
+    const vb = document.getElementById('view-buddy');
+    // Toggle: if panel is open for this buddy, close it; otherwise open it
+    if (vb && vb.classList.contains('active') && S.projectId === bid) {
+      closeDetail();
+    } else {
+      openBuddy(bid);
+    }
+    return;
   }
   const projInfo = e.target.closest('[data-proj-info]');
   if (projInfo) {
     e.stopPropagation();
-    openBuddy(projInfo.dataset.projInfo); return;
+    const bid = projInfo.dataset.projInfo;
+    const vb = document.getElementById('view-buddy');
+    // Toggle: if panel is open for this buddy, close it; otherwise open it
+    if (vb && vb.classList.contains('active') && S.projectId === bid) {
+      closeDetail();
+    } else {
+      openBuddy(bid);
+    }
+    return;
   }
   const projRow = e.target.closest('#view-projects .proj-row[data-buddy]');
   if (projRow) {
