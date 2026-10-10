@@ -138,6 +138,17 @@
   .photo img { width: 100%; border-radius: 8px; display: block; }
   .photo figcaption { font-size: 12px; color: var(--dim); margin-top: 8px; text-align: center; }
 
+  .quotes { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-top: 14px; }
+  .quotes blockquote {
+    background: var(--card); border: 1px solid var(--line); border-left: 5px solid var(--rose);
+    border-radius: 10px; padding: 16px 18px 12px; font-family: Georgia, "Iowan Old Style", serif;
+    font-size: 15.5px; font-style: italic; line-height: 1.6;
+  }
+  .quotes blockquote cite {
+    display: block; margin-top: 10px; font-family: -apple-system, "Segoe UI", Inter, sans-serif;
+    font-style: normal; font-size: 12px; color: var(--dim);
+  }
+
   footer { margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line);
            color: var(--dim); font-size: 13px; display: flex; gap: 16px; flex-wrap: wrap; }
   footer a { color: var(--terra); }
@@ -188,6 +199,9 @@
     <div class="fact"><div class="e">🎂</div><div class="t">Birthday: November 4</div><div class="d">From her Facebook profile — now on the important-dates board below.</div></div>
     <div class="fact"><div class="e">📍</div><div class="t">San Jose → Fiddletown</div><div class="d">Hometown San Jose; now Fiddletown, California — home.</div></div>
     <div class="fact"><div class="e">💆</div><div class="t">Esthetician &amp; skin therapist</div><div class="d">Self-employed; previously at Sirena Scena Salon.</div></div>
+    <div class="fact"><div class="e">🏎️</div><div class="t">Dell'Aquila Garage</div><div class="d">She champions the family garage — shares and promotes their builds constantly.</div></div>
+    <div class="fact"><div class="e">🏆</div><div class="t">Car culture</div><div class="d">Monterey Car Week devotee — celebrated Quentin's Best MG + Best in Show wins.</div></div>
+    <div class="fact"><div class="e">🌽</div><div class="t">Fiddletown local life</div><div class="d">Plugged in — the veggie stand on Fiddletown Rd, homemade chorizo with the "Hill'Aquila's".</div></div>
   </div>
 
   <h2 class="serif">Photos <span class="sub">From Nan's Facebook</span></h2>
@@ -196,6 +210,13 @@
       <img src="photos/profile.jpg" alt="Nan's Facebook profile photo">
       <figcaption>Profile photo · Facebook</figcaption>
     </figure>
+  </div>
+
+  <h2 class="serif">In her own words <span class="sub">From Nan's Facebook posts</span></h2>
+  <div class="quotes">
+    <blockquote>"Married to this guy, 38 years ago today. What a ride! I love you babe, Happy Anniversary ❤️"<cite>— April 24, 2026</cite></blockquote>
+    <blockquote>"31 years ago today this guy changed my entire life! Quentin was such a gift to us…"<cite>— May 30, 2026 · Quentin's birthday</cite></blockquote>
+    <blockquote>"Sawyer!!! It's your birthday! …You brought so much sunshine into our lives…"<cite>— June 22, 2026 · Sawyer's birthday</cite></blockquote>
   </div>
 
   <h2 class="serif">Grocery stipend <span class="sub">$1,200/mo · under review</span></h2>
@@ -230,6 +251,15 @@
   <div class="card" style="margin-top:14px">
     <div class="list-item"><span style="font-size:18px">🎂</span>
       <span class="txt"><b>Nan's birthday</b> — November 4 <span class="when">(from her Facebook profile)</span></span>
+    </div>
+    <div class="list-item"><span style="font-size:18px">💍</span>
+      <span class="txt"><b>Anniversary</b> — April 24 <span class="when">(her post: "Married to this guy, 38 years ago today")</span></span>
+    </div>
+    <div class="list-item"><span style="font-size:18px">🎂</span>
+      <span class="txt"><b>Sawyer's birthday</b> — June 22 <span class="when">(from her Facebook post)</span></span>
+    </div>
+    <div class="list-item"><span style="font-size:18px">🎂</span>
+      <span class="txt"><b>Quentin's birthday</b> — May 30 <span class="when">(her post: "31 years ago today…")</span></span>
     </div>
   </div>
   <div class="card" style="margin-top:14px" id="dates"></div>
