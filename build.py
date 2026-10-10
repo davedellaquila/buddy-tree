@@ -90,6 +90,14 @@ body.light #zoombar{background:#ffffff;border-color:#d0d7de}
 #journal-bar.open ul{display:block}
 #journal-bar li{margin:3px 0;color:#c9d1d9}
 .jchg{color:#8b949e;font-size:12px;margin:0 8px}
+.cl-day{font-size:13px;font-weight:600;color:#8b949e;margin:26px 0 6px}
+.cl-group{border-top:1px solid #21262d}
+.cl-row{display:flex;gap:12px;align-items:flex-start;padding:14px 4px;border-bottom:1px solid #21262d}
+.cl-ic{font-size:15px;line-height:1.45;flex:0 0 auto;width:22px;text-align:center}
+.cl-body{flex:1;min-width:0}
+.cl-head{font-size:14px;font-weight:600;color:#e6edf3}
+.cl-diff{font-size:12.5px;color:#8b949e;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cl-time{font-size:12px;color:#6e7681;white-space:nowrap;flex:0 0 auto;padding-top:3px}
 #journal-bar .jtime{color:#6e7681;font-size:11px;margin-left:6px}
 .pdrop{border:2px dashed #30363d;border-radius:12px;padding:20px;text-align:center;color:#8b949e;font-size:13px;margin-top:10px;cursor:pointer}
 .pdrop.over{border-color:#1f6feb;background:#0d1a30;color:#e6edf3}
@@ -466,27 +474,69 @@ function shortVal(v){
   const s = String(v);
   return escHtml(s.length > 90 ? s.slice(0, 90) + '…' : s);
 }
-function changeOldNew(c){
+const CHANGE_ICONS = {
+  notes: '✏️',
+  photos: '🖼️',
+  move: '↔️',
+  rename: '🏷️',
+  brand: '🏷️',
+};
+function changeDiff(c){
   let b = c.before, a = c.after;
   if (c.type === 'move') {
     b = b ? (((byId[b] || {}).name) || b) : '(top level)';
     a = a ? (((byId[a] || {}).name) || a) : '(top level)';
   }
   if (b == null && a == null) return '';
-  return ' <span class="jchg">' + shortVal(b) + ' → ' + shortVal(a) + '</span>';
+  return shortVal(b) + ' → ' + shortVal(a);
+}
+function changeOldNew(c){
+  const d = changeDiff(c);
+  return d ? ' <span class="jchg">' + d + '</span>' : '';
+}
+function dayLabel(d){
+  const day = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diff = Math.round((today - day) / 86400000);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Yesterday';
+  return d.toLocaleDateString([], {month: 'long', day: 'numeric'});
 }
 function renderChangelog(){
   const el = document.getElementById('view-changelog');
   if (!el) return;
   const js = (S.journal || []).slice().reverse();
-  let h = '<section class="projects-view" style="margin-top:24px"><h2>Changelog</h2>'
+  let h = '<section class="changelog" style="margin-top:24px;max-width:760px"><h2>Changelog</h2>'
     + '<p class="sub">Every change made in this dashboard, newest first.</p>';
-  if (!js.length) h += '<p class="fineprint">No changes yet.</p>';
-  else h += '<div class="proj-list">' + js.map(c =>
-    '<div class="proj-row"><span class="pname">' + escHtml(c.desc) + '</span>'
-    + '<span class="pdesc">' + changeOldNew(c) + '</span>'
-    + '<span class="attn-date">' + escHtml(new Date(c.t).toLocaleString()) + '</span></div>'
-  ).join('') + '</div>';
+  if (!js.length) { el.innerHTML = h + '<p class="fineprint">No changes yet.</p></section>'; return; }
+  const groups = [];
+  js.forEach(c => {
+    const d = new Date(c.t);
+    const key = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+    let g = null;
+    for (let i = 0; i < groups.length; i++) { if (groups[i].key === key) { g = groups[i]; break; } }
+    if (!g) { g = {key: key, date: d, items: []}; groups.push(g); }
+    g.items.push(c);
+  });
+  h += groups.map(g => {
+    const rows = g.items.map(c => {
+      const d = new Date(c.t);
+      const ic = CHANGE_ICONS[c.type] || '•';
+      const diff = changeDiff(c);
+      return '<div class="cl-row">'
+        + '<span class="cl-ic" aria-hidden="true">' + ic + '</span>'
+        + '<div class="cl-body">'
+        + '<div class="cl-head">' + escHtml(c.desc) + '</div>'
+        + (diff ? '<div class="cl-diff">' + diff + '</div>' : '')
+        + '</div>'
+        + '<span class="cl-time" title="' + escHtml(d.toLocaleString()) + '">'
+        + escHtml(d.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'})) + '</span>'
+        + '</div>';
+    }).join('');
+    return '<h3 class="cl-day">' + escHtml(dayLabel(g.date)) + '</h3>'
+      + '<div class="cl-group">' + rows + '</div>';
+  }).join('');
   el.innerHTML = h + '</section>';
 }
 function renderNav(){

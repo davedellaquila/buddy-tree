@@ -3,6 +3,16 @@
 All notable changes to the Buddies dashboard and buddy system. Newest first.
 `FEATURES.md` describes the current state; this file describes how it got there.
 
+## 2026-10-10 (Changelog restyle)
+
+### Changed
+- **Changelog view restyled as an activity feed** — entries are grouped
+  by day under "Today" / "Yesterday" / month-day headers; each row has
+  a type icon (notes, moves, renames), a bold headline, the old → new
+  diff as a quiet truncated sub-line, and a small muted time-only stamp
+  (full date on hover). Generous padding and dividers replace the
+  cramped rows.
+
 ## 2026-10-10
 
 ### Added
