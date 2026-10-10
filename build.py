@@ -581,15 +581,16 @@ function selectProject(id){
 function openBuddy(id){
   if (!byId[id]) return;
   const b = byId[id];
-  // Project Homepage view: clicking a buddy loads its homepage in the main view.
-  // No homepage -> leave the main view exactly as it was.
+  // Project Homepage view: clicking a buddy loads its homepage in the main view
+  // (if it has one) AND opens the right-side detail panel.
+  // No homepage -> leave the main view exactly as it was, but still open the panel.
   if (S.view === 'project') {
     if (b.homepage) {
       S.projectId = id; save();
       renderProjectView();
       renderNav();
     }
-    return;
+    // Fall through to open the right-side panel below
   }
   const inView = (S.sel || '').startsWith('view:');
   S.projectId = id; save();
@@ -1844,8 +1845,33 @@ async function dumpIngest(id, keepText){
     await ghPutFile(b.repo, 'docs/ingest.md', b64encode(cur + entry), 'Ingest dump for ' + id);
     if (!keepText) ta.value = '';
     if (st) st.textContent = 'Dumped to ' + b.repo + '/docs/ingest.md';
+    // Optimistically show the new dump — GitHub API may return stale data right after push
+    prependDumpEntry(id, {stamp: stamp, body: text});
   } catch (err) { if (st) st.textContent = 'Save failed: ' + (err.message || err); }
-  renderIngestFeed(id);
+}
+function prependDumpEntry(id, e){
+  const feed = document.getElementById('ingest-feed'); if (!feed) return;
+  // If feed shows "No dumps yet", re-render fully to get proper structure
+  if (!feed.querySelector('.dumps')) { renderIngestFeed(id); return; }
+  const body = feed.querySelector('.dumps-body');
+  if (!body) return;
+  const div = document.createElement('div');
+  div.className = 'attn';
+  div.innerHTML = '<div class="dump-actions"><button class="dump-act" data-dump-edit="0" title="Edit this dump">' + ICON_EDIT + '</button><button class="dump-act" data-dump-del="0" title="Delete this dump">' + ICON_TRASH + '</button></div><div class="attn-body"><div class="attn-text">' + escHtml(e.body.slice(0, 300)) + (e.body.length > 300 ? '\u2026' : '') + '</div><div class="attn-date">' + escHtml(e.stamp) + '</div></div>';
+  body.insertBefore(div, body.firstChild);
+  // Update count and entries cache
+  const head = feed.querySelector('.dumps-head h4');
+  const entries = feed._entries || [];
+  entries.unshift(e);
+  feed._entries = entries;
+  if (head) head.textContent = 'Dumps (' + entries.length + ')';
+  // Expand if collapsed so the new dump is visible
+  const dumps = feed.querySelector('.dumps');
+  if (dumps && dumps.classList.contains('collapsed')) {
+    dumps.classList.remove('collapsed');
+    if (!S.dumpsCollapsed || typeof S.dumpsCollapsed !== 'object') S.dumpsCollapsed = {};
+    S.dumpsCollapsed[id] = false; save();
+  }
 }
 function parseIngest(md){
   return md.split(/^## /m).slice(1).map(p => {
