@@ -521,6 +521,11 @@ function selectProject(id){
   S.projectId = id; save();
   show('view:project');
 }
+function openBuddy(id){
+  if (!byId[id]) return;
+  S.projectId = id; save();
+  show('buddy:' + id);
+}
 function shortVal(v){
   if (v == null || v === '') return '(empty)';
   const s = String(v);
@@ -1501,7 +1506,7 @@ function show(sel, push){
 document.addEventListener('keydown', e => {
   if (e.target && e.target.id === 'buddy-search' && e.key === 'ArrowDown') {
     const first = document.querySelector('#buddy-nav [data-buddy]');
-    if (first) { e.preventDefault(); e.target.blur(); show('buddy:' + first.dataset.buddy); }
+    if (first) { e.preventDefault(); e.target.blur(); openBuddy(first.dataset.buddy); }
     return;
   }
   if (e.target && e.target.matches && e.target.matches('input, textarea, [contenteditable="true"]')) return;
@@ -1528,7 +1533,7 @@ document.addEventListener('keydown', e => {
   else if (e.key === 'ArrowUp') pos = (pos - 1 + total) % total;
   else if (e.key === 'ArrowLeft') pos = 0;
   else if (e.key === 'ArrowRight') pos = total - 1;
-  if (pos >= 0 && pos < rows.length) show('buddy:' + rows[pos].dataset.buddy);
+  if (pos >= 0 && pos < rows.length) openBuddy(rows[pos].dataset.buddy);
 });
 /* ---------- sidebar resize ---------- */
 (function initSbResize(){
@@ -2141,7 +2146,7 @@ document.addEventListener('click', e => {
   const pt = e.target.closest('[data-proj-toggle]');
   if (pt) { const bid = pt.dataset.projToggle; if (!S.projCollapsed || typeof S.projCollapsed !== 'object') S.projCollapsed = {}; S.projCollapsed[bid] = !S.projCollapsed[bid]; save(); renderProjects(); return; }
   const bb = e.target.closest('[data-buddy]');
-  if (bb) { show('buddy:' + bb.dataset.buddy); return; }
+  if (bb) { openBuddy(bb.dataset.buddy); return; }
   const sb = e.target.closest('[data-seen]');
   if (sb) { S.seen[sb.dataset.seen] = Date.now(); save(); renderBuddy(S.sel.slice(6)); renderNav(); return; }
   const sa = e.target.closest('[data-seen-all]');
