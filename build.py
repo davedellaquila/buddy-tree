@@ -835,6 +835,7 @@ function isFieldVisible(fid){
 }
 const SETTING_DEFS = [
   {id:'hideBuddyWord', label:'Hide the word “Buddy” in names', type:'bool', def:false},
+  {id:'autoOpenPanel', label:'Open detail panel when clicking a project row', type:'bool', def:false, tip:'When off, clicking a project row only selects it — use the \u24d8 info icon to open the detail panel.'},
 ];
 function getSetting(id){
   const def = SETTING_DEFS.find(s => s.id === id);
@@ -844,6 +845,7 @@ function getSetting(id){
 function snapshotSettable(){
   return {
     hideBuddyWord: !!S.hideBuddyWord,
+    autoOpenPanel: !!S.autoOpenPanel,
     fieldOrder: getFieldOrder().slice(),
     fieldHidden: Object.assign({}, S.fieldHidden || {}),
     viewOrder: getViewOrder().slice(),
@@ -854,6 +856,7 @@ function snapshotSettable(){
 function resetToFactory(){
   const f = S.factory || {};
   S.hideBuddyWord = !!f.hideBuddyWord;
+  S.autoOpenPanel = !!f.autoOpenPanel;
   if (Array.isArray(f.fieldOrder) && f.fieldOrder.length) S.fieldOrder = f.fieldOrder.slice();
   if (f.fieldHidden && typeof f.fieldHidden === 'object') S.fieldHidden = Object.assign({}, f.fieldHidden);
   if (Array.isArray(f.viewOrder) && f.viewOrder.length) S.viewOrder = f.viewOrder.slice();
@@ -1535,7 +1538,8 @@ function renderProjects(){
       + (depth ? '<span class="dot">\u2514</span>' : '')
       + '<span class="pname">' + iconName(b) + '</span>'
       + '<span class="pdesc">' + escHtml(b.tagline || '') + '</span>'
-      + '<span class="status ' + b.statusClass + '">' + escHtml(b.status) + '</span></div>';
+      + '<span class="status ' + b.statusClass + '">' + escHtml(b.status) + '</span>'
+      + '<button class="proj-info" data-proj-info="' + b.id + '" title="Open ' + escHtml(dispName(b)) + ' details (right panel)" style="background:none;border:none;cursor:pointer;font-size:16px;padding:4px 8px;opacity:0.6" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">\u24d8</button></div>';
     if (!collapsed) kids.forEach(c => walk(c.id, depth + 1));
   })('project-buddy', 0);
   s += '</div></section>';
@@ -2631,9 +2635,14 @@ document.addEventListener('click', e => {
     manifestFilter = manifestFilter === manTile.dataset.tile ? null : manTile.dataset.tile;
     applyManifestFilter(); return;
   }
+  const projInfo = e.target.closest('[data-proj-info]');
+  if (projInfo) {
+    e.stopPropagation();
+    openBuddy(projInfo.dataset.projInfo); return;
+  }
   const projRow = e.target.closest('#view-projects .proj-row[data-buddy]');
   if (projRow) {
-    // Whole row toggles expand/collapse (if it has children) AND opens the buddy panel
+    // Whole row toggles expand/collapse (if it has children)
     const pt = projRow.querySelector('[data-proj-toggle]');
     if (pt) {
       const bid = pt.dataset.projToggle;
@@ -2641,7 +2650,9 @@ document.addEventListener('click', e => {
       S.projCollapsed[bid] = !S.projCollapsed[bid];
       save(); renderProjects();
     }
-    openBuddy(projRow.dataset.buddy); return;
+    // Open the detail panel only if the setting is on (default: off — use the ⓘ icon instead)
+    if (S.autoOpenPanel) openBuddy(projRow.dataset.buddy);
+    return;
   }
   const bb = e.target.closest('[data-buddy]');
   // Don't re-open the buddy when clicking an editable field (e.g. the name)

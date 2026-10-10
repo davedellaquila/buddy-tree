@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emile Buddy</title>
+<style>
+  :root{
+    --bg:#f7f5f0; --panel:#ffffff; --ink:#232a33; --muted:#6b7684;
+    --line:#e4e0d5; --steel:#2f5d8a; --steel-soft:#e8f0f8; --steel-line:#c9d9ea;
+    --amber:#b3541e; --amber-soft:#fdf0e2; --red:#b3352b; --red-soft:#fbeae8;
+    --green:#3d7a4e; --green-soft:#e9f3ec; --accent:#2f5d8a;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#14181d; --panel:#1d232b; --ink:#eceff3; --muted:#9aa6b2;
+      --line:#2c343e; --steel:#7fb0dd; --steel-soft:#1c2733; --steel-line:#33506b;
+      --amber:#e09a4e; --amber-soft:#2b2117; --red:#e07a6f; --red-soft:#2c1e1c;
+      --green:#7cbf8f; --green-soft:#1c2a21; --accent:#7fb0dd;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,"Segoe UI",sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.55;
+    background-image:radial-gradient(var(--line) 1px, transparent 1px);
+    background-size:22px 22px;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:40px 24px 64px}
+  header{display:flex; align-items:center; gap:18px; flex-wrap:wrap}
+  .icon{
+    width:76px; height:76px; border-radius:22px; font-size:40px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--steel-soft); border:1px solid var(--steel-line);
+    box-shadow:0 6px 20px rgba(47,93,138,.18);
+  }
+  h1{margin:0; font-size:34px; letter-spacing:-.5px; font-family:Georgia,"Times New Roman",serif; font-weight:700}
+  .tagline{margin:4px 0 0; color:var(--muted); font-size:15px}
+  .pill{
+    display:inline-block; font-size:12.5px; font-weight:700; letter-spacing:.4px;
+    color:var(--steel); background:var(--steel-soft);
+    border:1px solid var(--steel-line); border-radius:999px; padding:4px 12px; margin-top:8px;
+  }
+  .mission{
+    margin:26px 0 0; font-size:16.5px; line-height:1.7;
+    background:var(--panel); border:1px solid var(--line);
+    border-radius:14px; padding:20px 22px;
+  }
+  .mission b{color:var(--steel)}
+  h2{font-size:13px; letter-spacing:1.6px; text-transform:uppercase; color:var(--muted); margin:38px 0 14px}
+  .story{
+    background:linear-gradient(135deg, var(--steel-soft), var(--panel));
+    border:1px solid var(--steel-line); border-radius:14px; padding:20px 22px;
+    font-size:15.5px; line-height:1.75;
+  }
+  .story p{margin:0 0 12px}
+  .story p:last-child{margin:0}
+  .filenote{
+    margin:18px 0 0; padding:14px 18px; font-size:14.5px;
+    border:1px dashed var(--steel-line); background:var(--panel); border-radius:12px;
+  }
+  .filenote .k{font-weight:700; color:var(--steel); font-size:12px; letter-spacing:1px; text-transform:uppercase; display:block; margin-bottom:2px}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px}
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:16px 18px;
+  }
+  .card .e{font-size:24px}
+  .card h3{margin:8px 0 4px; font-size:15px}
+  .card p{margin:0; font-size:13.5px; color:var(--muted)}
+  .card .soon{font-style:italic}
+  .attn{
+    background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--amber);
+    border-radius:12px; padding:14px 18px; margin-bottom:10px; font-size:14.5px;
+  }
+  .attn.blocked{border-left-color:var(--red); background:var(--red-soft)}
+  .attn.closed{border-left-color:var(--green); background:var(--green-soft)}
+  .attn .k{font-weight:700; font-size:12px; letter-spacing:1px; text-transform:uppercase; display:block; margin-bottom:2px}
+  .attn .k.amber{color:var(--amber)} .attn .k.red{color:var(--red)} .attn .k.green{color:var(--green)}
+  .ship{border-left:3px solid var(--steel); padding:2px 0 2px 16px; margin:0 0 18px 4px}
+  .ship .v{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13px; color:var(--steel); font-weight:700}
+  .ship p{margin:4px 0 0; font-size:14px}
+  .links{display:flex; gap:10px; flex-wrap:wrap}
+  .links a{
+    display:inline-flex; align-items:center; gap:8px; text-decoration:none; color:var(--ink);
+    background:var(--panel); border:1px solid var(--line); border-radius:999px;
+    padding:10px 18px; font-size:14px; font-weight:600;
+  }
+  .links a:hover{border-color:var(--accent); color:var(--accent)}
+  footer.page{margin-top:36px; color:var(--muted); font-size:12.5px}
+  footer.page p{margin:4px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="icon">🤝</div>
+    <div>
+      <h1>Emile Buddy</h1>
+      <p class="tagline">The living dossier for Emile — Dave's middle brother.</p>
+      <span class="pill">● CHILD OF FAMILY BUDDY</span>
+    </div>
+  </header>
+
+  <p class="mission">
+    The one place for everything Dave needs to remember, track, and do regarding Emile:
+    <b>key facts, important dates, notes, reminders, and gift ideas.</b>
+    A per-person reference buddy — distinct from Relationship Buddy, and all the steadier for it.
+  </p>
+
+  <h2>The story so far</h2>
+  <div class="story">
+    <p>Emile is Dave's middle brother, and right now the active thread is the family business: the three of them — Dave, Ron, and Emile — are co-selling the Morgan Hill house at 18231 Llagas Creek Dr, with Kay Korbel running the listing.</p>
+    <p>The snag: Emile's DocuSign envelope, signing as Successor Trustee, has been bouncing since October 5. His mailbox is rejecting the mail — not a typo, the address is spelled right — and the sale can't proceed without his signature. The fix is either Emile sorting out his inbox or Kay re-firing the envelopes to his alternate email.</p>
+    <div class="filenote">
+      <span class="k">File note — Sep 29</span>
+      Dave clarified: Emile is his <b>middle brother</b>, not his father — despite the September 25 voicemail opening with "it's Dad again, Dave…" (possibly relaying their father's message; unconfirmed).
+    </div>
+  </div>
+
+  <h2>What I track</h2>
+  <div class="grid">
+    <div class="card"><div class="e">📋</div><h3>Key facts</h3><p>Middle brother · co-seller of the Morgan Hill house · Sports Car Performance.</p></div>
+    <div class="card"><div class="e">📇</div><h3>Contact paths</h3><p>iPhone, home, work &amp; Google Voice numbers on file. Primary email bouncing; alternate email on file — unverified.</p></div>
+    <div class="card"><div class="e">📅</div><h3>Important dates</h3><p class="soon">Nothing captured yet — birthdays and anniversaries still to collect.</p></div>
+    <div class="card"><div class="e">📝</div><h3>Notes</h3><p>Running log — Google Voice watch, the staging thread, every call and voicemail.</p></div>
+    <div class="card"><div class="e">🎁</div><h3>Gift ideas</h3><p class="soon">None yet — tell me one and it's filed for the right moment.</p></div>
+    <div class="card"><div class="e">🔔</div><h3>Reminders</h3><p>The DocuSign chase, the staging sign-off, and keeping in touch.</p></div>
+  </div>
+
+  <h2>Needs Dave's attention</h2>
+  <div class="attn blocked"><span class="k red">Blocked</span>DocuSign Successor Trustee envelope bouncing since Oct 5 — the sale can't proceed until Emile signs. Next move: text or call Emile (draft ready since Oct 5), or hand Kay the alternate email so she can re-fire (draft ready since Oct 7).</div>
+  <div class="attn"><span class="k amber">Waiting</span>Mayra Vera's staging proposal — $4,250 design/styling fee. Needs all three sellers to agree; Dave's reply asking Kay for the all-in cost and timing was drafted Sep 29.</div>
+  <div class="attn"><span class="k amber">Stalled</span>Google Voice watch for Emile's calls — the session expired. Dave needs to sign back in at voice.google.com before new calls, texts, or voicemails can be picked up.</div>
+  <div class="attn"><span class="k amber">Missing</span>Emile's birthday isn't on record — nor his gift-relevant interests. What does he love?</div>
+  <div class="attn closed"><span class="k green">Closed</span>HomeGuard termite-repair authorization — retired Oct 7 per Dave ("don't worry about HomeGuard"). One less thing chasing Emile.</div>
+
+  <h2>Fresh off the bench</h2>
+  <div class="ship">
+    <span class="v">2026-10-09</span>
+    <p>Emile Buddy born — thread, product brief, and private repo.</p>
+  </div>
+  <div class="ship">
+    <span class="v">2026-10-07</span>
+    <p>HomeGuard thread retired at Dave's direction. Draft text to Kay prepared — re-fire the DocuSigns to Emile's alternate email.</p>
+  </div>
+  <div class="ship">
+    <span class="v">2026-10-06</span>
+    <p>Alternate email found on Emile's iPad contact card; still nothing back from him — no signed DocuSign, no reply, no alternate address.</p>
+  </div>
+  <div class="ship">
+    <span class="v">2026-10-05</span>
+    <p>DocuSign envelope bounced twice at the correctly spelled address — a mailbox rejection, not a typo. Draft text to Emile prepared.</p>
+  </div>
+
+  <h2>Open it</h2>
+  <div class="links">
+    <a href="https://docs.google.com/document/d/19I51Rb1nbHZQT9zDZ6JDW8M5zI2WejrSSb-hfYrq0zA/edit" target="_blank" rel="noopener">📄&nbsp; Product brief</a>
+    <a href="https://github.com/davedellaquila/emile-buddy" target="_blank" rel="noopener">💻&nbsp; Repo</a>
+    <a href="https://davedellaquila.github.io/buddy-tree/" target="_blank" rel="noopener">🗂️&nbsp; Buddy dashboard</a>
+  </div>
+
+  <footer class="page">
+    <p>Emile Buddy · child of Family Buddy · built with care by Dave &amp; Astro</p>
+    <p>Phone numbers and email addresses stay in the private dossier — this page keeps them off the public web.</p>
+  </footer>
+
+</div>
+</body>
+</html>

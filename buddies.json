@@ -47,7 +47,8 @@
       "statusClass": "st-brief",
       "tagline": "Personal-ops \u2014 the \u201cfigure it out later\u201d list with teeth",
       "icon": "\ud83d\ude4b",
-      "photos": []
+      "photos": [],
+      "homepage": "personal-buddy/"
     },
     {
       "attention": [
@@ -539,7 +540,7 @@
           "text": "Brief updated: curiosity-driven direction decided and folded in \u2014 'What do you want to learn?' now leads."
         }
       ],
-      "brief": "https://docs.google.com/document/d/1UOJPkZQaHlZja1P5PkVdcGxYeufX494X1gugXc-jS1m8/edit",
+      "brief": "https://docs.google.com/document/d/1ZLYpo0FPzZja1P5PkVdcGxYeufX494X1gugXc-jS1m8/edit",
       "docs": [],
       "id": "school-buddy",
       "kind": "standalone",
@@ -551,7 +552,8 @@
       "statusClass": "st-brief",
       "tagline": "Learning companion",
       "icon": "\ud83c\udf93",
-      "photos": []
+      "photos": [],
+      "homepage": "school-buddy/"
     },
     {
       "attention": [
@@ -618,7 +620,8 @@
       "statusClass": "st-brief",
       "tagline": "The skeleton every buddy is born with",
       "icon": "\ud83c\udfd7\ufe0f",
-      "photos": []
+      "photos": [],
+      "homepage": "scaffold-buddy/"
     },
     {
       "attention": [
@@ -774,7 +777,8 @@
         }
       ],
       "icon": "\ud83e\uddd4",
-      "photos": []
+      "photos": [],
+      "homepage": "emile-buddy/"
     },
     {
       "id": "nancy-buddy",

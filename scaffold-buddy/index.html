@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scaffold Buddy</title>
+<style>
+  :root{
+    --bg:#0b2b66; --panel:rgba(255,255,255,.045); --ink:#eef4ff; --muted:#a9c0e8;
+    --line:rgba(255,255,255,.16); --accent:#67e8f9; --accent-soft:rgba(103,232,249,.12);
+    --amber:#fbbf24; --amber-soft:rgba(251,191,36,.12);
+    --grid:rgba(255,255,255,.055); --plate:rgba(255,255,255,.04);
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#f4f7ff; --panel:#ffffff; --ink:#102a5c; --muted:#5b719c;
+      --line:#d4ddf2; --accent:#0b5bd3; --accent-soft:#e3edff;
+      --amber:#b45309; --amber-soft:#fdf3e0;
+      --grid:rgba(11,43,102,.06); --plate:rgba(11,43,102,.05);
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,"Segoe UI",sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.55;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size:28px 28px;
+  }
+  .wrap{max-width:880px; margin:0 auto; padding:40px 24px 64px}
+  header{display:flex; align-items:center; gap:18px; flex-wrap:wrap}
+  .icon{
+    width:76px; height:76px; border-radius:22px; font-size:40px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--accent-soft); border:1.5px dashed var(--accent);
+    box-shadow:0 6px 20px rgba(103,232,249,.15);
+  }
+  h1{margin:0; font-size:34px; letter-spacing:-.5px}
+  .tagline{margin:4px 0 0; color:var(--muted); font-size:15px}
+  .pill{
+    display:inline-block; font-size:12.5px; font-weight:700; letter-spacing:.4px;
+    color:var(--amber); background:var(--amber-soft);
+    border:1px solid var(--line); border-radius:999px; padding:4px 12px; margin-top:8px;
+  }
+  .mission{
+    margin:26px 0 0; font-size:16.5px; line-height:1.7;
+    background:var(--panel); border:1px solid var(--line);
+    border-radius:14px; padding:20px 22px; position:relative;
+  }
+  .mission::before,.mission::after{
+    content:""; position:absolute; width:14px; height:14px; border:1.5px solid var(--accent);
+  }
+  .mission::before{top:-1.5px; left:-1.5px; border-right:none; border-bottom:none; border-radius:14px 0 0 0}
+  .mission::after{bottom:-1.5px; right:-1.5px; border-left:none; border-top:none; border-radius:0 0 14px 0}
+  .mission b{color:var(--accent)}
+  .mission code{
+    font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.92em;
+    background:var(--accent-soft); border:1px solid var(--line);
+    border-radius:6px; padding:1px 7px; white-space:nowrap;
+  }
+  h2{font-size:13px; letter-spacing:1.6px; text-transform:uppercase; color:var(--muted); margin:38px 0 14px}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px}
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:16px 18px;
+  }
+  .card .e{font-size:24px}
+  .card h3{margin:8px 0 4px; font-size:15px}
+  .card h3 code{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.95em; color:var(--accent)}
+  .card p{margin:0; font-size:13.5px; color:var(--muted)}
+  .schema{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:18px 12px 8px; overflow-x:auto;
+  }
+  .schema svg{display:block; width:100%; height:auto; min-width:560px}
+  .schema svg .svgroot{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13px; fill:var(--ink)}
+  .schema svg .t{fill:var(--ink)}
+  .schema svg .m{fill:var(--muted)}
+  .schema svg .a{fill:var(--accent)}
+  .schema svg .box{fill:var(--plate); stroke:var(--ink); stroke-width:1.5}
+  .schema svg .stamp{fill:var(--plate); stroke:var(--accent); stroke-width:1.5; stroke-dasharray:7 5}
+  .schema svg .ln{stroke:var(--accent); stroke-width:1.5; stroke-dasharray:7 5}
+  .schema svg .hd{fill:var(--accent)}
+  .attn{
+    background:var(--amber-soft); border:1px solid var(--line); border-left:4px solid var(--amber);
+    border-radius:12px; padding:14px 18px; margin-bottom:10px; font-size:14.5px;
+  }
+  .attn .k{font-weight:700; color:var(--amber); font-size:12px; letter-spacing:1px; text-transform:uppercase; display:block; margin-bottom:2px}
+  .attn a{color:inherit; font-weight:600}
+  .ship{border-left:3px solid var(--accent); padding:2px 0 2px 16px; margin:0 0 18px 4px}
+  .ship .v{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13px; color:var(--accent); font-weight:700}
+  .ship p{margin:4px 0 0; font-size:14px}
+  .links{display:flex; gap:10px; flex-wrap:wrap}
+  .links a{
+    display:inline-flex; align-items:center; gap:8px; text-decoration:none; color:var(--ink);
+    background:var(--panel); border:1px solid var(--line); border-radius:999px;
+    padding:10px 18px; font-size:14px; font-weight:600;
+  }
+  .links a:hover{border-color:var(--accent); color:var(--accent)}
+  footer{margin-top:36px; color:var(--muted); font-size:12.5px}
+  footer code{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.95em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="icon">🏗️</div>
+    <div>
+      <h1>Scaffold Buddy</h1>
+      <p class="tagline">The blueprint every buddy is born with — not the launcher.</p>
+      <span class="pill">● BRIEF UNDER REVIEW</span>
+    </div>
+  </header>
+
+  <p class="mission">
+    The meta-project that <b>designs, versions, and evolves the skeleton</b> every buddy
+    project is born with — <code>README.md</code>, <code>KNOWLEDGE.md</code>,
+    <code>DECISIONS.md</code> — plus the curation rule and the kickoff-script stamping step.
+    Distinct from the <b>Project Buddy tool</b> (the launcher) and the
+    <b>Project Buddy product</b> (the idea bank).
+  </p>
+
+  <h2>The skeleton</h2>
+  <div class="schema" aria-label="Skeleton schematic">
+    <svg viewBox="0 0 780 200" role="img" aria-label="Kickoff script stamps README, KNOWLEDGE and DECISIONS into every new buddy repo">
+      <g class="svgroot">
+        <rect class="stamp" x="16" y="62" width="150" height="76" rx="8"/>
+        <text class="t" x="91" y="94" text-anchor="middle" font-weight="700">kickoff script</text>
+        <text class="m" x="91" y="114" text-anchor="middle" font-size="11">the stamper</text>
+        <line class="ln" x1="166" y1="100" x2="236" y2="100"/>
+        <polygon class="hd" points="236,94 248,100 236,106"/>
+        <text class="a" x="201" y="88" text-anchor="middle" font-size="11">stamps</text>
+        <g>
+          <rect class="box" x="258" y="42" width="150" height="116" rx="8"/>
+          <text class="t" x="333" y="70" text-anchor="middle" font-weight="700">README.md</text>
+          <text class="m" x="333" y="92" text-anchor="middle" font-size="11">the front door</text>
+          <text class="m" x="333" y="110" text-anchor="middle" font-size="11">what it is · links to</text>
+          <text class="m" x="333" y="128" text-anchor="middle" font-size="11">brief, repo, thread</text>
+        </g>
+        <g>
+          <rect class="box" x="424" y="42" width="150" height="116" rx="8"/>
+          <text class="t" x="499" y="70" text-anchor="middle" font-weight="700">KNOWLEDGE.md</text>
+          <text class="m" x="499" y="92" text-anchor="middle" font-size="11">the memory</text>
+          <text class="m" x="499" y="110" text-anchor="middle" font-size="11">terms · facts · people</text>
+          <text class="m" x="499" y="128" text-anchor="middle" font-size="11">constraints · refs</text>
+        </g>
+        <g>
+          <rect class="box" x="590" y="42" width="150" height="116" rx="8"/>
+          <text class="t" x="665" y="70" text-anchor="middle" font-weight="700">DECISIONS.md</text>
+          <text class="m" x="665" y="92" text-anchor="middle" font-size="11">the log</text>
+          <text class="m" x="665" y="110" text-anchor="middle" font-size="11">dated decisions ·</text>
+          <text class="m" x="665" y="128" text-anchor="middle" font-size="11">what, when, why</text>
+        </g>
+        <text class="m" x="390" y="186" font-size="11">FIG. 1 — EVERY BUDDY REPO SHIPS WITH THIS SKELETON</text>
+      </g>
+    </svg>
+  </div>
+
+  <h2>The two rules</h2>
+  <div class="grid">
+    <div class="card"><div class="e">🗣️</div><h3>Curation rule</h3><p>Threads stay conversational. Anything durable gets written into the knowledge base.</p></div>
+    <div class="card"><div class="e">⚙️</div><h3>Kickoff stamping</h3><p>Every new buddy repo gets the skeleton stamped in at birth — same bones, every time.</p></div>
+  </div>
+
+  <h2>Needs Dave's attention</h2>
+  <div class="attn"><span class="k">Review</span><a href="https://docs.google.com/document/d/1rfrWpNABG-FbiHhbmOyYwVMZk1pwJekm6rNoPsMrh6k/edit" target="_blank" rel="noopener">Product brief</a> awaiting your verdict — approve, edits, or defer.</div>
+  <div class="attn"><span class="k">Queued</span>v1 template stamping into the empty repo — unblocked the moment the brief is approved.</div>
+
+  <h2>Fresh off the bench</h2>
+  <div class="ship">
+    <span class="v">2026-10-09</span>
+    <p>Brief written, mission backfilled across buddy threads, private repo created (empty), review asked.</p>
+  </div>
+
+  <h2>Open it</h2>
+  <div class="links">
+    <a href="https://docs.google.com/document/d/1rfrWpNABG-FbiHhbmOyYwVMZk1pwJekm6rNoPsMrh6k/edit" target="_blank" rel="noopener">📄&nbsp; Product brief</a>
+    <a href="https://github.com/davedellaquila/scaffold-buddy" target="_blank" rel="noopener">💻&nbsp; Repo</a>
+  </div>
+
+  <footer>Scaffold Buddy · the blueprint, not the launcher · built with care by Dave &amp; Astro</footer>
+
+</div>
+</body>
+</html>
