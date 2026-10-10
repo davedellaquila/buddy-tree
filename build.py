@@ -696,7 +696,7 @@ function renderNav(){
   let h = '';
   function matches(b){
     if (!words.length) return true;
-    const hay = ((b.name || '') + ' ' + (b.tagline || '')).toLowerCase();
+    const hay = (dispName(b) + ' ' + (b.name || '') + ' ' + (b.tagline || '')).toLowerCase();
     return words.every(w => hay.includes(w));
   }
   function row(id, depth){
@@ -2216,7 +2216,7 @@ function firstSearchMatch(){
   const words = q.split(/\s+/).filter(Boolean);
   if (!words.length) return null;
   for (const b of BUDDIES) {
-    const hay = ((b.name || '') + ' ' + (b.tagline || '')).toLowerCase();
+    const hay = (dispName(b) + ' ' + (b.name || '') + ' ' + (b.tagline || '')).toLowerCase();
     if (words.every(w => hay.includes(w))) return b.id;
   }
   return null;
