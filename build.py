@@ -180,10 +180,11 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 #field-settings .fset-resize{position:absolute;right:3px;bottom:3px;width:14px;height:14px;cursor:nwse-resize;opacity:.55;
   background:linear-gradient(135deg,transparent 55%,var(--muted) 55%);border-radius:0 0 8px 0}
 #field-settings .fset-resize:hover{opacity:1}
-#field-settings .fset-close-x{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;
-  border:1px solid var(--border);background:var(--panel);color:var(--muted);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;padding:0}
-#field-settings .fset-close-x:hover{color:var(--text);border-color:var(--muted)}
+#field-settings .fset-close-x{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;
+  border:1px solid var(--border);background:linear-gradient(135deg,var(--panel),var(--wash));color:var(--muted);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;padding:0;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);transition:all .15s ease}
+#field-settings .fset-close-x:hover{color:#fff;background:linear-gradient(135deg,#e0533d,#c23e2a);border-color:#c23e2a;box-shadow:0 2px 12px rgba(224,83,61,.3);transform:scale(1.05)}
 .fset-row{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--border2);border-radius:8px;margin-bottom:6px;background:var(--bg);cursor:grab}
 .fset-row.dragging{opacity:.5}
 .fset-row .fh{color:var(--muted);cursor:grab;font-size:14px}
@@ -1662,10 +1663,15 @@ function locHash(){ try { return (typeof location !== 'undefined' && location.ha
 function isStandalone(){ return /(^|\/)standalone$/.test(locHash().replace(/^#\//, '')); }
 function hashFor(sel){ return '#/' + sel + (isStandalone() ? '/standalone' : ''); }
 document.addEventListener('keydown', e => {
-  // Cmd+, (Mac) or Ctrl+, opens Settings
+  // Cmd+, (Mac) or Ctrl+, toggles Settings
   if ((e.metaKey || e.ctrlKey) && e.key === ',') {
     e.preventDefault();
-    openFieldSettings();
+    const m = document.getElementById('field-settings');
+    if (m && m.classList.contains('show')) {
+      m.classList.remove('show');
+    } else {
+      openFieldSettings();
+    }
     return;
   }
   if (e.metaKey || e.ctrlKey || e.altKey) return;
