@@ -796,10 +796,10 @@ function openFieldSettings(){
   let m = document.getElementById('field-settings');
   if (!m) {
     m = document.createElement('div'); m.id = 'field-settings';
-    m.innerHTML = '<div class="fset-head" id="fset-drag"><h3>Buddy fields</h3><p class="fineprint" style="margin-bottom:12px">Drag to reorder. Uncheck to hide.</p></div>'
-      + '<div class="fset-body"><div id="fset-list"></div>'
-      + '<h3 style="margin-top:18px">Main views</h3><p class="fineprint" style="margin-bottom:12px">Drag to reorder. Number keys 1–9 follow this order.</p><div id="vset-list"></div>'
-      + '<div id="fset-settings" style="margin-top:12px"></div></div>'
+    m.innerHTML = '<div class="fset-head" id="fset-drag"><h3>Settings</h3></div>'
+      + '<div class="fset-body"><div id="fset-settings"></div>'
+      + '<h3 style="margin-top:18px">Buddy fields</h3><p class="fineprint" style="margin-bottom:12px">Drag to reorder. Uncheck to hide.</p><div id="fset-list"></div>'
+      + '<h3 style="margin-top:18px">Main views</h3><p class="fineprint" style="margin-bottom:12px">Drag to reorder. Number keys 1–9 follow this order.</p><div id="vset-list"></div></div>'
       + '<div class="fset-footer">'
       + '<div style="display:flex;gap:8px"><button class="linkbtn" id="fset-reset" title="Restore all settings to factory defaults">Reset to Factory Defaults</button>'
       + '<button class="linkbtn" id="fset-update" title="Save current settings as the new factory defaults">Update Factory Defaults</button></div>'
