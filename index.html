@@ -1588,7 +1588,8 @@ function renderBuddy(id){
     + '<div id="token-banner"><h4>🔑 Connect GitHub to unlock this buddy</h4>'
     + '<p>Photos, shared notes, and ingest save to the buddy’s repo. Paste a token once — it stays on this device.</p>'
     + '<div class="ghtoken"><input type="password" id="ghtok2" placeholder="GitHub token (repo scope)" aria-label="GitHub token">'
-    + '<button class="linkbtn" id="ghtok2-save">Save token</button></div></div>'
+    + '<button class="linkbtn" id="ghtok2-save">Save token</button>'
+    + '<a href="https://github.com/settings/tokens" target="_blank" rel="noopener" class="linkbtn" style="text-decoration:none" title="Open GitHub token settings in a new tab">Get a token</a></div></div>'
     + '<div class="sa-bar"><span>🔖 Standalone view</span><button class="linkbtn" id="sa-full">Open full dashboard →</button></div>'
     + '<button class="bp-close-x" id="bp-close-x" title="Close">✕</button>'
     + '<div class="bp-topnav"><button class="linkbtn" data-navbtn="back">← Back</button>'
@@ -1622,7 +1623,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Anybody with repo access can see this note. Saved to the buddy’s repo (docs/notes.md).">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Anybody with repo access can see this note."></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261009.2046</div>'
+    + '<div class="bp-build">Build 20261009.2048</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -2152,7 +2153,7 @@ function renderPlan(id){
     + '<p class="fineprint">Saved on this device. (For your eyes only)</p></div>'
     + '<div class="bp-sec"><h3>Shared notes<span class="info-tip" data-tip="Visible to everyone with access to this project.">\u24d8</span></h3><textarea class="notes" id="bp-shared" placeholder="Shared notes\u2026 (visible to everyone with access)">'+escHtml((S.planShared||{})[id]||'')+'</textarea>'
     + '<p class="fineprint">Shared — visible to everyone with access.</p></div>'
-    + '<div class="bp-build">Build 20261009.2046</div>'
+    + '<div class="bp-build">Build 20261009.2048</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
@@ -2414,7 +2415,7 @@ async function dumpIngest(id, keepText){
   const b = byId[id];
   const stamp = new Date().toLocaleString();
   const entry = '## ' + stamp + String.fromCharCode(10,10) + text + String.fromCharCode(10,10);
-  if (!ghToken() || !b.repo) { if (st) st.textContent = 'Add a GitHub token above to unlock ingest.'; return; }
+  if (!ghToken() || !b.repo) { if (st) st.innerHTML = 'Add a GitHub token to unlock ingest. <a href="https://github.com/settings/tokens" target="_blank" rel="noopener">Get one here</a>.'; return; }
   if (st) st.textContent = 'Dumping…';
   try {
     const cur = await ghGetFile(b.repo, 'docs/ingest.md') || '# Ingest log — ' + b.name + String.fromCharCode(10,10);
@@ -2752,7 +2753,8 @@ function renderTokenRow(id){
   const st = document.getElementById('pstat'); if (!st || document.getElementById('ghtok')) return;
   const d = document.createElement('div'); d.className = 'ghtoken';
   d.innerHTML = '<input type="password" id="ghtok" placeholder="GitHub token (repo scope) — stored on this device only" aria-label="GitHub token">'
-    + '<button class="linkbtn" id="ghtok-save">Save token</button>';
+    + '<div style="margin-top:8px;display:flex;gap:8px"><button class="linkbtn" id="ghtok-save">Save token</button>'
+    + '<a href="https://github.com/settings/tokens" target="_blank" rel="noopener" class="linkbtn" style="text-decoration:none" title="Open GitHub token settings in a new tab">Get a token</a></div>';
   st.after(d);
   document.getElementById('ghtok-save').addEventListener('click', () => {
     const v = document.getElementById('ghtok').value.trim();
@@ -2874,7 +2876,7 @@ function initGear(){
 // has a newer build than the one currently loaded (helps Safari web apps
 // and other containers without a hard-refresh shortcut).
 function initVersionCheck(){
-  const myBuild = '20261009.2046';
+  const myBuild = '20261009.2048';
   async function check(){
     try {
       const r = await fetch('version.txt?_=' + Date.now(), {cache: 'no-store'});

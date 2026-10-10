@@ -1264,7 +1264,8 @@ function renderBuddy(id){
     + '<div id="token-banner"><h4>\U0001f511 Connect GitHub to unlock this buddy</h4>'
     + '<p>Photos, shared notes, and ingest save to the buddy\u2019s repo. Paste a token once \u2014 it stays on this device.</p>'
     + '<div class="ghtoken"><input type="password" id="ghtok2" placeholder="GitHub token (repo scope)" aria-label="GitHub token">'
-    + '<button class="linkbtn" id="ghtok2-save">Save token</button></div></div>'
+    + '<button class="linkbtn" id="ghtok2-save">Save token</button>'
+    + '<a href="https://github.com/settings/tokens" target="_blank" rel="noopener" class="linkbtn" style="text-decoration:none" title="Open GitHub token settings in a new tab">Get a token</a></div></div>'
     + '<div class="sa-bar"><span>\U0001f516 Standalone view</span><button class="linkbtn" id="sa-full">Open full dashboard \u2192</button></div>'
     + '<button class="bp-close-x" id="bp-close-x" title="Close">\u2715</button>'
     + '<div class="bp-topnav"><button class="linkbtn" data-navbtn="back">\u2190 Back</button>'
@@ -2090,7 +2091,7 @@ async function dumpIngest(id, keepText){
   const b = byId[id];
   const stamp = new Date().toLocaleString();
   const entry = '## ' + stamp + String.fromCharCode(10,10) + text + String.fromCharCode(10,10);
-  if (!ghToken() || !b.repo) { if (st) st.textContent = 'Add a GitHub token above to unlock ingest.'; return; }
+  if (!ghToken() || !b.repo) { if (st) st.innerHTML = 'Add a GitHub token to unlock ingest. <a href="https://github.com/settings/tokens" target="_blank" rel="noopener">Get one here</a>.'; return; }
   if (st) st.textContent = 'Dumping\u2026';
   try {
     const cur = await ghGetFile(b.repo, 'docs/ingest.md') || '# Ingest log \u2014 ' + b.name + String.fromCharCode(10,10);
@@ -2428,7 +2429,8 @@ function renderTokenRow(id){
   const st = document.getElementById('pstat'); if (!st || document.getElementById('ghtok')) return;
   const d = document.createElement('div'); d.className = 'ghtoken';
   d.innerHTML = '<input type="password" id="ghtok" placeholder="GitHub token (repo scope) \u2014 stored on this device only" aria-label="GitHub token">'
-    + '<button class="linkbtn" id="ghtok-save">Save token</button>';
+    + '<div style="margin-top:8px;display:flex;gap:8px"><button class="linkbtn" id="ghtok-save">Save token</button>'
+    + '<a href="https://github.com/settings/tokens" target="_blank" rel="noopener" class="linkbtn" style="text-decoration:none" title="Open GitHub token settings in a new tab">Get a token</a></div>';
   st.after(d);
   document.getElementById('ghtok-save').addEventListener('click', () => {
     const v = document.getElementById('ghtok').value.trim();
