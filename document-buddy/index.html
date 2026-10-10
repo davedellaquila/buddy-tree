@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document Buddy</title>
+<style>
+  :root{
+    --bg:#f6f1e5; --panel:#fffdf7; --ink:#272219; --muted:#8a7d61;
+    --line:#e3d9c1; --redline:#e8b4a6;
+    --blue:#1a73e8; --blue-soft:#e9f1fd;
+    --amber:#b3541e; --amber-soft:#fdf0e0;
+    --green:#1e7e46; --green-soft:#e7f3ea;
+    --accent:#1a73e8;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#15120d; --panel:#201b13; --ink:#f0e8d3; --muted:#a79a7c;
+      --line:#322b1d; --redline:#5c3a32;
+      --blue:#7fa9f2; --blue-soft:#1d2842;
+      --amber:#e09a4e; --amber-soft:#2b2117;
+      --green:#4caf6d; --green-soft:#1c2b21;
+      --accent:#7fa9f2;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,"Segoe UI",sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.55;
+    background-image:radial-gradient(var(--line) 1px, transparent 1px);
+    background-size:22px 22px;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:40px 24px 64px}
+  header{display:flex; align-items:center; gap:18px; flex-wrap:wrap}
+  .icon{
+    width:76px; height:76px; border-radius:22px; font-size:40px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--blue-soft); border:1px solid var(--line);
+    box-shadow:0 6px 20px rgba(26,115,232,.18);
+  }
+  h1{margin:0; font-size:34px; letter-spacing:-.5px}
+  .tagline{margin:4px 0 0; color:var(--muted); font-size:15px}
+  .pill{
+    display:inline-block; font-size:12.5px; font-weight:700; letter-spacing:.4px;
+    color:var(--amber); background:var(--amber-soft);
+    border:1px solid var(--line); border-radius:999px; padding:4px 12px; margin-top:8px;
+  }
+  .mission{
+    position:relative; margin:26px 0 0; font-size:16.5px; line-height:1.7;
+    background:var(--panel); border:1px solid var(--line);
+    border-radius:6px 14px 14px 14px; padding:20px 22px 20px 30px;
+    box-shadow:0 2px 10px rgba(0,0,0,.05);
+  }
+  .mission::before{
+    content:""; position:absolute; top:0; bottom:0; left:16px; width:2px;
+    background:var(--redline); border-radius:2px;
+  }
+  .mission b{color:var(--blue)}
+  h2{font-size:13px; letter-spacing:1.6px; text-transform:uppercase; color:var(--muted); margin:38px 0 14px}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px}
+  .card{
+    position:relative; background:var(--panel); border:1px solid var(--line);
+    border-radius:4px 12px 12px 12px; padding:26px 18px 16px;
+  }
+  .card::before{
+    content:""; position:absolute; top:-1px; left:14px; width:64px; height:12px;
+    background:var(--line); border-radius:0 0 6px 6px;
+  }
+  .card .e{font-size:24px}
+  .card h3{margin:8px 0 4px; font-size:15px}
+  .card p{margin:0; font-size:13.5px; color:var(--muted)}
+  .card code{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px; color:var(--muted)}
+  .attn{
+    background:var(--amber-soft); border:1px solid var(--line); border-left:4px solid var(--amber);
+    border-radius:12px; padding:14px 18px; margin-bottom:10px; font-size:14.5px;
+  }
+  .attn .k{font-weight:700; color:var(--amber); font-size:12px; letter-spacing:1px; text-transform:uppercase; display:block; margin-bottom:2px}
+  .attn a{color:inherit; font-weight:600}
+  .pipe{display:flex; align-items:stretch; gap:0; margin:6px 0 8px; flex-wrap:wrap}
+  .step{
+    flex:1 1 0; min-width:110px; text-align:center; font-size:12.5px; color:var(--muted);
+    padding:12px 6px; border-top:3px solid var(--line); position:relative;
+  }
+  .step .dot{
+    width:14px; height:14px; border-radius:50%; background:var(--line);
+    margin:-21px auto 8px; border:3px solid var(--bg);
+  }
+  .step.done{color:var(--ink)}
+  .step.done .dot{background:var(--green)}
+  .step.now{color:var(--ink); font-weight:700}
+  .step.now .dot{
+    background:var(--amber); animation:pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(179,84,30,.45)} 50%{box-shadow:0 0 0 7px rgba(179,84,30,0)}}
+  .trail{border-left:3px solid var(--blue); padding:2px 0 2px 16px; margin:0 0 18px 4px}
+  .trail .v{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13px; color:var(--blue); font-weight:700}
+  .trail p{margin:4px 0 0; font-size:14px}
+  .links{display:flex; gap:10px; flex-wrap:wrap}
+  .links a{
+    display:inline-flex; align-items:center; gap:8px; text-decoration:none; color:var(--ink);
+    background:var(--panel); border:1px solid var(--line); border-radius:999px;
+    padding:10px 18px; font-size:14px; font-weight:600;
+  }
+  .links a:hover{border-color:var(--accent); color:var(--accent)}
+  .stamp{
+    display:inline-block; margin:34px 0 0; padding:8px 18px;
+    border:3px double var(--green); border-radius:8px; color:var(--green);
+    font-weight:800; letter-spacing:3px; font-size:15px;
+    transform:rotate(-4deg); opacity:.85;
+    animation:stampin .5s cubic-bezier(.2,2.4,.4,1) both;
+  }
+  @keyframes stampin{from{transform:rotate(-4deg) scale(1.6); opacity:0} to{transform:rotate(-4deg) scale(1); opacity:.85}}
+  footer{margin-top:28px; color:var(--muted); font-size:12.5px}
+  footer .filed{font-family:ui-monospace,Menlo,Consolas,monospace}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="icon">📄</div>
+    <div>
+      <h1>Document Buddy</h1>
+      <p class="tagline">The Google Docs layer — Drive's missing organization.</p>
+      <span class="pill">● BRIEF REVIEW</span>
+    </div>
+  </header>
+
+  <p class="mission">
+    Document Buddy is the in-between layer for Google Docs that Drive's weak
+    organization UX never gave you — it organizes folders, tracks per-doc meta
+    info, and answers <b>'what are we working on?'</b> with a formatted list in
+    chat. This was Project Buddy's first real end-to-end run: thread, brief,
+    repo, review ask, all from the tool.
+  </p>
+
+  <h2>Where this stands</h2>
+  <div class="pipe" aria-label="Project pipeline">
+    <div class="step done"><div class="dot"></div>Thread</div>
+    <div class="step done"><div class="dot"></div>Brief</div>
+    <div class="step done"><div class="dot"></div>Repo</div>
+    <div class="step now"><div class="dot"></div>Review</div>
+    <div class="step"><div class="dot"></div>PRD</div>
+    <div class="step"><div class="dot"></div>Build</div>
+  </div>
+
+  <h2>What I track</h2>
+  <div class="grid">
+    <div class="card"><div class="e">🗂️</div><h3>Folder hygiene</h3><p>Zuki Docs stays organized — every doc in its place, nothing rotting in Drive root.</p></div>
+    <div class="card"><div class="e">🏷️</div><h3>Per-doc meta info</h3><p>What each doc is, where it stands, what it needs next.</p></div>
+    <div class="card"><div class="e">💬</div><h3>"What are we working on?"</h3><p>A formatted status list, right in chat, whenever Dave asks.</p></div>
+    <div class="card"><div class="e">📦</div><h3>The repo</h3><p><code>davedellaquila/document-buddy</code><br>Private · created Oct 9 · empty · ready.</p></div>
+  </div>
+
+  <h2>Needs Dave's attention</h2>
+  <div class="attn"><span class="k">Review</span><a href="https://docs.google.com/document/d/13ASNd4D68Tx8sIP0J1JDvGHYEAQspNZsGTxh_m_5sbk/edit" target="_blank" rel="noopener">Product brief</a> is ready — looks good, edits, or defer? After review: PRD or park?</div>
+  <div class="attn"><span class="k">Open question</span>Does it move real files, or report only?</div>
+  <div class="attn"><span class="k">Open question</span>Where does the meta info live?</div>
+
+  <h2>The paper trail</h2>
+  <div class="trail">
+    <span class="v">2026-10-09</span>
+    <p>Thread opened, brief written, repo created, review asked — Project Buddy's first end-to-end run.</p>
+  </div>
+  <div class="trail">
+    <span class="v">2026-10-09</span>
+    <p>Mission statement backfilled to the thread; homepage designed for the dashboard.</p>
+  </div>
+
+  <h2>Open it</h2>
+  <div class="links">
+    <a href="https://docs.google.com/document/d/13ASNd4D68Tx8sIP0J1JDvGHYEAQspNZsGTxh_m_5sbk/edit" target="_blank" rel="noopener">📄&nbsp; Product brief</a>
+    <a href="https://github.com/davedellaquila/document-buddy" target="_blank" rel="noopener">💻&nbsp; Repo</a>
+    <a href="https://davedellaquila.github.io/buddy-tree/" target="_blank" rel="noopener">🌳&nbsp; Buddy tree</a>
+  </div>
+
+  <div><span class="stamp" aria-hidden="true">✓ FILED</span></div>
+
+  <footer>
+    Document Buddy · child of Project Buddy · filed with care by Dave &amp; Astro<br>
+    <span class="filed">Filed under: D — Docs · Dave · 2026-10-09</span>
+  </footer>
+
+</div>
+</body>
+</html>

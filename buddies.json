@@ -577,7 +577,8 @@
       "statusClass": "st-brief",
       "tagline": "The Google Docs layer",
       "icon": "\ud83d\udcc4",
-      "photos": []
+      "photos": [],
+      "homepage": "document-buddy/"
     },
     {
       "attention": [
