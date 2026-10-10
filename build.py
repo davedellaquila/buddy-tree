@@ -61,9 +61,9 @@ body{background:var(--bg);color:var(--text)}
 body{padding:0}
 .app{display:flex;min-height:100vh;align-items:stretch}
 #sidebar{width:308px;flex:0 0 308px;background:var(--bg);border-right:1px solid var(--border2);
-  padding:22px 14px 32px;position:sticky;top:0;height:100vh;overflow-y:auto}
+  padding:0 14px 32px;position:sticky;top:0;height:100vh;overflow-y:auto}
 #main{flex:1;min-width:0;padding:36px 32px 80px}
-.brand{padding:0 8px 14px}
+.brand{padding:22px 8px 14px;position:sticky;top:0;z-index:5;background:var(--bg)}
 .brand .eyebrow{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
 .brand h1{font-size:22px;margin:4px 0 0}
 #brand-name{outline:none;border-bottom:2px dashed transparent;cursor:text;display:inline-block;min-width:60px}
