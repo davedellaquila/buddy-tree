@@ -3,106 +3,102 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Emile Buddy — Living dossier for Dave's middle brother</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏎️</text></svg>">
+<title>Amanda Buddy — Living dossier for Amanda</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💍</text></svg>">
 <style>
   :root {
-    --paper: #F4F1E7;
-    --card: #FFFEF9;
-    --ink: #232B24;
-    --dim: #6F7669;
-    --line: #DED7C0;
-    --racing: #1E5631;
-    --racing-deep: #143B23;
-    --racing-soft: #E0EBDF;
-    --gold: #B8862F;
-    --gold-soft: #F6ECD4;
-    --note: #FDF6DC;
-    --amber: #B3541E;
-    --red: #B3402E;
-    --red-soft: #F9E9E6;
+    --paper: #FBF7FA;
+    --card: #FFFDFE;
+    --ink: #4A2F3D;
+    --dim: #96717F;
+    --line: #ECDCE3;
+    --rose: #C05B7F;
+    --rose-soft: #F9E4EC;
+    --plum: #7A4E63;
+    --gold: #B98A2F;
+    --gold-soft: #F7ECD4;
+    --note: #FFF4EC;
+    --amber: #B98A2F;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     background: var(--paper); color: var(--ink);
     font-family: -apple-system, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
     line-height: 1.55; padding: 28px 20px 70px;
-    background-image: radial-gradient(var(--line) 1px, transparent 1px);
-    background-size: 22px 22px;
   }
   .wrap { max-width: 1040px; margin: 0 auto; }
   .serif { font-family: Georgia, "Iowan Old Style", "Times New Roman", serif; }
 
   header.hero {
-    background: linear-gradient(135deg, #151B17 0%, var(--racing-deep) 45%, var(--racing) 100%);
-    color: #F5F1E3; border: 1px solid #0F2A19; border-radius: 16px;
+    background: linear-gradient(135deg, #FFF6FA 0%, #FBEFF4 55%, #F9E6EF 100%);
+    border: 1px solid var(--line); border-radius: 16px;
     padding: 34px 32px 26px; margin-bottom: 24px;
     position: relative; overflow: hidden;
-    box-shadow: 0 10px 30px rgba(20,59,35,.30);
   }
   header.hero::after {
-    content: "🏎️"; position: absolute; right: 20px; top: 2px;
-    font-size: 120px; opacity: .14; transform: rotate(6deg); pointer-events: none;
+    content: "💍"; position: absolute; right: 26px; top: 8px;
+    font-size: 110px; opacity: .14; transform: rotate(-8deg); pointer-events: none;
   }
-  .kicker { color: var(--gold); font-size: 12px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; }
-  h1 { font-size: 40px; margin: 8px 0 6px; font-weight: 700; color: #FFFDF4; }
+  .kicker { color: var(--rose); font-size: 12px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; }
+  h1 { font-size: 40px; margin: 8px 0 6px; font-weight: 700; }
   h1 .ico { margin-right: 10px; }
-  .tagline { font-size: 18px; color: #D8CFB4; font-style: italic; }
-  .mission { margin-top: 12px; max-width: 74ch; font-size: 15px; color: #EDE7D2; }
-  .mission b { color: #F2D98B; }
+  .tagline { font-size: 18px; color: var(--dim); font-style: italic; }
+  .mission { margin-top: 12px; max-width: 74ch; font-size: 15px; }
+  .mission b { color: var(--rose); }
   .meta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
   .pill {
     display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.22); border-radius: 999px;
-    padding: 6px 14px; font-size: 13px; color: #F5F1E3; text-decoration: none;
+    background: var(--card); border: 1px solid var(--line); border-radius: 999px;
+    padding: 6px 14px; font-size: 13px; color: var(--ink); text-decoration: none;
   }
-  .pill.st { background: rgba(184,134,47,.22); border-color: rgba(184,134,47,.65); font-weight: 600; color: #F2D98B; }
-  a.pill:hover { border-color: var(--gold); color: #F2D98B; }
+  .pill.st { background: var(--rose-soft); border-color: #E6B8C9; font-weight: 600; }
+  a.pill:hover { border-color: var(--rose); }
 
   h2 { font-size: 21px; margin: 34px 0 6px; }
   h2 .sub { display: block; font-family: -apple-system, "Segoe UI", Inter, sans-serif;
             font-size: 13px; color: var(--dim); font-weight: 400; margin-top: 2px; }
 
-  .mind { border: 1px solid var(--line); border-left: 5px solid var(--gold);
+  .mind { border: 1px solid var(--line); border-left: 5px solid var(--rose);
           background: var(--card); border-radius: 10px; padding: 14px 18px;
           margin-bottom: 12px; display: flex; gap: 14px; align-items: flex-start; }
+  .mind.gold { border-left-color: var(--gold); }
   .mind.amber { border-left-color: var(--amber); }
-  .mind.red { border-left-color: var(--red); background: var(--red-soft); }
   .mind .dot { font-size: 20px; line-height: 1.4; }
   .mind .t { font-weight: 700; font-size: 15px; }
   .mind .d { color: var(--dim); font-size: 13.5px; }
+  .mind a { color: var(--rose); font-weight: 600; }
 
   .facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-top: 14px; }
   .fact { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
   .fact .e { font-size: 24px; margin-bottom: 6px; }
   .fact .t { font-weight: 700; font-size: 14.5px; }
   .fact .d { color: var(--dim); font-size: 13px; margin-top: 4px; }
-  .fact.note-fact { background: var(--racing-soft); border-color: #B9D1B8; }
+  .fact.note-fact { background: var(--rose-soft); border-color: #E6B8C9; }
 
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; margin-top: 14px; }
 
   .board { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; margin-top: 14px; }
   .note {
     background: var(--note); border-radius: 4px; padding: 16px 16px 12px;
-    box-shadow: 0 3px 10px rgba(35,43,36,.10); position: relative;
+    box-shadow: 0 3px 10px rgba(74,47,61,.10); position: relative;
     transform: rotate(-.6deg); transition: transform .15s;
   }
-  .note:nth-child(even) { transform: rotate(.7deg); background: #FBF3D8; }
+  .note:nth-child(even) { transform: rotate(.7deg); background: #FFF9F2; }
   .note:hover { transform: rotate(0) scale(1.02); }
   .note::before { content: ""; position: absolute; top: -8px; left: 50%; transform: translateX(-50%) rotate(2deg);
-                  width: 64px; height: 18px; background: rgba(30,86,49,.30); border-radius: 2px; }
+                  width: 64px; height: 18px; background: rgba(192,91,127,.32); border-radius: 2px; }
   .note .x { position: absolute; top: 6px; right: 8px; border: none; background: none; cursor: pointer;
              color: var(--dim); font-size: 15px; }
-  .note .x:hover { color: var(--red); }
+  .note .x:hover { color: #B3402E; }
   .note p { font-size: 14px; margin-top: 6px; white-space: pre-wrap; }
   .note .when { font-size: 11px; color: var(--dim); margin-top: 8px; }
 
   .list-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 2px; border-bottom: 1px solid var(--line); font-size: 14.5px; }
   .list-item:last-child { border-bottom: none; }
   .list-item .x { margin-left: auto; border: none; background: none; cursor: pointer; color: var(--dim); font-size: 15px; }
-  .list-item .x:hover { color: var(--red); }
+  .list-item .x:hover { color: #B3402E; }
   .list-item.done .txt { text-decoration: line-through; color: var(--dim); }
-  .list-item input[type=checkbox] { margin-top: 5px; accent-color: var(--racing); width: 16px; height: 16px; }
+  .list-item input[type=checkbox] { margin-top: 5px; accent-color: var(--rose); width: 16px; height: 16px; }
   .list-item .when { font-size: 11px; color: var(--dim); }
 
   .gift { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; position: relative; }
@@ -110,31 +106,32 @@
   .gift .t { font-weight: 700; font-size: 15px; margin: 6px 0 2px; }
   .gift .d { color: var(--dim); font-size: 13px; }
   .gift .x { position: absolute; top: 8px; right: 10px; border: none; background: none; cursor: pointer; color: var(--dim); font-size: 15px; }
-  .gift .x:hover { color: var(--red); }
+  .gift .x:hover { color: #B3402E; }
 
   .addrow { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
   .addrow input, .addrow textarea {
     flex: 1 1 220px; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
     font-size: 14px; font-family: inherit; background: #fff; color: var(--ink);
   }
-  .addrow input:focus, .addrow textarea:focus { outline: 2px solid var(--racing-soft); border-color: var(--racing); }
+  .addrow input:focus, .addrow textarea:focus { outline: 2px solid var(--rose-soft); border-color: var(--rose); }
   .btn {
     border: none; border-radius: 8px; padding: 10px 18px; font-size: 14px; font-weight: 700;
-    background: var(--racing); color: #fff; cursor: pointer;
+    background: var(--rose); color: #fff; cursor: pointer;
   }
-  .btn:hover { background: var(--racing-deep); }
+  .btn:hover { background: #A34B6B; }
   .empty { color: var(--dim); font-style: italic; font-size: 14px; padding: 10px 2px; }
 
   .photostrip { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px; }
   .photo { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px; max-width: 250px;
-           box-shadow: 0 3px 10px rgba(35,43,36,.08); transform: rotate(-1deg); }
+           box-shadow: 0 3px 10px rgba(74,47,61,.08); transform: rotate(-1deg); }
   .photo:nth-child(even) { transform: rotate(1deg); }
   .photo img { width: 100%; border-radius: 8px; display: block; }
   .photo figcaption { font-size: 12px; color: var(--dim); margin-top: 8px; text-align: center; }
+  a.photo { display: block; text-decoration: none; color: inherit; text-align: center; }
 
   .quotes { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-top: 14px; }
   .quotes blockquote {
-    background: var(--card); border: 1px solid var(--line); border-left: 5px solid var(--racing);
+    background: var(--card); border: 1px solid var(--line); border-left: 5px solid var(--rose);
     border-radius: 10px; padding: 16px 18px 12px; font-family: Georgia, "Iowan Old Style", serif;
     font-size: 15.5px; font-style: italic; line-height: 1.6;
   }
@@ -145,7 +142,7 @@
 
   footer { margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line);
            color: var(--dim); font-size: 13px; display: flex; gap: 16px; flex-wrap: wrap; }
-  footer a { color: var(--racing); }
+  footer a { color: var(--rose); }
   @media (max-width: 640px) { h1 { font-size: 30px; } header.hero::after { font-size: 70px; } }
 </style>
 </head>
@@ -154,74 +151,83 @@
 
   <header class="hero">
     <div class="kicker">Family Buddy · child</div>
-    <h1 class="serif"><span class="ico">🏎️</span>Emile Buddy</h1>
-    <div class="tagline serif">Living dossier for Dave's middle brother.</div>
-    <p class="mission">The one place for everything Dave needs to <b>remember, track, and do</b> regarding Emile — key facts, important dates, notes, reminders, and gift ideas. The active thread right now is the family business: co-selling the Morgan Hill house with Dave and Ron.</p>
+    <h1 class="serif"><span class="ico">💍</span>Amanda Buddy</h1>
+    <div class="tagline serif">Living dossier for Amanda.</div>
+    <p class="mission">Amanda Buddy is the one place for everything Dave needs to <b>remember, track, and do</b> regarding Amanda — key facts, important dates, notes, reminders, and gift ideas. She's Quentin's fiancée; this dossier keeps up as the wedding and the next chapter unfold.</p>
     <div class="meta">
       <span class="pill st">📝 Brief review</span>
-      <a class="pill" href="https://docs.google.com/document/d/19I51Rb1nbHZQT9zDZ6JDW8M5zI2WejrSSb-hfYrq0zA/edit" target="_blank" rel="noopener">📄 Product brief</a>
-      <a class="pill" href="https://github.com/davedellaquila/emile-buddy" target="_blank" rel="noopener">💻 emile-buddy repo</a>
+      <a class="pill" href="https://docs.google.com/document/d/19zf1xyyTehPRpoOeyEIJG84OntfsplxEmUTe5Qb3nlo/edit" target="_blank" rel="noopener">📄 Product brief</a>
+      <a class="pill" href="https://facebook.com/amanda.i.perez" target="_blank" rel="noopener">👤 Facebook profile</a>
       <span class="pill">🏠 Parent: Family Buddy</span>
     </div>
   </header>
 
   <h2 class="serif">On my mind <span class="sub">What needs Dave's attention</span></h2>
-  <div class="mind red">
-    <div class="dot">🚫</div>
-    <div><div class="t">DocuSign blocked — sale can't proceed until Emile signs</div>
-    <div class="d">His Successor Trustee signing envelope has been bouncing since Oct 5 — the mailbox is rejecting mail, not a typo (the address is spelled right). Next moves: text or call Emile (draft ready since Oct 5), or hand Kay Korbel his alternate email so she can re-fire it (draft ready since Oct 7 — that inbox is unverified).</div></div>
+  <div class="mind">
+    <div class="dot">🪪</div>
+    <div><div class="t">Her surname is Amanda Perez — newly established</div>
+    <div class="d">Dave never knew her surname (the rent notice named her by first name only). Her Facebook profile establishes <b>Amanda Ivelisse Perez</b>. The notice can now name her in full.</div></div>
+  </div>
+  <div class="mind gold">
+    <div class="dot">📄</div>
+    <div><div class="t">Rent-increase notice: serve in person this trip</div>
+    <div class="d">$1,000 → $2,000/mo household, effective <b>Jan 7, 2027</b>. Applies to Amanda and Quentin jointly at 6929 Lenwood Way.</div></div>
   </div>
   <div class="mind amber">
-    <div class="dot">🛋️</div>
-    <div><div class="t">Staging proposal waiting on all three sellers</div>
-    <div class="d">Mayra Vera's $4,250 design/styling fee — approval needs Dave, Ron, AND Emile. Dave's reply asking Kay for the all-in cost and timing was drafted Sep 29.</div></div>
-  </div>
-  <div class="mind amber">
-    <div class="dot">☎️</div>
-    <div><div class="t">Google Voice watch for Emile's calls has stalled</div>
-    <div class="d">The shared browser session expired — Dave needs to sign back in at voice.google.com before new calls, texts, or voicemails from Emile can be picked up.</div></div>
+    <div class="dot">🐜</div>
+    <div><div class="t">Pest-control company name still unknown — she's paying for it</div>
+    <div class="d">Dave was going to ask Amanda at dinner which company services Lenwood (not Green Grass). Still open.</div></div>
   </div>
   <div class="mind">
-    <div class="dot">🎂</div>
-    <div><div class="t">Emile's birthday isn't on record</div>
-    <div class="d">Not on his Facebook profile either. One of the first things to ask him next time he calls.</div></div>
+    <div class="dot">💍</div>
+    <div><div class="t">Engagement newly confirmed — wedding ahead</div>
+    <div class="d">Dave confirmed Oct 9 that Amanda and Quentin are engaged (her post: "August 10, 2026 marks the best day of my life"). No wedding date or plans yet — this dossier's next chapter.</div></div>
   </div>
 
-  <h2 class="serif">Who Emile is <span class="sub">Only what's known — unknowns stay unknown</span></h2>
+  <h2 class="serif">Who Amanda is <span class="sub">Only what's known — unknowns stay unknown</span></h2>
   <div class="facts">
-    <div class="fact"><div class="e">🤝</div><div class="t">Middle brother</div><div class="d">Dave's middle brother — confirmed Sep 29, 2026. Not the father: the Sep 25 voicemail opening "it's Dad again, Dave…" was likely him relaying their father's message.</div></div>
-    <div class="fact"><div class="e">🏁</div><div class="t">Runs Emiles Sports Car Performance</div><div class="d">Listed as his employer on Facebook — cars are his trade, not just his hobby.</div></div>
-    <div class="fact"><div class="e">🏠</div><div class="t">Morgan Hill co-seller</div><div class="d">Co-selling 18231 Llagas Creek Dr with Dave and Ron. Listing agent: Kay Korbel.</div></div>
-    <div class="fact"><div class="e">📍</div><div class="t">Santa Cruz, California</div><div class="d">Current city per his Facebook profile; hometown Santa Clara, California. His phone numbers carry the 831 area code.</div></div>
-    <div class="fact"><div class="e">🏎️</div><div class="t">1979 Lamborghini Urraco</div><div class="d">His own May 2026 reel: test driving a '79 Urraco after a recent fuel-system overhaul. This is what he does.</div></div>
-    <div class="fact"><div class="e">🎸</div><div class="t">Classic-rock live performances</div><div class="d">His timeline is mostly shares of concert performances — Hendrix and company. He posts video more than words.</div></div>
-    <div class="fact"><div class="e">🎓</div><div class="t">Peterson High School</div><div class="d">Per his Facebook profile — alongside a joking "University of Formula One."</div></div>
-    <div class="fact note-fact"><div class="e">🤐</div><div class="t">Man of few words</div><div class="d">Almost no original captions in the last year — one in twenty posts. His uploads carry the story; words rarely do.</div></div>
+    <div class="fact"><div class="e">🪪</div><div class="t">Amanda Ivelisse Perez</div><div class="d">Full name from her Facebook profile — established 2026-10-09. Dave hadn't known her surname.</div></div>
+    <div class="fact note-fact"><div class="e">💍</div><div class="t">Quentin's fiancée</div><div class="d">Engaged August 10, 2026. Confirmed by Dave Oct 9, 2026.</div></div>
+    <div class="fact"><div class="e">🎂</div><div class="t">Birthday: August 2, 1994</div><div class="d">From her Facebook profile — now on the important-dates board.</div></div>
+    <div class="fact"><div class="e">🗽</div><div class="t">Bronx → San Jose</div><div class="d">Hometown Bronx, New York. Now lives in San Jose, California.</div></div>
+    <div class="fact"><div class="e">🎓</div><div class="t">Herbert H. Lehman High School</div><div class="d">From her Facebook profile (graduated 2008).</div></div>
+    <div class="fact"><div class="e">💞</div><div class="t">With Quentin since 2020</div><div class="d">Her Facebook life event: "In a Relationship with Quentin Dell'Aquila" — Aug 16, 2020.</div></div>
+    <div class="fact"><div class="e">🏠</div><div class="t">6929 Lenwood Way</div><div class="d">Lives with Quentin in Dave's San Jose house; their household has paid $1,000/mo for over a year.</div></div>
+    <div class="fact"><div class="e">📄</div><div class="t">Rent notice: $1,000 → $2,000</div><div class="d">90-day notice finalized Oct 4, 2026; effective Jan 7, 2027. Applies to her and Quentin jointly.</div></div>
+    <div class="fact"><div class="e">🍸</div><div class="t">Happy hour with Dave</div><div class="d">Oct 8, 2026 — one margarita, "lovely and very tasty." Their first direct social moment on record.</div></div>
+    <div class="fact"><div class="e">🐜</div><div class="t">Pays for the Lenwood pest control</div><div class="d">She foots the bill; the company name is unknown (Dave asked at dinner Oct 9).</div></div>
+    <div class="fact"><div class="e">👫</div><div class="t">Has a brother, "Gibby"</div><div class="d">Her own Facebook post (Mar 2026): "Go Gibby!!! My brother doing his thing. So proud of him."</div></div>
+    <div class="fact"><div class="e">🐶</div><div class="t">Dog lover</div><div class="d">Boosted a found-pit-bull notice from Bakersfield Animal Care Center (Aug 2026); "K9 HUDSON 🥺" (Jul 2026).</div></div>
   </div>
 
-  <h2 class="serif">Photos <span class="sub">From Emile's Facebook</span></h2>
-  <div class="photostrip">
+  <h2 class="serif">Photos <span class="sub">From Amanda's Facebook</span></h2>
+  <div class="photostrip" id="photostrip">
     <figure class="photo">
-      <img src="photos/profile.jpg" alt="Emile's Facebook profile photo">
+      <img src="photos/profile.jpg" alt="Amanda's Facebook profile photo">
       <figcaption>Profile photo · Facebook</figcaption>
     </figure>
+    <a class="photo" href="https://www.facebook.com/photo.php?fbid=37886384464309700&amp;set=a.271725009535784&amp;type=3" target="_blank" rel="noopener">
+      <div style="font-size:64px;line-height:1.2;padding:14px 0 6px">💍</div>
+      <figcaption>"She said YES" — the engagement announcement photo · Aug 2026<br>(view on Facebook)</figcaption>
+    </a>
   </div>
-  <p class="empty">His timeline holds one recent photo upload (March 2026) and a reel of the Urraco test drive (May 2026) — links kept in the dossier's notes. New photos land here as they surface.</p>
 
-  <h2 class="serif">In his own words <span class="sub">From Emile's Facebook posts</span></h2>
+  <h2 class="serif">In her own words <span class="sub">From Amanda's Facebook posts</span></h2>
   <div class="quotes">
-    <blockquote>"Test driving a 1979 Lamborghini Urraco. Recent fuel system overhaul."<cite>— May 15, 2026 · Facebook reel</cite></blockquote>
+    <blockquote>"August 10, 2026 marks the best day of my life. The day he chose me to be his life partner. 🤍"<cite>— August 18, 2026 · engagement announcement</cite></blockquote>
+    <blockquote>"After all these years, all the memories, all the growing, and everything we've built together, I still choose you every single day."<cite>— August 18, 2026 · engagement announcement</cite></blockquote>
+    <blockquote>"Bawling. Never Forget. ♥️"<cite>— September 10, 2026 · Sept 11 remembrance</cite></blockquote>
+    <blockquote>"Go Gibby!!! My brother doing his thing. So proud of him."<cite>— March 17, 2026</cite></blockquote>
   </div>
-  <p class="empty">That's the whole quote board — his one original caption in the last year. He's a man of few words; when he captions something, it's worth keeping.</p>
 
   <h2 class="serif">Notes <span class="sub">Pinned as they come up — saved on this device</span></h2>
   <div class="board" id="notes"></div>
   <div class="addrow">
-    <textarea id="noteInput" rows="2" placeholder="Pin a note about Emile…"></textarea>
+    <textarea id="noteInput" rows="2" placeholder="Pin a note about Amanda…"></textarea>
     <button class="btn" onclick="addNote()">Pin it</button>
   </div>
 
-  <h2 class="serif">Reminders <span class="sub">Things to do for or about Emile</span></h2>
+  <h2 class="serif">Reminders <span class="sub">Things to do for or about Amanda</span></h2>
   <div class="card" style="margin-top:14px" id="reminders"></div>
   <div class="addrow">
     <input id="reminderInput" placeholder="Add a reminder…">
@@ -230,14 +236,23 @@
 
   <h2 class="serif">Important dates <span class="sub">Birthdays, anniversaries, the things you can't forget</span></h2>
   <div class="card" style="margin-top:14px">
-    <div class="list-item"><span style="font-size:18px">❓</span>
-      <span class="txt"><b>Birthday</b> — not on record <span class="when">(not listed on his Facebook profile either)</span></span>
+    <div class="list-item"><span style="font-size:18px">🎂</span>
+      <span class="txt"><b>Amanda's birthday</b> — August 2 <span class="when">(born 1994 — from her Facebook profile)</span></span>
+    </div>
+    <div class="list-item"><span style="font-size:18px">💍</span>
+      <span class="txt"><b>Engagement</b> — August 10, 2026 <span class="when">(her post: "the best day of my life"; announced Aug 11 via Quentin's "She said YES" photo)</span></span>
+    </div>
+    <div class="list-item"><span style="font-size:18px">💞</span>
+      <span class="txt"><b>With Quentin since</b> — August 16, 2020 <span class="when">(Facebook life event: "In a Relationship with Quentin Dell'Aquila")</span></span>
+    </div>
+    <div class="list-item"><span style="font-size:18px">📄</span>
+      <span class="txt"><b>Rent increase effective</b> — January 7, 2027 <span class="when">($1,000 → $2,000/mo household, Quentin &amp; Amanda jointly)</span></span>
     </div>
   </div>
   <div class="card" style="margin-top:14px" id="dates"></div>
   <div class="addrow">
-    <input id="dateName" placeholder="Occasion (e.g. Emile's birthday)">
-    <input id="dateWhen" placeholder="When (e.g. March 14)">
+    <input id="dateName" placeholder="Occasion (e.g. Wedding date)">
+    <input id="dateWhen" placeholder="When (e.g. TBD 2027)">
     <button class="btn" onclick="addDate()">Add date</button>
   </div>
 
@@ -245,19 +260,19 @@
   <div class="board" id="gifts"></div>
   <div class="addrow">
     <input id="giftName" placeholder="Gift idea…">
-    <input id="giftWhy" placeholder="Why he'd love it (optional)">
+    <input id="giftWhy" placeholder="Why she'd love it (optional)">
     <button class="btn" onclick="addGift()">Add idea</button>
   </div>
 
   <footer>
-    <span>🏎️ Emile Buddy · child of <b>Family Buddy</b></span>
-    <span><a href="https://docs.google.com/document/d/19I51Rb1nbHZQT9zDZ6JDW8M5zI2WejrSSb-hfYrq0zA/edit" target="_blank" rel="noopener">Product brief</a></span>
-    <span><a href="https://github.com/davedellaquila/emile-buddy" target="_blank" rel="noopener">davedellaquila/emile-buddy</a></span>
+    <span>💍 Amanda Buddy · child of <b>Family Buddy</b></span>
+    <span><a href="https://docs.google.com/document/d/19zf1xyyTehPRpoOeyEIJG84OntfsplxEmUTe5Qb3nlo/edit" target="_blank" rel="noopener">Product brief</a></span>
+    <span><a href="https://facebook.com/amanda.i.perez" target="_blank" rel="noopener">Facebook profile</a></span>
   </footer>
 </div>
 
 <script>
-const KEY = "emile-buddy-v1";
+const KEY = "amanda-buddy-v1";
 const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 let store = { notes: [], reminders: [], dates: [], gifts: [] };
 try {
@@ -267,14 +282,12 @@ try {
 // Seed verified notes on first run
 if (!localStorage.getItem(KEY)) {
   store.notes = [
-    { text: "DocuSign (Successor Trustee) has been bouncing since Oct 5 — the mailbox rejects mail, not a typo. Alternate email on his iPad contact card (Sports Car Performance); that inbox is unverified.", when: "2026-10-09" },
-    { text: "Co-selling 18231 Llagas Creek Dr, Morgan Hill with Dave and Ron (Kay Korbel listing). Mayra Vera's $4,250 staging proposal needs all three sellers' sign-off.", when: "2026-10-09" },
-    { text: "Sep 25 voicemail opened 'it's Dad again, Dave…' — but Emile is the middle brother (confirmed Sep 29), so he was likely relaying their father's message.", when: "2026-10-09" }
+    { text: "Engaged to Quentin since Aug 10, 2026 (Dave confirmed Oct 9). Wedding ahead — no date or plans yet; watch this space.", when: "2026-10-09" },
+    { text: "She pays for the Lenwood pest control — company name unknown. Dave asked her at dinner Oct 9.", when: "2026-10-09" }
   ];
   store.reminders = [
-    { text: "Confirm whether the Oct 5 text to Emile went out — or re-send", done: false },
-    { text: "Ask Kay to re-fire the DocuSign to the alternate email if the primary inbox still bounces", done: false },
-    { text: "Get Emile's birthday on record next time he calls", done: false }
+    { text: "Ask Amanda the name of the Lenwood pest-control company (she's paying for it).", done: false },
+    { text: "Serve the 90-day rent-increase notice ($1,000 → $2,000/mo, effective Jan 7, 2027) to Quentin and Amanda in person this trip.", done: false }
   ];
 }
 const save = () => localStorage.setItem(KEY, JSON.stringify(store));
@@ -284,7 +297,7 @@ function renderNotes() {
   const el = document.getElementById("notes");
   el.innerHTML = store.notes.length ? store.notes.map((n, i) =>
     `<div class="note"><button class="x" onclick="delNote(${i})" title="Remove">✕</button><p>${esc(n.text)}</p><div class="when">${esc(n.when || "")}</div></div>`
-  ).join("") : `<div class="empty">No notes pinned yet — the three above this line are seeded from what Emile Buddy already knows.</div>`;
+  ).join("") : `<div class="empty">No notes pinned yet — the seeded notes above are what Amanda Buddy already knows.</div>`;
 }
 function addNote() {
   const t = document.getElementById("noteInput").value.trim();
@@ -322,7 +335,7 @@ function renderDates() {
        <span class="txt"><b>${esc(d.name)}</b> — ${esc(d.when)}</span>
        <button class="x" onclick="delDate(${i})" title="Remove">✕</button>
      </div>`
-  ).join("") : `<div class="empty">No user-added dates yet — Emile's birthday goes here the moment Dave learns it.</div>`;
+  ).join("") : `<div class="empty">No extra dates on record yet — the static board above holds what Dave knows.</div>`;
 }
 function addDate() {
   const n = document.getElementById("dateName").value.trim();

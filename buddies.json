@@ -736,7 +736,8 @@
         }
       ],
       "icon": "👦",
-      "photos": []
+      "photos": [],
+      "homepage": "sawyer-buddy/"
     },
     {
       "id": "amanda-buddy",
@@ -744,7 +745,7 @@
       "parent": "family-buddy",
       "kind": "family",
       "tagline": "Living dossier for Amanda",
-      "mission": "Amanda Buddy is the one place for everything Dave needs to remember, track, and do regarding Amanda: key facts, important dates, notes, reminders, and gift ideas. Key facts: Quentin's girlfriend/fiancée; lives with Quentin in the San Jose house; part of the $1,000→$2,000/mo rent notice (90-day, effective Jan 7, 2027); her surname isn't established yet; first direct social moment with Dave on record: happy hour on 2026-10-08.",
+      "mission": "Amanda Buddy is the one place for everything Dave needs to remember, track, and do regarding Amanda: key facts, important dates, notes, reminders, and gift ideas. Amanda Ivelisse Perez — Quentin's fiancée (engaged Aug 10, 2026; together since Aug 2020); birthday Aug 2, 1994; Bronx NY hometown, Lehman HS; lives with Quentin in the San Jose house; part of the $1,000→$2,000/mo rent notice (90-day, effective Jan 7, 2027).",
       "status": "Brief review",
       "statusClass": "st-brief",
       "brief": "https://docs.google.com/document/d/19zf1xyyTehPRpoOeyEIJG84OntfsplxEmUTe5Qb3nlo/edit",
@@ -758,7 +759,8 @@
         }
       ],
       "icon": "👩",
-      "photos": []
+      "photos": [],
+      "homepage": "amanda-buddy/"
     },
     {
       "id": "emile-buddy",
@@ -811,8 +813,8 @@
       "name": "Jessica Buddy",
       "parent": "family-buddy",
       "kind": "family",
-      "tagline": "Living dossier for Sawyer's aunt",
-      "mission": "Jessica Buddy is the one place for everything Dave needs to remember, track, and do regarding Jessica: key facts, important dates, notes, reminders, and gift ideas. Key facts: Sawyer's aunt (spelled with a C, not a K); lives in Campbell, CA; Sawyer stayed over at her place the night of 2026-10-08. Which side of the family she's on isn't established.",
+      "tagline": "Living dossier for Sawyer's girlfriend",
+      "mission": "Jessica Buddy is the one place for everything Dave needs to remember, track, and do regarding Jessica: key facts, important dates, notes, reminders, and gift ideas. Jessica (spelled with a C) — Sawyer's girlfriend of ~10 years (met at his senior prom); lives in Campbell, CA; works in insurance. Dave: 'she's a really sweet girl and she's making Sawyer very happy.'",
       "status": "Brief review",
       "statusClass": "st-brief",
       "brief": "https://docs.google.com/document/d/1u0sPo4bFl11BBl_j8wTfcA0U0KH0pzjhQDE9j_Ey8Fg/edit",
@@ -826,7 +828,8 @@
         }
       ],
       "icon": "👱‍♀️",
-      "photos": []
+      "photos": [],
+      "homepage": "jessica-buddy/"
     },
     {
       "id": "pops-buddy",
