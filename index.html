@@ -1264,7 +1264,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Saved to the buddy’s repo (docs/notes.md) — visible to everyone with repo access.">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Shared notes…"></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261010.0032</div>'
+    + '<div class="bp-build">Build 20261009.1733</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -1455,9 +1455,8 @@ function renderProjects(){
     const kids = kidsOf[id] || [];
     const hasKids = kids.length > 0;
     const collapsed = !!S.projCollapsed[id];
-    const arrowCls = hasKids ? (collapsed ? '' : 'expanded') : 'leaf';
     s += '<div class="proj-row d' + Math.min(depth, 3) + '" data-buddy="' + b.id + '">'
-      + '<span class="parrow ' + arrowCls + '" data-proj-toggle="' + b.id + '">›</span>'
+      + (hasKids ? '<span class="parrow ' + (collapsed ? '' : 'expanded') + '" data-proj-toggle="' + b.id + '">›</span>' : '')
       + (depth ? '<span class="dot">└</span>' : '')
       + '<span class="pname">' + iconName(b) + '</span>'
       + '<span class="pdesc">' + escHtml(b.tagline || '') + '</span>'
@@ -1467,15 +1466,6 @@ function renderProjects(){
   s += '</div></section>';
   const vp = document.getElementById('view-projects');
   vp.innerHTML = s;
-  vp.querySelectorAll('[data-proj-toggle]').forEach(el => {
-    el.addEventListener('click', e => {
-      e.stopPropagation();
-      const bid = el.dataset.projToggle;
-      S.projCollapsed[bid] = !S.projCollapsed[bid];
-      save();
-      renderProjects();
-    });
-  });
 }
 let treeHTML0 = null, projHTML0 = null;
 function refreshViews(){
@@ -1710,7 +1700,7 @@ function renderPlan(id){
     + '<p class="fineprint">Saved on this device. (For your eyes only)</p></div>'
     + '<div class="bp-sec"><h3>Shared notes<span class="info-tip" data-tip="Visible to everyone with access to this project.">\u24d8</span></h3><textarea class="notes" id="bp-shared" placeholder="Shared notes\u2026 (visible to everyone with access)">'+escHtml((S.planShared||{})[id]||'')+'</textarea>'
     + '<p class="fineprint">Shared — visible to everyone with access.</p></div>'
-    + '<div class="bp-build">Build 20261010.0032</div>'
+    + '<div class="bp-build">Build 20261009.1733</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
@@ -2410,6 +2400,8 @@ document.addEventListener('click', e => {
   if (pb) { e.preventDefault(); show('plan:' + pb.dataset.plan); return; }
   const sb2 = document.getElementById('sidebar');
   if (sb2) sb2.classList.remove('open');
+  const pt = e.target.closest('[data-proj-toggle]');
+  if (pt) { const bid = pt.dataset.projToggle; if (!S.projCollapsed || typeof S.projCollapsed !== 'object') S.projCollapsed = {}; S.projCollapsed[bid] = !S.projCollapsed[bid]; save(); renderProjects(); return; }
   const bb = e.target.closest('[data-buddy]');
   if (bb) { if (e.target.closest('#buddy-nav')) selectProject(bb.dataset.buddy); else show('buddy:' + bb.dataset.buddy); return; }
   const sb = e.target.closest('[data-seen]');

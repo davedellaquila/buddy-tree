@@ -2057,6 +2057,8 @@ document.addEventListener('click', e => {
   if (pb) { e.preventDefault(); show('plan:' + pb.dataset.plan); return; }
   const sb2 = document.getElementById('sidebar');
   if (sb2) sb2.classList.remove('open');
+  const pt = e.target.closest('[data-proj-toggle]');
+  if (pt) { const bid = pt.dataset.projToggle; if (!S.projCollapsed || typeof S.projCollapsed !== 'object') S.projCollapsed = {}; S.projCollapsed[bid] = !S.projCollapsed[bid]; save(); renderProjects(); return; }
   const bb = e.target.closest('[data-buddy]');
   if (bb) { if (e.target.closest('#buddy-nav')) selectProject(bb.dataset.buddy); else show('buddy:' + bb.dataset.buddy); return; }
   const sb = e.target.closest('[data-seen]');
