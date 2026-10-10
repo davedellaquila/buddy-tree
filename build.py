@@ -1270,7 +1270,7 @@ function renderBuddy(id){
   const b = byId[id]; if(!b) return;
   const items = (b.attention || []).slice().sort((x,y) => (S.seen[x.id]?1:0) - (S.seen[y.id]?1:0));
   let arts = '';
-  if (b.brief) arts += artRow(ICON_DOC, 'Product Brief', 'The canonical mission & intent — Google Doc', b.brief);
+  if (b.brief) arts += artRow(ICON_DOC, 'Brief', 'The canonical mission & intent — Google Doc', b.brief);
   if (b.homepageSource) arts += artRow(ICON_LINK, 'Homepage', 'Buddy homepage — opens on Muse', b.homepageSource);
   if (b.repo) arts += artRow(ICON_REPO, 'GitHub Repo', 'davedellaquila/'+b.repo+' (private)', 'https://github.com/davedellaquila/'+b.repo);
   (b.docs || []).forEach(d => { arts += artRow(ICON_LINK, d.label, 'Related document — Google Doc', d.url); });
