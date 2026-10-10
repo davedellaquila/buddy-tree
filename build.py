@@ -117,7 +117,7 @@ body{padding:0}
 #sb-resize::after{content:'';width:7px;height:56px;border-radius:3px;background:var(--faint)}
 #sb-resize:hover::after{background:var(--accent-hi)}
 #sb-resize:hover{background:var(--ghost)}
-@media (max-width:900px){#sb-resize{display:none}}
+@media (max-width:639px){#sb-resize{display:none}}
 .bp-topnav{display:flex;gap:4px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
 .bp-topnav .sep{color:var(--faint);margin:0 2px}
 #journal-bar{display:none;margin:0 0 12px;background:var(--wash);border:1px solid var(--accent);border-radius:10px;padding:9px 13px;font-size:13px}
@@ -344,7 +344,12 @@ body.standalone .sa-bar{display:flex}
 }
 /* ---- Medium: 640-1100px (iPad) ---- */
 @media (min-width:640px) and (max-width:1100px){
-  #sidebar{width:250px;flex:0 0 250px}
+  /* Keep a real left sidebar — do not stack above main (iPad portrait is ~744–834px). */
+  .app{display:flex;flex-direction:row;align-items:stretch}
+  #sidebar{width:250px;flex:0 0 250px;position:sticky;top:0;height:100vh;height:100dvh;
+    max-height:none;border-right:1px solid var(--border2);border-bottom:0;overflow-y:auto;overflow-x:hidden}
+  #main{flex:1;min-width:0;padding:28px 22px 64px}
+  #main.homepage-mode{padding:0}
   #view-nav{display:flex;gap:4px;background:var(--panel);border:1px solid var(--border);
     border-radius:12px;padding:4px}
   #view-nav .navbtn{flex:1}
@@ -464,20 +469,15 @@ body.standalone .sa-bar{display:flex}
 .bp-mini-zoom button:hover{border-color:var(--accent)}
 .linkbtn{background:none;border:0;color:var(--accent);font:inherit;font-size:12.5px;cursor:pointer;padding:0}
 .linkbtn:hover{text-decoration:underline}
-@media (max-width:900px){
-  .app{flex-direction:column}
-  #sidebar{width:auto;flex:none;position:static;height:auto;max-height:46vh;border-right:0;border-bottom:1px solid var(--border2)}
-  #main{padding:24px 18px 64px}
+.grip {
+  position: absolute; top: 4px; left: 4px; z-index: 2;
+  cursor: grab; opacity: .45; color: var(--muted); font-size: 16px; line-height: 1;
+  padding: 8px; user-select: none; -webkit-user-select: none;
 }
-  .grip {
-    position: absolute; top: 4px; left: 4px; z-index: 2;
-    cursor: grab; opacity: .45; color: var(--muted); font-size: 16px; line-height: 1;
-    padding: 8px; user-select: none; -webkit-user-select: none;
-  }
-  .node:hover .grip { opacity: .9; }
-  .grip:hover { opacity: 1 !important; color: var(--text); }
-  .grip:active { cursor: grabbing; }
-  .node{position:relative;}
+.node:hover .grip { opacity: .9; }
+.grip:hover { opacity: 1 !important; color: var(--text); }
+.grip:active { cursor: grabbing; }
+.node{position:relative;}
 """
 
 ICON_DOC = ('<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor"'
