@@ -1569,8 +1569,13 @@ function show(sel, push){
         renderHomepage(pb);
       } else {
         hideHomepage();
+        vb.classList.add('active');
+        vb.style.width = '';
         const home = document.getElementById('buddy-home');
-        if (home) home.innerHTML = '';
+        if (home) {
+          home.style.display = '';
+          home.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:60vh;color:var(--muted);font-size:15px">No homepage for this project.</div>';
+        }
       }
     } else if (sel.startsWith('view:')) {
       const ev = document.getElementById('view-' + sel.slice(5));
