@@ -2619,6 +2619,11 @@ function initVersionCheck(){
       const r = await fetch('version.txt?_=' + Date.now(), {cache: 'no-store'});
       if (!r.ok) return;
       const serverBuild = (await r.text()).trim();
+      // Don't show the banner for 10 min after "Update now" was clicked (gives Pages time to deploy)
+      try {
+        const clicked = parseInt(sessionStorage.getItem('updateClicked') || '0', 10);
+        if (clicked && Date.now() - clicked < 10 * 60 * 1000) return;
+      } catch (e) {}
       if (serverBuild && serverBuild !== myBuild && !document.getElementById('update-banner')) {
         const b = document.createElement('div');
         b.id = 'update-banner';
@@ -2629,6 +2634,7 @@ function initVersionCheck(){
         document.body.appendChild(b);
         document.getElementById('update-now').addEventListener('click', () => {
           b.remove();
+          try { sessionStorage.setItem('updateClicked', String(Date.now())); } catch (e) {}
           location.href = location.pathname + '?v=' + Date.now() + location.hash;
         });
         document.getElementById('update-dismiss').addEventListener('click', () => {
