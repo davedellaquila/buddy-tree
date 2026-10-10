@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sharing Buddy</title>
+<style>
+  :root{
+    --bg:#f7f8fc; --panel:#ffffff; --ink:#1b1e2a; --muted:#6b7186;
+    --line:#e4e7f0; --accent:#4f46e5; --accent-soft:#eef0ff;
+    --teal:#0e7c7b; --teal-soft:#e6f6f5;
+    --amber:#b3541e; --amber-soft:#fdf0e2;
+    --green:#1e7e46; --green-soft:#e5f2e9;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12131a; --panel:#1b1d28; --ink:#eef0ff; --muted:#a2a8bf;
+      --line:#2a2d3f; --accent:#8b85ff; --accent-soft:#23244d;
+      --teal:#4ec9c6; --teal-soft:#16302f;
+      --amber:#e09a4e; --amber-soft:#2b2117;
+      --green:#4caf6d; --green-soft:#1c2b21;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,"Segoe UI",sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.55;
+  }
+  .wrap{max-width:880px; margin:0 auto; padding:40px 24px 64px}
+  header{display:flex; align-items:center; gap:18px; flex-wrap:wrap}
+  .icon{
+    width:76px; height:76px; border-radius:22px; font-size:40px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--accent-soft); border:1px solid var(--line);
+    box-shadow:0 6px 20px rgba(79,70,229,.18);
+  }
+  h1{margin:0; font-size:34px; letter-spacing:-.5px}
+  .tagline{margin:4px 0 0; color:var(--muted); font-size:15px}
+  .pill{
+    display:inline-block; font-size:12.5px; font-weight:700; letter-spacing:.4px;
+    color:var(--accent); background:var(--accent-soft);
+    border:1px solid var(--line); border-radius:999px; padding:4px 12px; margin-top:8px;
+  }
+  .mission{
+    margin:26px 0 0; font-size:16.5px; line-height:1.7;
+    background:var(--panel); border:1px solid var(--line);
+    border-radius:14px; padding:20px 22px;
+  }
+  .mission b{color:var(--accent)}
+  h2{font-size:13px; letter-spacing:1.6px; text-transform:uppercase; color:var(--muted); margin:38px 0 14px}
+  .levels{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+  @media (max-width:640px){ .levels{grid-template-columns:1fr} }
+  .level{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:18px; text-align:center; position:relative;
+  }
+  .level.default{border:2px solid var(--accent); box-shadow:0 4px 16px rgba(79,70,229,.15)}
+  .level .e{font-size:32px}
+  .level h3{margin:10px 0 4px; font-size:15px}
+  .level p{margin:0; font-size:13px; color:var(--muted)}
+  .level .badge{
+    position:absolute; top:-10px; left:50%; transform:translateX(-50%);
+    background:var(--accent); color:#fff; font-size:10.5px; font-weight:700;
+    letter-spacing:.6px; padding:2px 10px; border-radius:999px; text-transform:uppercase;
+  }
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px}
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:16px 18px;
+  }
+  .card .e{font-size:24px}
+  .card h3{margin:8px 0 4px; font-size:15px}
+  .card p{margin:0; font-size:13.5px; color:var(--muted)}
+  .attn{
+    background:var(--amber-soft); border:1px solid var(--line); border-left:4px solid var(--amber);
+    border-radius:12px; padding:14px 18px; margin-bottom:10px; font-size:14.5px;
+  }
+  .attn .k{font-weight:700; color:var(--amber); font-size:12px; letter-spacing:1px; text-transform:uppercase; display:block; margin-bottom:2px}
+  .flow{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:18px 20px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    font-size:14px;
+  }
+  .flow .step{background:var(--accent-soft); border:1px solid var(--line); border-radius:10px; padding:8px 14px; font-weight:600}
+  .flow .arrow{color:var(--muted); font-size:18px}
+  .links{display:flex; gap:10px; flex-wrap:wrap}
+  .links a{
+    display:inline-flex; align-items:center; gap:8px; text-decoration:none; color:var(--ink);
+    background:var(--panel); border:1px solid var(--line); border-radius:999px;
+    padding:10px 18px; font-size:14px; font-weight:600;
+  }
+  .links a:hover{border-color:var(--accent); color:var(--accent)}
+  .note{font-size:13.5px; color:var(--muted); background:var(--teal-soft); border:1px solid var(--line); border-radius:12px; padding:14px 18px}
+  .note b{color:var(--teal)}
+  footer{margin-top:36px; color:var(--muted); font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="icon">🔗</div>
+    <div>
+      <h1>Sharing Buddy</h1>
+      <p class="tagline">Sharing buddies with outside users — without throwing open every door.</p>
+      <span class="pill">● BRIEF REVIEW</span>
+    </div>
+  </header>
+
+  <p class="mission">
+    I figure out how Buddies get shared with the people Dave cares about.
+    <b>Per-buddy shareable links, clear access levels, and real privacy</b> —
+    so he can hand Nancy the Party Buddy, or a collaborator one project,
+    without exposing everything else. The static dashboard can't enforce access,
+    so the real sharing lives in a backend — likely tied to the Buddy Suite story.
+  </p>
+
+  <h2>Access levels</h2>
+  <div class="levels">
+    <div class="level default">
+      <span class="badge">Default</span>
+      <div class="e">🔒</div>
+      <h3>Private</h3>
+      <p>Only Dave. Nothing leaves the vault unless he says so.</p>
+    </div>
+    <div class="level">
+      <div class="e">🔗</div>
+      <h3>Link-only</h3>
+      <p>Anyone with the link. Read-only, revocable, no account needed.</p>
+    </div>
+    <div class="level">
+      <div class="e">🌐</div>
+      <h3>Public</h3>
+      <p>Discoverable. For the things Dave wants the world to see.</p>
+    </div>
+  </div>
+
+  <h2>What I track</h2>
+  <div class="grid">
+    <div class="card"><div class="e">🔗</div><h3>Shareable links</h3><p>Per-buddy links, revocable at any time. One buddy shared ≠ everything shared.</p></div>
+    <div class="card"><div class="e">🎚️</div><h3>Access levels</h3><p>Private / link-only / public. Default private, always.</p></div>
+    <div class="card"><div class="e">👨‍👩‍👧</div><h3>Family sharing</h3><p>Share with Nancy, the kids, neighbors — with privacy care built in.</p></div>
+    <div class="card"><div class="e">📦</div><h3>Small projects</h3><p>The little sub-projects that don't warrant a full buddy still get covered.</p></div>
+    <div class="card"><div class="e">🔐</div><h3>Backend &amp; auth</h3><p>Static pages can't enforce access. Real sharing needs the backend.</p></div>
+    <div class="card"><div class="e">🚪</div><h3>Revocation</h3><p>Kill a link, close a door. Sharing is a tap to give and a tap to take back.</p></div>
+  </div>
+
+  <h2>How sharing should feel</h2>
+  <div class="flow">
+    <span class="step">🔒 Private by default</span>
+    <span class="arrow">→</span>
+    <span class="step">👆 Dave picks a buddy</span>
+    <span class="arrow">→</span>
+    <span class="step">🔗 Link, issued</span>
+    <span class="arrow">→</span>
+    <span class="step">👀 They see just that buddy</span>
+    <span class="arrow">→</span>
+    <span class="step">🚪 Revoke anytime</span>
+  </div>
+
+  <h2>Needs Dave's attention</h2>
+  <div class="attn"><span class="k">Review</span>Product brief is ready — per-buddy links, access levels, privacy. Looks good, edits, or defer?</div>
+  <div class="attn"><span class="k">Pilot</span>V1 pilots with the first buddy <b>you</b> name. Which one should go first — Party Buddy with Nancy?</div>
+  <div class="attn"><span class="k">Decision</span>Backend lives in the Buddy Suite story — confirm that's where the auth work belongs.</div>
+
+  <h2>Links</h2>
+  <div class="links">
+    <a href="https://docs.google.com/document/d/1QdzAdT6o0z0EN682dz3eJoeSLgZqrLLxvD4g59SfRlE/edit" target="_blank">📄 Product brief</a>
+    <a href="https://github.com/davedellaquila/sharing-buddy" target="_blank">💻 Repo</a>
+    <a href="https://davedellaquila.github.io/buddy-tree/" target="_blank">🌳 Buddies dashboard</a>
+  </div>
+
+  <h2>A note on privacy</h2>
+  <div class="note">
+    <b>Sharing is not publishing.</b> Every share starts private, every link is
+    scoped to one buddy, and Dave can revoke it in one tap. Family gets the warmth
+    without the exposure — that's the whole point of me.
+  </div>
+
+  <footer>Sharing Buddy · child of Project Buddy · build 20261010</footer>
+
+</div>
+</body>
+</html>
