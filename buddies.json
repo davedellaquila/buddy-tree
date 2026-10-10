@@ -324,7 +324,10 @@
    "statusClass": "st-brief",
    "tagline": "Dossiers, meeting briefs, estimate calibration",
    "icon": "💻",
-   "photos": []
+   "photos": [],
+   "homepage": "work-buddy/",
+   "homepageSource": "https://muse.ai/s/work-buddy-hg5xrxhxqexi2xzxv",
+   "homepageSynced": "2026-10-09"
   },
   {
    "attention": [],

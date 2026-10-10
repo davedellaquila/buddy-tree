@@ -3,6 +3,19 @@
 All notable changes to the Buddies dashboard and buddy system. Newest first.
 `FEATURES.md` describes the current state; this file describes how it got there.
 
+## 2026-10-10 (Buddy homepages)
+
+### Added
+- **Buddy homepages** — any buddy can now carry a `homepage` (URL loaded in
+  the center Project view), `homepageSource` (the canonical Muse URL, shown
+  as an "Open on Muse ↗" link), and `homepageSynced` (mirror date). Buddies
+  without a homepage keep the built-in detail page in the Project view.
+- **Work Buddy homepage live** — the Project view for Work Buddy now loads
+  its Muse-created homepage, mirrored into the repo at `work-buddy/` (the
+  muse.ai page blocks third-party iframes, so the self-contained export is
+  hosted on Pages and framed same-origin). The canonical
+  https://muse.ai/s/work-buddy-hg5xrxhxqexi2xzxv stays one click away.
+
 ## 2026-10-10 (Factory reset: symmetric sidebars)
 
 ### Changed
