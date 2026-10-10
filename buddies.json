@@ -1156,6 +1156,28 @@
    "tagline": "Security + monetization watchdog",
    "icon": "🛡️",
    "photos": []
+  },
+  {
+   "attention": [
+    {
+     "id": "shopping-buddy-brief",
+     "date": "2026-10-10",
+     "text": "Brief ready for review — looks good, edits, or defer? Open: which price watches are active, groceries vs discretionary, off-limits categories."
+    }
+   ],
+   "brief": "https://docs.google.com/document/d/1dALnh7njN6Ji4jCMhWMIrIwsKDeFSvftzmCfkMRAE6I/edit",
+   "docs": [],
+   "id": "shopping-buddy",
+   "kind": "standalone",
+   "mission": "Shopping Buddy is Dave's personal shopping companion — a genuinely useful tool, not a toy. It owns the full arc of how he shops: purchase research (the DeWalt trimmer playbook), price tracking with alerts (Ace Combat 7 at $14.99), the watch list, price history, and a decision log so nothing gets re-researched.",
+   "name": "Shopping Buddy",
+   "parent": "personal-buddy",
+   "repo": "shopping-buddy",
+   "status": "Brief review",
+   "statusClass": "st-brief",
+   "tagline": "Purchase research, price tracking, alerts",
+   "icon": "🏷️",
+   "photos": []
   }
  ]
 }
