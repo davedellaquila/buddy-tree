@@ -304,14 +304,16 @@ body.standalone .sa-bar{display:flex}
 #bp-close{display:none}
 #view-buddy.panel #bp-close,#view-buddy.sheet #bp-close{display:inline-block}
 /* ---------- buddy homepage embed (Project view) ---------- */
-#homepage-wrap{display:flex;flex-direction:column;height:calc(100vh - 116px);min-height:480px}
-#homepage-bar{display:flex;align-items:center;gap:10px;padding:2px 2px 10px;color:var(--muted);font-size:13px}
+#homepage-wrap{display:flex;flex-direction:column;height:100%;min-height:0;margin:0}
+#main.homepage-mode{padding:0}
+#main.homepage-mode #view-buddy{padding:0}
+#homepage-bar{display:flex;align-items:center;gap:10px;padding:10px 16px 8px;color:var(--muted);font-size:13px}
 #homepage-title{font-weight:600;color:var(--ink)}
 #homepage-meta{font-size:12px}
 #homepage-src{margin-left:auto;font-size:13px;color:var(--accent);text-decoration:none;white-space:nowrap}
 #homepage-src:hover{text-decoration:underline}
-#homepage-frame{flex:1;width:100%;min-height:0;border:1px solid var(--border);border-radius:12px;background:#fff}
-@media (max-width:760px){#homepage-wrap{height:calc(100vh - 88px)}}
+#homepage-frame{flex:1;width:100%;min-height:0;border:0;border-radius:0;background:#fff;display:block}
+@media (max-width:760px){#homepage-wrap{height:100%}}
 
 .pstrip img{height:150px;border-radius:10px;border:1px solid var(--border);display:block}
 .pstrip img:hover{border-color:var(--accent)}
@@ -949,9 +951,15 @@ function hideHomepage(){
   if (wrap) wrap.style.display = 'none';
   const home = document.getElementById('buddy-home');
   if (home) home.style.display = '';
+  const mn = document.getElementById('main');
+  if (mn) mn.classList.remove('homepage-mode');
 }
 function renderHomepage(b){
   hideHomepage();
+  const bar2 = document.getElementById('journal-bar');
+  if (bar2) bar2.classList.remove('show');
+  const mn = document.getElementById('main');
+  if (mn) mn.classList.add('homepage-mode');
   const vb = document.getElementById('view-buddy');
   const home = document.getElementById('buddy-home');
   if (home) home.style.display = 'none';
