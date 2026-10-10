@@ -329,6 +329,7 @@ body.standalone .sa-bar{display:flex}
 .pdel:hover{background:var(--danger)}
 .node.drop-target{outline:2px solid var(--accent);outline-offset:3px}
 .proj-row.drop-target{background:var(--active);box-shadow:inset 0 0 0 2px var(--accent)}
+#view-projects .proj-row[data-buddy]{cursor:pointer}
 /* ---- buddy homepage ---- */
 .bp-wrap{max-width:880px;margin:0 auto;padding:6px 4px}
 .bp-crumb{font-size:12.5px;color:var(--muted);margin-bottom:10px}
@@ -2231,8 +2232,17 @@ document.addEventListener('click', e => {
   if (pb) { e.preventDefault(); show('plan:' + pb.dataset.plan); return; }
   const sb2 = document.getElementById('sidebar');
   if (sb2) sb2.classList.remove('open');
-  const pt = e.target.closest('[data-proj-toggle]');
-  if (pt) { const bid = pt.dataset.projToggle; if (!S.projCollapsed || typeof S.projCollapsed !== 'object') S.projCollapsed = {}; S.projCollapsed[bid] = !S.projCollapsed[bid]; save(); renderProjects(); return; }
+  const projRow = e.target.closest('#view-projects .proj-row[data-buddy]');
+  if (projRow) {
+    const pt = projRow.querySelector('[data-proj-toggle]');
+    if (pt) {
+      const bid = pt.dataset.projToggle;
+      if (!S.projCollapsed || typeof S.projCollapsed !== 'object') S.projCollapsed = {};
+      S.projCollapsed[bid] = !S.projCollapsed[bid];
+      save(); renderProjects(); return;
+    }
+    openBuddy(projRow.dataset.buddy); return;
+  }
   const bb = e.target.closest('[data-buddy]');
   if (bb) { openBuddy(bb.dataset.buddy); return; }
   const sb = e.target.closest('[data-seen]');
