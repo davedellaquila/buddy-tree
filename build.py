@@ -1871,8 +1871,8 @@ document.addEventListener('keydown', e => {
     const btn = btns[idx];
     if (btn && btn.dataset.view) { show('view:' + btn.dataset.view); e.preventDefault(); }
   }
-  // I toggles the right-side detail panel for the selected buddy
-  if (e.key === 'i' || e.key === 'I') {
+  // I or Return toggles the right-side detail panel for the selected buddy
+  if (e.key === 'i' || e.key === 'I' || e.key === 'Enter') {
     const vb = document.getElementById('view-buddy');
     if (vb && vb.classList.contains('active')) {
       closeDetail();
