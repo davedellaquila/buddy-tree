@@ -878,7 +878,14 @@ function initTheme(){
     });
   }
 }
-function dispName(b){ let n = S.names[b.id] || b.name; if (S.hideBuddyWord) n = n.replace(/\s+Buddy$/i, ''); return n; }
+function dispName(b){
+  // If the user overrode the name, use it exactly as provided (even if it contains "Buddy").
+  // The hideBuddyWord setting only applies to original registry names.
+  if (S.names[b.id]) return S.names[b.id];
+  let n = b.name;
+  if (S.hideBuddyWord) n = n.replace(/\s+Buddy$/i, '');
+  return n;
+}
 function getHomepage(b){ return (S.homepages && S.homepages[b.id]) || b.homepage || ''; }
 function unseenItems(b){ return (b.attention || []).filter(a => !S.seen[a.id]); }
 function descUnseen(id){
