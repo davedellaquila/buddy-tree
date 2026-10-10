@@ -216,8 +216,12 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 .dumps .darrow{transform:rotate(90deg)}
 .dumps.collapsed .darrow{transform:rotate(0deg)}
 .dump-actions{position:absolute;top:10px;right:12px;display:flex;gap:8px;align-items:center}
-.dump-act{background:none;border:none;cursor:pointer;font-size:15px;opacity:.5;padding:2px;line-height:1}
-.dump-act:hover{opacity:1}
+.dump-act{background:none;border:none;cursor:pointer;opacity:.55;padding:3px;line-height:1;color:var(--muted);display:inline-flex;align-items:center}
+.dump-act:hover{opacity:1;color:var(--text)}
+.dump-act[data-dump-del]{color:#e0533d}
+.dump-act[data-dump-del]:hover{color:#ff6b5b}
+.dump-act svg{width:14px;height:14px;display:block}
+body.no-write .pdel,body.no-write [data-dump-del],body.no-write [data-dump-edit]{display:none!important}
 .dumps-body .attn-body{padding-right:64px}
 .dumps.collapsed .dumps-body{display:none}
 #sb-gear{position:absolute;top:10px;right:10px;z-index:10;width:36px;height:36px;background:none;border:none;
@@ -316,6 +320,8 @@ body.standalone .sa-bar{display:flex}
 .ptile-label{font-size:11px;letter-spacing:.14em;font-weight:700;color:var(--muted)}
 .ptile-num{font-size:42px;font-weight:800;color:var(--tint);line-height:1.25}
 .ptile-sub{font-size:13px;color:var(--muted)}
+.ptile[data-tile]{cursor:pointer}
+.ptile.sel{box-shadow:inset 0 0 0 2px var(--tint)}
 #main.homepage-mode{padding:0}
 #main.homepage-mode #view-project.active{min-height:100vh}
 #homepage-wrap{flex:1;display:flex;flex-direction:column;min-height:0;margin:0;position:relative}
@@ -330,9 +336,10 @@ body.standalone .sa-bar{display:flex}
 .pstrip img:hover{border-color:var(--accent)}
 .pwrap{position:relative;flex:0 0 auto}
 .pdel{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:var(--scrim);
-  color:var(--on-accent);border:none;font-size:14px;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1}
+  color:#e0533d;border:none;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1}
 .pwrap:hover .pdel{display:flex}
-.pdel:hover{background:var(--danger)}
+.pdel:hover{background:var(--danger);color:#fff}
+.pdel svg{width:13px;height:13px;display:block}
 .node.drop-target{outline:2px solid var(--accent);outline-offset:3px}
 .proj-row.drop-target{background:var(--active);box-shadow:inset 0 0 0 2px var(--accent)}
 #view-projects .proj-row[data-buddy]{cursor:pointer}
@@ -416,6 +423,14 @@ ICON_REPO = ('<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke
 ICON_LINK = ('<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor"'
              ' stroke-width="1.5"><path d="M6.5 9.5l3-3M7.5 5.5l1.5-1.5a2.5 2.5 0 013.5 3.5L11 9"/>'
              '<path d="M8.5 10.5L7 12a2.5 2.5 0 01-3.5-3.5L5 7"/></svg>')
+ICON_TRASH = ('<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"'
+             ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/>'
+             '<path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>'
+             '<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>'
+             '<line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>')
+ICON_EDIT = ('<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"'
+            ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+            '<path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>')
 
 
 def esc(s):
@@ -442,13 +457,27 @@ def build():
     n_buddies = len(buddies)
 
     plan_rows = "".join(
-        f'<div class="proj-row d1" data-plan="{p["id"]}">'
+        f'<div class="proj-row d1" data-plan="{p["id"]}" data-status="{esc(p["status"])}">'
         f'<span class="pname">{esc(p["icon"] + " " + p["name"])}</span>'
         f'<span class="pdesc">{esc(p["desc"][:110])}</span>'
         f'<span class="status {p["statusClass"]}">{esc(p["status"])}</span></div>'
         for p in plans
     )
+    status_tints = {'Live': '#2f9e44', 'Active': '#1f6feb', 'Brief review': '#a371f7',
+                    'Exploring': '#d97a1f', 'Planned': '#8b949e', 'Draft': '#8b949e'}
+    status_order = ['Live', 'Active', 'Brief review', 'Exploring', 'Planned', 'Draft']
+    status_counts = {}
+    for p in plans:
+        status_counts[p["status"]] = status_counts.get(p["status"], 0) + 1
+    plan_tiles = "".join(
+        f'<div class="ptile" data-tile="{esc(s)}" style="--tint:{status_tints.get(s, "#8b949e")};flex:1 1 140px">'
+        f'<div class="ptile-label">{esc(s.upper())}</div>'
+        f'<div class="ptile-num">{status_counts[s]}</div>'
+        f'<div class="ptile-sub">business plans</div></div>'
+        for s in status_order if s in status_counts
+    )
     vpl = ('<div id="view-plans" class="view"><section class="projects-view" style="margin-top:24px">'
+           f'<div id="plans-tiles" style="display:flex;gap:14px;margin:2px auto 20px;max-width:860px;flex-wrap:wrap">{plan_tiles}</div>'
            '<h2>Business Plans</h2>'
            '<p class="sub">BRDs and business plans \u2014 real-world ventures, separate from the buddy-app '
            'software projects. Plans link to the buddies that build them.</p>'
@@ -618,14 +647,14 @@ function renderChangelog(){
   const typeOrder = Object.keys(TYPE_META).filter(t => typeCounts[t]).concat(Object.keys(typeCounts).filter(t => !TYPE_META[t]));
   const typeTiles = typeOrder.map(t => {
     const m = TYPE_META[t] || [t.toUpperCase(), '#57606a'];
-    return tileHtml(m[0], typeCounts[t], m[1], 'changes logged');
+    return tileHtml(m[0], typeCounts[t], m[1], 'changes logged', t, clFilter === t);
   }).join('');
   let h = '<section class="changelog" style="margin:24px auto 0;max-width:760px">'
     + (typeTiles ? '<div id="changelog-tiles" style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">' + typeTiles + '</div>' : '')
     + '<h2>Changelog</h2>'
     + '<p class="sub">Every change made in this dashboard, newest first.</p>';
-  const js = (S.journal || []).slice().reverse();
-  if (!js.length) { el.innerHTML = h + '<p class="fineprint">No changes yet.</p></section>'; return; }
+  const js = (S.journal || []).slice().reverse().filter(c => !clFilter || (c && c.type) === clFilter);
+  if (!js.length) { el.innerHTML = h + '<p class="fineprint">' + (clFilter ? 'No changes of this type yet.' : 'No changes yet.') + '</p></section>'; return; }
   const groups = [];
   js.forEach(c => {
     const d = new Date(c.t);
@@ -993,11 +1022,20 @@ function initPanelResize(){
     save(); sx = null;
   });
 }
-function tileHtml(label, num, tint, sub){
-  return '<div class="ptile" style="--tint:' + tint + ';flex:1">'
+function tileHtml(label, num, tint, sub, fkey, sel){
+  return '<div class="ptile' + (sel ? ' sel' : '') + '"' + (fkey ? ' data-tile="' + fkey + '"' : '') + ' style="--tint:' + tint + ';flex:1">'
     + '<div class="ptile-label">' + escHtml(label) + '</div>'
     + '<div class="ptile-num">' + escHtml(String(num)) + '</div>'
     + '<div class="ptile-sub">' + escHtml(sub) + '</div></div>';
+}
+let projFilter = null, clFilter = null, planFilter = null;
+function applyPlanFilter(){
+  document.querySelectorAll('#view-plans .proj-row[data-status]').forEach(r => {
+    r.style.display = (!planFilter || r.dataset.status === planFilter) ? '' : 'none';
+  });
+  document.querySelectorAll('#plans-tiles .ptile').forEach(t => {
+    t.classList.toggle('sel', t.dataset.tile === planFilter);
+  });
 }
 function renderProjectView(){
   const pv = document.getElementById('view-project');
@@ -1308,17 +1346,35 @@ function renderProjects(){
   });
   let s = '<section class="projects-view" style="margin-top:24px">'
     + '<div id="project-tiles">'
-    + tileHtml('TO REVIEW', unseen, '#d43d2a', 'Needs your attention')
-    + tileHtml('NEW', fresh, '#d97a1f', 'Added in the last 7 days')
-    + tileHtml('CLEARED', cleared, '#2f9e44', 'Reviewed & cleared')
+    + tileHtml('TO REVIEW', unseen, '#d43d2a', 'Needs your attention', 'unseen', projFilter === 'unseen')
+    + tileHtml('NEW', fresh, '#d97a1f', 'Added in the last 7 days', 'fresh', projFilter === 'fresh')
+    + tileHtml('CLEARED', cleared, '#2f9e44', 'Reviewed & cleared', 'cleared', projFilter === 'cleared')
     + '</div>'
     + '<h2>Projects by Buddy</h2>'
     + '<p class="sub">Every buddy, in hierarchy order, with its current status.</p><div class="proj-list">';
+  // When a tile filter is active, show matching buddies plus their ancestors
+  let showIds = null;
+  if (projFilter) {
+    const matches = b => (b.attention || []).some(a => {
+      const seen = !!S.seen[a.id];
+      if (projFilter === 'unseen') return !seen;
+      if (projFilter === 'cleared') return seen;
+      const t = Date.parse(a.date || '');
+      return t && t >= weekAgo;
+    });
+    showIds = {};
+    Object.values(byId).forEach(b => {
+      if (!matches(b)) return;
+      let x = b;
+      while (x) { showIds[x.id] = true; x = x.parent ? byId[x.parent] : null; }
+    });
+  }
   (function walk(id, depth){
     const b = byId[id]; if (!b) return;
+    if (showIds && !showIds[id]) return;
     const kids = kidsOf[id] || [];
     const hasKids = kids.length > 0;
-    const collapsed = !!S.projCollapsed[id];
+    const collapsed = projFilter ? false : !!S.projCollapsed[id];
     s += '<div class="proj-row d' + Math.min(depth, 3) + '" data-buddy="' + b.id + '">'
       + (hasKids ? '<span class="parrow ' + (collapsed ? '' : 'expanded') + '" data-proj-toggle="' + b.id + '">\u203a</span>' : '')
       + (depth ? '<span class="dot">\u2514</span>' : '')
@@ -1801,7 +1857,7 @@ async function renderIngestFeed(id){
   feed.innerHTML = '<div class="dumps' + (dCollapsed ? ' collapsed' : '') + '">'
     + '<div class="dumps-head" id="dumps-toggle"><span class="darrow">\u203a</span><h4>Dumps (' + entries.length + ')</h4></div>'
     + '<div class="dumps-body"><div style="height:8px"></div>'
-    + entries.map(function(e, i){ return '<div class="attn"><div class="dump-actions"><button class="dump-act" data-dump-edit="' + i + '" title="Edit this dump">✏️</button><button class="dump-act" data-dump-del="' + i + '" title="Delete this dump">🗑️</button></div><div class="attn-body"><div class="attn-text">' + escHtml(e.body.slice(0, 300)) + (e.body.length > 300 ? '\u2026' : '') + '</div><div class="attn-date">' + escHtml(e.stamp) + '</div></div></div>'; }).join('')
+    + entries.map(function(e, i){ return '<div class="attn"><div class="dump-actions"><button class="dump-act" data-dump-edit="' + i + '" title="Edit this dump">' + ICON_EDIT + '</button><button class="dump-act" data-dump-del="' + i + '" title="Delete this dump">' + ICON_TRASH + '</button></div><div class="attn-body"><div class="attn-text">' + escHtml(e.body.slice(0, 300)) + (e.body.length > 300 ? '\u2026' : '') + '</div><div class="attn-date">' + escHtml(e.stamp) + '</div></div></div>'; }).join('')
     + '</div></div>';
   feed._entries = entries;
   var dt = document.getElementById('dumps-toggle');
@@ -1993,7 +2049,7 @@ async function loadPhotos(id){
   const ph3 = document.getElementById('photos-h3');
   if (ph3) ph3.textContent = 'Photos (' + all.length + ')';
   strip.innerHTML = all.map(p => {
-    const del = p.path ? '<button class="pdel" data-del="' + escHtml(p.path) + '" data-repo="' + escHtml(p.repo || 'buddy-system') + '" title="Delete photo">\u2715</button>' : '';
+    const del = p.path ? '<button class="pdel" data-del="' + escHtml(p.path) + '" data-repo="' + escHtml(p.repo || 'buddy-system') + '" title="Delete photo">' + ICON_TRASH + '</button>' : '';
     return '<div class="pwrap"><a href="' + escHtml(p.href) + '" target="_blank" rel="noopener"><img src="' + escHtml(p.src) + '" loading="lazy" alt=""></a>' + del + '</div>';
   }).join('');
   const st = document.getElementById('pstat');
@@ -2194,6 +2250,7 @@ function refreshTokenUI(id){
 }
 function updateTokenGating(id){
   const has = !!ghToken();
+  document.body.classList.toggle('no-write', !has);
   const banner = document.getElementById('token-banner');
   if (banner) banner.classList.toggle('show', !has);
   const sn = document.getElementById('bp-shared-notes');
@@ -2279,6 +2336,21 @@ document.addEventListener('click', e => {
   if (pb) { e.preventDefault(); show('plan:' + pb.dataset.plan); return; }
   const sb2 = document.getElementById('sidebar');
   if (sb2) sb2.classList.remove('open');
+  const projTile = e.target.closest('#project-tiles [data-tile]');
+  if (projTile) {
+    projFilter = projFilter === projTile.dataset.tile ? null : projTile.dataset.tile;
+    renderProjects(); return;
+  }
+  const clTile = e.target.closest('#changelog-tiles [data-tile]');
+  if (clTile) {
+    clFilter = clFilter === clTile.dataset.tile ? null : clTile.dataset.tile;
+    renderChangelog(); return;
+  }
+  const planTile = e.target.closest('#plans-tiles [data-tile]');
+  if (planTile) {
+    planFilter = planFilter === planTile.dataset.tile ? null : planTile.dataset.tile;
+    applyPlanFilter(); return;
+  }
   const projRow = e.target.closest('#view-projects .proj-row[data-buddy]');
   if (projRow) {
     const pt = projRow.querySelector('[data-proj-toggle]');
@@ -2319,6 +2391,7 @@ refreshViews();
 })();
 renderJournal();
 initTokenPill();
+updateTokenGating();
 initSearch();
 initGear();
 initPlansToggle();
@@ -2327,6 +2400,8 @@ initPlansToggle();
     js = js.replace("ICON_DOC", "'" + ICON_DOC.replace("'", "\\'") + "'")
     js = js.replace("ICON_REPO", "'" + ICON_REPO.replace("'", "\\'") + "'")
     js = js.replace("ICON_LINK", "'" + ICON_LINK.replace("'", "\\'") + "'")
+    js = js.replace("ICON_TRASH", "'" + ICON_TRASH.replace("'", "\\'") + "'")
+    js = js.replace("ICON_EDIT", "'" + ICON_EDIT.replace("'", "\\'") + "'")
 
     out = """<!DOCTYPE html>
 <html lang="en">

@@ -3,6 +3,23 @@
 All notable changes to the Buddies dashboard and buddy system. Newest first.
 `FEATURES.md` describes the current state; this file describes how it got there.
 
+## 2026-10-10 (Clickable tiles, plans tiles, red trash icon, token gating)
+
+### Added
+- **Clickable summary tiles** (Dave's idea) — clicking a tile filters the
+  list below to matching items; clicking the active tile again clears the
+  filter. Works on Projects (TO REVIEW / NEW / CLEARED), Changelog
+  (change types), and Business Plans (statuses).
+- **Business Plans tiles** (Dave's idea) — the Plans page now opens with
+  per-status tiles (LIVE, ACTIVE, BRIEF REVIEW, EXPLORING, PLANNED, DRAFT).
+
+### Changed
+- **Red monochrome trash icon** (Dave's request) — photo delete and dump
+  delete now use a low-fidelity red trash-can SVG; dump edit uses a
+  matching monochrome pencil SVG (replacing the ✕/✏️/🗑️).
+- **Edit/delete gated on GitHub token** (Dave's request) — photo delete and
+  dump edit/delete icons are hidden when no GitHub token is saved.
+
 ## 2026-10-10 (Manifest tiles, homepage full-bleed, tile widths, grippers)
 
 ### Added

@@ -46,8 +46,14 @@ Build: `build.py` generates `index.html` from `buddies.json` + `plans.json`.
 - **Projects view** — hierarchical outline of every buddy with its status;
   opens with global attention tiles (TO REVIEW / NEW / CLEARED across all
   buddies), constrained to the same 860px width as the list below.
-  Clicking a row toggles its section and loads the buddy in the
+  Clicking a tile filters the list to matching buddies; clicking again
+  clears. Clicking a row toggles its section and loads the buddy in the
   right-side panel.
+- **Business Plans view** — opens with per-status tiles (LIVE, ACTIVE,
+  BRIEF REVIEW, EXPLORING, PLANNED, DRAFT); clicking a tile filters the
+  plans below.
+- **Changelog view** — opens with per-change-type tiles; clicking a tile
+  filters the entries below.
 - **Manifest view** — the new-project drill as rows, each badged with a
   colored pill (Automatic / Planned); opens with AUTOMATIC (8) and
   PLANNED (2) summary tiles.
