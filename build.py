@@ -111,7 +111,7 @@ body{padding:0}
 #zoombar .zv{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
 #zoomfit{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:14px;width:30px;height:26px;cursor:pointer}
 #zoomfit:hover{color:var(--text);border-color:var(--muted)}
-#sb-resize{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:center;width:12px;height:100vh;margin-left:auto;margin-right:-21px;margin-bottom:-100vh;cursor:ew-resize}
+#sb-resize{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:center;width:12px;height:100vh;margin-left:auto;margin-right:-6px;margin-bottom:-100vh;cursor:ew-resize}
 #sb-resize::after{content:'';width:7px;height:56px;border-radius:3px;background:var(--faint)}
 #sb-resize:hover::after{background:var(--accent-hi)}
 #sb-resize:hover{background:var(--ghost)}
@@ -194,7 +194,7 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
   cursor:pointer;display:flex;align-items:center;justify-content:center}
 .bp-close-x:hover{color:var(--text)}
 #buddy-home{position:relative}
-#bp-resize{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:center;width:12px;height:100vh;margin-right:auto;margin-left:-6px;margin-bottom:-100vh;cursor:ew-resize}
+#bp-resize{position:absolute;top:0;left:-6px;z-index:20;display:flex;align-items:center;justify-content:center;width:12px;height:100vh;cursor:ew-resize}
 #bp-resize::after{content:'';width:7px;height:56px;border-radius:3px;background:var(--faint)}
 #bp-resize:hover::after{background:var(--accent-hi)}
 #bp-resize:hover{background:var(--ghost)}
@@ -459,10 +459,16 @@ def build():
     n_buddies = len(buddies)
 
     plan_rows = "".join(
-        f'<div class="proj-row d1" data-plan="{p["id"]}" data-status="{esc(p["status"])}">'
-        f'<span class="pname">{esc(p["icon"] + " " + p["name"])}</span>'
-        f'<span class="pdesc">{esc(p["desc"][:110])}</span>'
-        f'<span class="status {p["statusClass"]}">{esc(p["status"])}</span></div>'
+        f'<div class="plan-card" data-plan="{p["id"]}" data-status="{esc(p["status"])}">'
+        f'<div class="plan-card-head"><span class="plan-card-icon">{esc(p["icon"])}</span>'
+        f'<span class="plan-card-name">{esc(p["name"])}</span>'
+        f'<span class="status {p["statusClass"]}" style="margin-left:auto">{esc(p["status"])}</span></div>'
+        f'<div class="plan-card-desc">{esc(p["desc"][:200])}{"…" if len(p["desc"]) > 200 else ""}</div>'
+        + ("".join(
+            f'<a class="plan-card-link" href="{esc(d["url"])}" target="_blank" rel="noopener">📄 {esc(d["label"])}</a>'
+            for d in p.get("docs", [])
+        ))
+        + '</div>'
         for p in plans
     )
     status_tints = {'Live': '#2f9e44', 'Active': '#1f6feb', 'Brief review': '#a371f7',
@@ -483,7 +489,7 @@ def build():
            '<h2>Business Plans</h2>'
            '<p class="sub">BRDs and business plans \u2014 real-world ventures, separate from the buddy-app '
            'software projects. Plans link to the buddies that build them.</p>'
-           f'<div class="proj-list">{plan_rows}</div></section></div>')
+           f'<div class="plan-grid">{plan_rows}</div></section></div>')
 
     js = """const BUDDIES = BUDDIES_JSON;
 const ROOT_ORDER = ORDER_JSON;
