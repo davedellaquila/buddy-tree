@@ -1134,6 +1134,28 @@
    "tagline": "Living dossier for Rachel",
    "icon": "🔧",
    "photos": []
+  },
+  {
+   "attention": [
+    {
+     "id": "guardian-buddy-brief",
+     "date": "2026-10-10",
+     "text": "Brief ready for review — looks good, edits, or defer? Open: server-side split before launch, trademark priorities, open-source vs proprietary, pricing hypothesis."
+    }
+   ],
+   "brief": "https://docs.google.com/document/d/1sznSg7jSLRlDnAgFb-FaKnxp5lktWnFNQqK6DIEqF6E/edit",
+   "docs": [],
+   "id": "guardian-buddy",
+   "kind": "standalone",
+   "mission": "Guardian Buddy is Dave's security and monetization watchdog for Money Buddy and the buddy system. Born from Dave's question: what stops someone from downloading the raw HTML and stealing the idea? Honest premise: you can't DRM HTML — the moat is the service, data, and brand, not the markup. Partners with Buddy Suite (monetization plan owner) and the Money Buddy thread.",
+   "name": "Guardian Buddy",
+   "parent": "project-buddy",
+   "repo": "guardian-buddy",
+   "status": "Brief review",
+   "statusClass": "st-brief",
+   "tagline": "Security + monetization watchdog",
+   "icon": "🛡️",
+   "photos": []
   }
  ]
 }
