@@ -161,6 +161,29 @@
     {
       "attention": [
         {
+          "id": "little-guy-buddy-brief",
+          "date": "2026-10-09",
+          "text": "Product brief ready for review — looks good, edits, or defer? Open: age, breed, vet history, which house he lives at — all flagged, not guessed."
+        }
+      ],
+      "brief": "https://docs.google.com/document/d/1DsPDePEL2FooO-foNZcENbhl63F2DTaYw3V6e3WaSXg/edit",
+      "docs": [],
+      "id": "little-guy-buddy",
+      "kind": "family",
+      "mission": "Little Guy Buddy is the living dossier for Little Guy — one of Dave's three cats, alongside Marley (Mars) and Rocky. Key facts, vet visits and medical notes, and reminders (flea treatment, vet appointments) live here.",
+      "name": "Little Guy Buddy",
+      "parent": "family-buddy",
+      "repo": "little-guy-buddy",
+      "status": "Brief review",
+      "statusClass": "st-brief",
+      "tagline": "Living dossier for the cat Little Guy",
+      "icon": "🐱",
+      "photos": [],
+      "homepage": "little-guy-buddy/"
+    },
+    {
+      "attention": [
+        {
           "date": "2026-10-09",
           "id": "property-buddy-brief",
           "text": "Product brief ready for review — looks good, edits, or defer? Open: one app vs. separate instances, who gets access, how deeds are secured, which property goes first."

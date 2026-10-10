@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mei-ying Buddy — Living dossier for Mei-ying</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
+<style>
+  :root {
+    --paper: #FBF7F1;
+    --card: #FFFDF9;
+    --ink: #43302B;
+    --dim: #8C766B;
+    --line: #E9DCCB;
+    --plum: #8E4A6B;
+    --plum-soft: #F5E3EC;
+    --plum-line: #E4C3D4;
+    --jade: #6F9577;
+    --jade-soft: #E5EEE3;
+    --gold: #B98A2F;
+    --gold-soft: #F9EFD4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font-family: -apple-system, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+    line-height: 1.55; padding: 28px 20px 70px;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; }
+  .serif { font-family: Georgia, "Iowan Old Style", "Times New Roman", serif; }
+
+  header.hero {
+    background: linear-gradient(135deg, #FDF6EE 0%, #FAEEE3 55%, #F7E4DC 100%);
+    border: 1px solid var(--line); border-radius: 16px;
+    padding: 34px 32px 26px; margin-bottom: 24px;
+    position: relative; overflow: hidden;
+  }
+  header.hero::after {
+    content: "🌸"; position: absolute; right: 26px; top: 8px;
+    font-size: 110px; opacity: .14; transform: rotate(-8deg); pointer-events: none;
+  }
+  .kicker { color: var(--plum); font-size: 12px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; }
+  h1 { font-size: 40px; margin: 8px 0 6px; font-weight: 700; }
+  h1 .ico { margin-right: 10px; }
+  .tagline { font-size: 18px; color: var(--dim); font-style: italic; }
+  .mission { margin-top: 12px; max-width: 74ch; font-size: 15px; }
+  .mission b { color: var(--plum); }
+  .meta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 999px;
+    padding: 6px 14px; font-size: 13px; color: var(--ink); text-decoration: none;
+  }
+  .pill.st { background: var(--plum-soft); border-color: var(--plum-line); font-weight: 600; }
+  a.pill:hover { border-color: var(--plum); }
+
+  h2 { font-size: 21px; margin: 34px 0 6px; }
+  h2 .sub { display: block; font-family: -apple-system, "Segoe UI", Inter, sans-serif;
+            font-size: 13px; color: var(--dim); font-weight: 400; margin-top: 2px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 14px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 18px;
+  }
+  .card .t { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+  .card .t .e { margin-right: 8px; }
+  .card p { font-size: 13.5px; color: var(--dim); }
+
+  .fact {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 18px; margin-top: 12px; font-size: 15px;
+  }
+  .fact .lbl { display: block; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase;
+               color: var(--plum); font-weight: 700; margin-bottom: 4px; }
+
+  .openq { margin-top: 12px; border: 1px dashed var(--plum-line); border-radius: 12px; overflow: hidden; }
+  .openq .row {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    padding: 13px 18px; background: var(--card); font-size: 14.5px;
+    border-bottom: 1px dashed var(--plum-line);
+  }
+  .openq .row:last-child { border-bottom: 0; }
+  .openq .row .q { font-weight: 600; }
+  .openq .row .a { color: var(--dim); font-size: 13px; font-style: italic; white-space: nowrap; }
+  .hint { margin-top: 10px; font-size: 13.5px; color: var(--dim); }
+  .hint b { color: var(--plum); }
+
+  .empty {
+    margin-top: 12px; background: var(--gold-soft); border: 1px solid #EBD9A8;
+    border-radius: 12px; padding: 16px 18px; font-size: 14.5px; color: var(--ink);
+  }
+  .empty .e { margin-right: 8px; }
+
+  .attention {
+    margin-top: 12px; background: #FDECEA; border: 1px solid #F3C1BC;
+    border-radius: 12px; padding: 16px 18px; font-size: 14.5px;
+  }
+  .attention .dot {
+    display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+    background: #D6544A; margin-right: 8px;
+  }
+  .attention a { color: var(--plum); font-weight: 600; }
+
+  footer { margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line);
+           font-size: 12.5px; color: var(--dim); display: flex; justify-content: space-between;
+           flex-wrap: wrap; gap: 8px; }
+  a { color: var(--plum); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">Living dossier · Family Buddy</div>
+    <h1 class="serif"><span class="ico">🌸</span>Mei-ying</h1>
+    <div class="tagline serif">Wife of Ron Dell'Aquila — Dave's oldest brother.</div>
+    <p class="mission">This buddy keeps <b>everything Dave knows about Mei-ying</b> in one living place —
+      key facts, dates, notes from conversations, reminders, and gift ideas.
+      The dossier just opened, so most pages are still blank — and that's fine.
+      Unknowns are <b>flagged, never guessed</b>.</p>
+    <div class="meta">
+      <span class="pill st">● Status: New</span>
+      <span class="pill">👪 Child of Family Buddy</span>
+      <a class="pill" href="https://docs.google.com/document/d/1acZkE931q1RslDeJPa7ZOdehKUEnVBu4KlnwLMFz7I0/edit" target="_blank" rel="noopener">📄 Brief</a>
+      <a class="pill" href="https://github.com/davedellaquila/mei-ying-buddy" target="_blank" rel="noopener">💻 Repo</a>
+    </div>
+  </header>
+
+  <h2 class="serif">Known so far <span class="sub">Verified facts — the seed of the dossier.</span></h2>
+  <div class="fact">
+    <span class="lbl">Relationship</span>
+    Married to <b>Ron Dell'Aquila</b>, Dave's oldest brother.
+  </div>
+
+  <h2 class="serif">Pages still to write <span class="sub">Open questions — flagged, not guessed. Tell me and I'll fill them in.</span></h2>
+  <div class="openq">
+    <div class="row"><span class="q">🎂 Birthdate</span><span class="a">unknown</span></div>
+    <div class="row"><span class="q">💼 Occupation</span><span class="a">unknown</span></div>
+    <div class="row"><span class="q">🌍 Background</span><span class="a">unknown</span></div>
+    <div class="row"><span class="q">💛 Interests</span><span class="a">unknown</span></div>
+  </div>
+  <p class="hint">Dave — anything you share about Mei-ying lands here automatically: <b>no prompt needed</b>, and it propagates to the repo and memory too.</p>
+
+  <h2 class="serif">What this buddy tracks <span class="sub">Four drawers, always within reach.</span></h2>
+  <div class="grid">
+    <div class="card"><div class="t"><span class="e">🗂️</span>Key facts &amp; dates</div><p>Birthdays, anniversaries, milestones — the things you never want to blank on.</p></div>
+    <div class="card"><div class="t"><span class="e">💬</span>Notes</div><p>Things she mentions, stories, preferences — captured from your conversations.</p></div>
+    <div class="card"><div class="t"><span class="e">⏰</span>Reminders</div><p>Birthdays, calls to make, occasions to mark — nudged before they slip.</p></div>
+    <div class="card"><div class="t"><span class="e">🎁</span>Gift ideas</div><p>A running list, so the perfect gift is never a last-minute scramble.</p></div>
+  </div>
+
+  <h2 class="serif">Reminders <span class="sub">Upcoming occasions for Mei-ying.</span></h2>
+  <div class="empty"><span class="e">📭</span>Nothing on the calendar yet — her birthdate alone would light this up.</div>
+
+  <h2 class="serif">Gift ideas <span class="sub">The running list.</span></h2>
+  <div class="empty"><span class="e">💡</span>No ideas yet. Tell me what she loves and I'll keep the list warm.</div>
+
+  <h2 class="serif">Needs Dave's attention <span class="sub">Open items.</span></h2>
+  <div class="attention">
+    <span class="dot"></span><b>Brief review:</b> the
+    <a href="https://docs.google.com/document/d/1acZkE931q1RslDeJPa7ZOdehKUEnVBu4KlnwLMFz7I0/edit" target="_blank" rel="noopener">Mei-ying Buddy brief</a>
+    is ready for your review — looks good, edits, or defer?
+  </div>
+
+  <footer>
+    <span>🌸 Mei-ying Buddy · a Family Buddy dossier</span>
+    <span>Introduced October 9, 2026</span>
+  </footer>
+
+</div>
+</body>
+</html>
