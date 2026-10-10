@@ -124,15 +124,16 @@ body{padding:0}
 #journal-bar.open ul{display:block}
 #journal-bar li{margin:3px 0;color:var(--text2)}
 .jchg{color:var(--muted);font-size:12px;margin:0 8px}
-.cl-day{font-size:13px;font-weight:600;color:var(--muted);margin:26px 0 6px}
-.cl-group{border-top:1px solid var(--border2)}
-.cl-row{display:flex;gap:12px;align-items:flex-start;padding:14px 4px;border-bottom:1px solid var(--border2)}
-.cl-ic{font-size:15px;line-height:1.45;flex:0 0 auto;width:22px;text-align:center}
-.cl-body{flex:1;min-width:0}
-.cl-head{display:flex;align-items:baseline;gap:12px;font-size:14px;font-weight:600;color:var(--text)}
-.cl-diff{font-size:12.5px;color:var(--muted);margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.cl-title{flex:1;min-width:0}
-.cl-time{font-size:12px;color:var(--faint);white-space:nowrap;font-weight:400;flex:0 0 auto}
+.cl-day{font-size:20px;font-weight:700;color:var(--text);margin:28px 0 12px}
+.cl-day:first-child{margin-top:0}
+.cl-group{display:flex;flex-direction:column;gap:4px}
+.cl-row{display:flex;gap:14px;align-items:flex-start;padding:12px 8px;border-radius:12px}
+.cl-row:hover{background:var(--ghost)}
+.cl-ic{font-size:18px;line-height:1;flex:0 0 auto;width:44px;height:44px;border-radius:12px;background:var(--wash2);display:flex;align-items:center;justify-content:center}
+.cl-body{flex:1;min-width:0;padding-top:2px}
+.cl-title{font-size:15px;font-weight:600;color:var(--text);line-height:1.3}
+.cl-desc{font-size:13.5px;color:var(--muted);margin-top:3px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cl-time{font-size:12px;color:var(--faint);margin-top:4px;white-space:nowrap}
 #journal-bar .jtime{color:var(--faint);font-size:11px;margin-left:6px}
 .pdrop{border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;color:var(--muted);font-size:13px;margin-top:10px;cursor:pointer}
 .pdrop.over{border-color:var(--accent);background:var(--wash);color:var(--text)}
@@ -204,6 +205,10 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 .dumps-head h4{margin:0;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
 .dumps-head .darrow{font-size:25px;color:var(--muted);transition:transform .15s;display:inline-block;line-height:1;position:relative;top:-2px}
 .bp-sec > h3{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}
+.bp-sec > h3 .secgrip{cursor:grab;color:var(--faint);font-size:14px;line-height:1;padding:2px 4px;border-radius:4px}
+.bp-sec > h3 .secgrip:hover{color:var(--muted);background:var(--ghost)}
+.bp-sec > h3 .secgrip:active{cursor:grabbing}
+.bp-sec.sec-dragging{opacity:0.4}
 .bp-sec > h3 .secarrow{font-size:25px;color:var(--muted);transition:transform .15s;display:inline-block;line-height:1}
 .bp-sec.collapsed > *:not(h3){display:none}
 .bp-sec .secarrow{transform:rotate(90deg)}
@@ -596,10 +601,10 @@ function renderChangelog(){
       return '<div class="cl-row">'
         + '<span class="cl-ic" aria-hidden="true">' + ic + '</span>'
         + '<div class="cl-body">'
-        + '<div class="cl-head"><span class="cl-title">' + escHtml(c.desc) + '</span>'
-        + '<span class="cl-time" title="' + escHtml(d.toLocaleString()) + '">'
-        + escHtml(d.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'})) + '</span></div>'
-        + (diff ? '<div class="cl-diff">' + diff + '</div>' : '')
+        + '<div class="cl-title">' + escHtml(c.desc) + '</div>'
+        + (diff ? '<div class="cl-desc">' + diff + '</div>' : '')
+        + '<div class="cl-time" title="' + escHtml(d.toLocaleString()) + '">'
+        + escHtml(d.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'})) + '</div>'
         + '</div>'
         + '</div>';
     }).join('');
