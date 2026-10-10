@@ -111,7 +111,7 @@ body{padding:0}
 #zoombar .zv{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
 #zoomfit{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:14px;width:30px;height:26px;cursor:pointer}
 #zoomfit:hover{color:var(--text);border-color:var(--muted)}
-#sb-resize{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:center;width:12px;height:100vh;margin-left:auto;margin-right:-6px;margin-bottom:-100vh;cursor:ew-resize}
+#sb-resize{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:center;width:12px;height:100vh;margin-left:auto;margin-right:-21px;margin-bottom:-100vh;cursor:ew-resize}
 #sb-resize::after{content:'';width:7px;height:56px;border-radius:3px;background:var(--faint)}
 #sb-resize:hover::after{background:var(--accent-hi)}
 #sb-resize:hover{background:var(--ghost)}
@@ -1161,8 +1161,8 @@ function renderBuddy(id){
     + planSec
     + '<div class="bp-sec" data-field="notes"><h3>Notes<span class="info-tip" data-tip="Saved on this device. (For your eyes only)">\u24d8</span></h3><textarea class="notes" id="bp-notes" placeholder="Scratch pad for this buddy\u2026 (For your eyes only)">'+escHtml(S.notes[id]||'')+'</textarea>'
     + '</div>'
-    + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Saved to the buddy\u2019s repo (docs/notes.md) \u2014 visible to everyone with repo access.">\u24d8</span></h3>'
-    + '<textarea class="notes" id="bp-shared-notes" placeholder="Shared notes\u2026"></textarea>'
+    + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Anybody with repo access can see this note. Saved to the buddy\u2019s repo (docs/notes.md).">\u24d8</span></h3>'
+    + '<textarea class="notes" id="bp-shared-notes" placeholder="Anybody with repo access can see this note."></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
     + '<div class="bp-build">Build __BUILD__</div>'
     + '</div>';
