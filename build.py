@@ -188,6 +188,8 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
   box-shadow:0 2px 8px rgba(0,0,0,.08);transition:all .15s ease}
 #field-settings .fset-close-x:hover{color:#fff;background:linear-gradient(135deg,#e0533d,#c23e2a);border-color:#c23e2a;box-shadow:0 2px 12px rgba(224,83,61,.3);transform:scale(1.05)}
 .fset-row{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--border2);border-radius:8px;margin-bottom:6px;background:var(--bg);cursor:grab}
+.fset-row.drag-over{border-color:var(--accent);background:var(--wash2)}
+.fset-row .fh{touch-action:none;cursor:grab;padding:4px 8px;font-size:18px;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center}
 .fset-row.dragging{opacity:.5}
 .fset-row .fh{color:var(--muted);cursor:grab;font-size:14px}
 .fset-row .fl{flex:1;font-size:13px}
@@ -1071,6 +1073,55 @@ function openFieldSettings(){
       }
     });
   });
+  // Touch drag support for iPad (HTML5 DnD doesn't work on touch)
+  function addTouchDrag(listEl, getId, onReorder) {
+    let tDragEl = null, tTarget = null;
+    listEl.querySelectorAll('.fset-row').forEach(row => {
+      const handle = row.querySelector('.fh');
+      if (!handle) return;
+      handle.style.touchAction = 'none';
+      handle.addEventListener('touchstart', e => {
+        tDragEl = row; row.classList.add('dragging');
+        e.preventDefault();
+      }, {passive: false});
+      handle.addEventListener('touchmove', e => {
+        if (!tDragEl) return;
+        e.preventDefault();
+        const t = e.touches[0];
+        const el = document.elementFromPoint(t.clientX, t.clientY);
+        const targetRow = el ? el.closest('.fset-row') : null;
+        listEl.querySelectorAll('.fset-row').forEach(r => r.classList.remove('drag-over'));
+        if (targetRow && targetRow !== tDragEl) {
+          targetRow.classList.add('drag-over');
+          tTarget = targetRow;
+        } else {
+          tTarget = null;
+        }
+      }, {passive: false});
+      handle.addEventListener('touchend', e => {
+        if (!tDragEl) return;
+        row.classList.remove('dragging');
+        listEl.querySelectorAll('.fset-row').forEach(r => r.classList.remove('drag-over'));
+        if (tTarget && tTarget !== tDragEl) {
+          onReorder(getId(tDragEl), getId(tTarget));
+        }
+        tDragEl = null; tTarget = null;
+      });
+    });
+  }
+  addTouchDrag(list, r => r.dataset.fid, (fromId, toId) => {
+    const ids = Array.from(list.querySelectorAll('.fset-row')).map(r => r.dataset.fid);
+    const from = ids.indexOf(fromId), to = ids.indexOf(toId);
+    const order = getFieldOrder();
+    const [moved] = order.splice(from, 1);
+    order.splice(to, 0, moved);
+    S.fieldOrder = order; save();
+    openFieldSettings();
+    const vb2 = document.getElementById('view-buddy');
+    if (vb2 && vb2.classList.contains('active') && S.projectId && byId[S.projectId]) {
+      renderBuddy(S.projectId);
+    }
+  });
   list.querySelectorAll('[data-vis]').forEach(cb => {
     cb.addEventListener('change', () => {
       if (!S.fieldHidden) S.fieldHidden = {};
@@ -1108,6 +1159,16 @@ function openFieldSettings(){
         renderNav();
         openFieldSettings();
       });
+    addTouchDrag(vlist, r => r.dataset.vid, (fromId, toId) => {
+      const ids = Array.from(vlist.querySelectorAll('.fset-row')).map(r => r.dataset.vid);
+      const from = ids.indexOf(fromId), to = ids.indexOf(toId);
+      const order = getViewOrder();
+      const moved = order.splice(from, 1)[0];
+      order.splice(to, 0, moved);
+      S.viewOrder = order; save();
+      renderNav();
+      openFieldSettings();
+    });
     });
   }
   m.classList.add('show');
