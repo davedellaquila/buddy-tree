@@ -3,6 +3,13 @@
 All notable changes to the Buddies dashboard and buddy system. Newest first.
 `FEATURES.md` describes the current state; this file describes how it got there.
 
+## 2026-10-10 (Factory reset: symmetric sidebars)
+
+### Changed
+- **Reset to Factory Defaults now restores symmetric sidebars** — both
+  the left sidebar and the right buddy-detail panel return to the
+  default 308px width.
+
 ## 2026-10-10 (Changelog row layout)
 
 ### Changed

@@ -441,6 +441,7 @@ function buildKids(){
   BUDDIES.forEach(b => { const p = effParent(b) || '__root'; (kidsOf[p] = kidsOf[p] || []).push(b); });
 }
 const LS_KEY = 'buddyTree.v3';
+const SB_DEFAULT_W = 308;
 let S = {seen:{}, notes:{}, names:{}, parents:{}, zoom:100, sel:'view:tree'};
 try { Object.assign(S, JSON.parse(localStorage.getItem(LS_KEY) || '{}')); } catch(e) {}
 S.parents = S.parents || {};
@@ -718,6 +719,7 @@ function resetToFactory(){
   if (Array.isArray(f.fieldOrder) && f.fieldOrder.length) S.fieldOrder = f.fieldOrder.slice();
   if (f.fieldHidden && typeof f.fieldHidden === 'object') S.fieldHidden = Object.assign({}, f.fieldHidden);
   if (Array.isArray(f.viewOrder) && f.viewOrder.length) S.viewOrder = f.viewOrder.slice();
+  S.sbWidth = SB_DEFAULT_W; S.panelWidth = SB_DEFAULT_W;
   save();
 }
 function updateFactory(){
@@ -809,6 +811,7 @@ function openFieldSettings(){
     m.querySelector('#fset-reset').addEventListener('click', () => {
       if (!confirm('Reset all settings to factory defaults?')) return;
       resetToFactory(); renderSettingChecks(); openFieldSettings();
+      applySbWidth(); applyPanelWidth();
       show(S.sel, false);
     });
     m.querySelector('#fset-update').addEventListener('click', () => {
@@ -891,6 +894,10 @@ function openFieldSettings(){
 function applyPanelWidth(){
   const vb = document.getElementById('view-buddy');
   if (vb && S.panelWidth) vb.style.width = S.panelWidth + 'px';
+}
+function applySbWidth(){
+  const sb = document.getElementById('sidebar');
+  if (sb) { const w = S.sbWidth || SB_DEFAULT_W; sb.style.width = w + 'px'; sb.style.flex = '0 0 ' + w + 'px'; }
 }
 function initPanelResize(){
   const vb = document.getElementById('view-buddy');
@@ -1518,8 +1525,7 @@ document.addEventListener('keydown', e => {
 /* ---------- sidebar resize ---------- */
 (function initSbResize(){
   const sb = document.getElementById('sidebar');
-  function apply(){ const w = S.sbWidth || 308; sb.style.width = w + 'px'; sb.style.flex = '0 0 ' + w + 'px'; }
-  apply();
+  applySbWidth();
   const h = document.getElementById('sb-resize');
   let sx = null, sw = 0;
   h.addEventListener('pointerdown', e => { sx = e.clientX; sw = sb.getBoundingClientRect().width; h.setPointerCapture(e.pointerId); e.preventDefault(); });
