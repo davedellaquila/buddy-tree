@@ -131,6 +131,13 @@
   .btn:hover { background: #A95C3B; }
   .empty { color: var(--dim); font-style: italic; font-size: 14px; padding: 10px 2px; }
 
+  .photostrip { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px; }
+  .photo { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px; max-width: 250px;
+           box-shadow: 0 3px 10px rgba(59,47,38,.08); transform: rotate(-1deg); }
+  .photo:nth-child(even) { transform: rotate(1deg); }
+  .photo img { width: 100%; border-radius: 8px; display: block; }
+  .photo figcaption { font-size: 12px; color: var(--dim); margin-top: 8px; text-align: center; }
+
   footer { margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line);
            color: var(--dim); font-size: 13px; display: flex; gap: 16px; flex-wrap: wrap; }
   footer a { color: var(--terra); }
@@ -181,6 +188,14 @@
     <div class="fact"><div class="e">🎂</div><div class="t">Birthday: November 4</div><div class="d">From her Facebook profile — now on the important-dates board below.</div></div>
     <div class="fact"><div class="e">📍</div><div class="t">San Jose → Fiddletown</div><div class="d">Hometown San Jose; now Fiddletown, California — home.</div></div>
     <div class="fact"><div class="e">💆</div><div class="t">Esthetician &amp; skin therapist</div><div class="d">Self-employed; previously at Sirena Scena Salon.</div></div>
+  </div>
+
+  <h2 class="serif">Photos <span class="sub">From Nan's Facebook</span></h2>
+  <div class="photostrip" id="photostrip">
+    <figure class="photo">
+      <img src="photos/profile.jpg" alt="Nan's Facebook profile photo">
+      <figcaption>Profile photo · Facebook</figcaption>
+    </figure>
   </div>
 
   <h2 class="serif">Grocery stipend <span class="sub">$1,200/mo · under review</span></h2>
