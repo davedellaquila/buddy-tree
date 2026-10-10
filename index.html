@@ -120,6 +120,8 @@
   .proj-row .parrow { font-size: 18px; color: #8b949e; cursor: pointer; display: inline-block; line-height: 1; transition: transform .15s; user-select: none; }
   .proj-row .parrow.expanded { transform: rotate(90deg); }
   .proj-row .parrow.leaf { visibility: hidden; }
+  .proj-path { font-size: 12px; color: var(--muted); line-height: 1.3; margin: 0 0 2px; width: 100%; }
+  .proj-row.filter-hit { /* matching row when a tile filter is active */ }
   .status {
     font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
     padding: 3px 10px; border-radius: 999px; white-space: nowrap;
@@ -473,7 +475,13 @@ html.light #menu-btn .menu-btn-dot{box-shadow:0 0 0 2px rgba(255,255,255,.85)}
   .app{display:block}
   /* Prevent iOS auto-zoom on input focus */
   input, textarea, select{font-size:16px !important}
-  #menu-btn{display:flex}
+  /* Muse menu shares one sticky header row with page titles (not stacked above them) */
+  #menu-btn{
+    display:flex;
+    top:max(8px, calc(env(safe-area-inset-top, 0px) + 6px));
+    left:max(10px, env(safe-area-inset-left, 0px));
+    z-index:92;
+  }
   /* Sidebar drawer with scrim */
   #sidebar{position:fixed;left:0;top:0;bottom:0;z-index:95;height:100vh;height:100dvh;
     transform:translateX(-105%);transition:transform .28s cubic-bezier(.32,.72,.35,1);width:min(85vw,340px);flex:none}
@@ -481,9 +489,10 @@ html.light #menu-btn .menu-btn-dot{box-shadow:0 0 0 2px rgba(255,255,255,.85)}
   #sb-resize{display:none}
   #sb-scrim{display:none;position:fixed;inset:0;z-index:94;background:rgba(0,0,0,.45);opacity:0;transition:opacity .25s}
   #sb-scrim.show{display:block;opacity:1}
-  /* Side gutters for metric tiles + main content (safe-area aware) */
+  /* Side gutters; top padding ≈ one header row (menu + sticky title share it) */
   #main{
-    padding:72px 18px 60px;
+    padding:56px 18px 60px;
+    padding-top:max(56px, calc(env(safe-area-inset-top, 0px) + 52px));
     padding-left:max(18px, env(safe-area-inset-left, 0px));
     padding-right:max(18px, env(safe-area-inset-right, 0px));
   }
@@ -699,14 +708,17 @@ html.light #menu-btn .menu-btn-dot{box-shadow:0 0 0 2px rgba(255,255,255,.85)}
   .ptile-sub{font-size:10px;line-height:1.2;margin-top:1px;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .ptile-label,.ptile-sub{overflow-wrap:normal;word-break:normal;hyphens:none}
-  /* Business Plans / list page body type — above iOS comfort minimum */
+  /* Sticky title shares the same top row as #menu-btn (menu left, title centered in bar) */
   .projects-view h2,.standalones h2{
-    font-size:22px;position:sticky;z-index:7;background:var(--bg);
-    /* Sit below the floating Muse menu button */
-    top:max(58px, calc(env(safe-area-inset-top, 0px) + 52px));
-    padding:10px 8px 8px;margin:0 0 6px;
+    font-size:20px;line-height:1.2;position:sticky;z-index:7;background:var(--bg);
+    top:max(0px, env(safe-area-inset-top, 0px));
+    box-sizing:border-box;min-height:56px;
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    /* Symmetric horizontal pad clears the 44px Muse button so the title stays optically centered */
+    padding:8px 56px;margin:0 0 6px;
     box-shadow:0 8px 16px -12px rgba(0,0,0,.5)}
   .projects-view p.sub,.standalones p.sub{font-size:16px;line-height:1.45;margin-bottom:16px}
+  .proj-path{font-size:13px;color:var(--muted);line-height:1.35;margin:0 0 2px}
   .plan-card{padding:14px 16px;margin-bottom:12px;border-radius:12px}
   .plan-card-head{margin-bottom:8px;gap:8px}
   .plan-card-icon{font-size:22px}
@@ -2184,39 +2196,50 @@ function renderProjects(){
     + '<div id="project-status-tiles" style="margin-top:12px">'
     + statusOrder.map(st => tileHtml(st.toUpperCase(), statusCounts[st], statusTints[st] || '#8b949e', st + ' projects', 'status:' + st, statusFilter === st, 'Click to filter by ' + st + ' status. Click again to clear.')).join('')
     + '</div>'
-    + '<h2>Projects by Buddy</h2>'
-    + '<p class="sub">Every buddy, in hierarchy order, with its current status.</p><div class="proj-list">';
-  // When a tile filter is active, show matching buddies plus their ancestors
-  let showIds = null;
-  if (projFilter) {
-    const matches = b => (b.attention || []).some(a => {
-      const seen = !!S.seen[a.id];
-      if (projFilter === 'unseen') return !seen;
-      if (projFilter === 'cleared') return seen;
-      const t = Date.parse(a.date || '');
-      return t && t >= weekAgo;
-    });
-    showIds = {};
+    + '<h2>Projects by Buddy</h2>';
+  // Tile filters: show ONLY matching buddies (tile count = row count).
+  // Ancestors used to be injected for nesting and appeared as extra "records"
+  // with the wrong status — instead render matches flat with a path crumb.
+  const matchIds = {};
+  let filterMode = null; // 'status' | 'attention' | null
+  if (statusFilter) {
+    filterMode = 'status';
     Object.values(byId).forEach(b => {
-      if (!matches(b)) return;
-      let x = b;
-      while (x) { showIds[x.id] = true; const p = effParent(x); x = p ? byId[p] : null; }
+      if ((b.status || 'Unknown') === statusFilter) matchIds[b.id] = true;
     });
-  } else if (statusFilter) {
-    showIds = {};
+  } else if (projFilter) {
+    filterMode = 'attention';
     Object.values(byId).forEach(b => {
-      if ((b.status || 'Unknown') !== statusFilter) return;
-      let x = b;
-      while (x) { showIds[x.id] = true; const p = effParent(x); x = p ? byId[p] : null; }
+      const hit = (b.attention || []).some(a => {
+        const seen = !!S.seen[a.id];
+        if (projFilter === 'unseen') return !seen;
+        if (projFilter === 'cleared') return seen;
+        const t = Date.parse(a.date || '');
+        return t && t >= weekAgo;
+      });
+      if (hit) matchIds[b.id] = true;
     });
   }
-  (function walk(id, depth){
-    const b = byId[id]; if (!b) return;
-    if (showIds && !showIds[id]) return;
-    const kids = kidsOf[id] || [];
-    const hasKids = kids.length > 0;
-    const collapsed = (projFilter || statusFilter) ? false : !!S.projCollapsed[id];
-    s += '<div class="proj-row d' + Math.min(depth, 3) + '" data-buddy="' + b.id + '">'
+  const matchCount = Object.keys(matchIds).length;
+  const sub = filterMode === 'status'
+    ? (matchCount === 1
+        ? 'Showing the 1 buddy with status “' + statusFilter + '”.'
+        : 'Showing ' + matchCount + ' buddies with status “' + statusFilter + '”.')
+    : filterMode === 'attention'
+      ? (matchCount === 1
+          ? 'Showing 1 matching buddy.'
+          : 'Showing ' + matchCount + ' matching buddies.')
+      : 'Every buddy, in hierarchy order, with its current status.';
+  s += '<p class="sub">' + escHtml(sub) + '</p><div class="proj-list">';
+
+  function projRowHtml(b, depth, opts){
+    opts = opts || {};
+    const kids = kidsOf[b.id] || [];
+    const hasKids = !opts.flat && kids.length > 0;
+    const collapsed = opts.flat ? false : !!S.projCollapsed[b.id];
+    const path = opts.path || [];
+    return '<div class="proj-row d' + Math.min(depth, 3) + (opts.flat ? ' filter-hit' : '') + '" data-buddy="' + b.id + '">'
+      + (path.length ? '<div class="proj-path">' + path.map(escHtml).join(' · ') + '</div>' : '')
       + '<div class="proj-row-head">'
       + (hasKids ? '<span class="parrow ' + (collapsed ? '' : 'expanded') + '" data-proj-toggle="' + b.id + '">›</span>' : '')
       + '<span class="pname">' + iconName(b) + '</span>'
@@ -2225,8 +2248,44 @@ function renderProjects(){
       + '</div>'
       + '<span class="pdesc">' + escHtml(b.tagline || '') + '</span>'
       + '</div>';
-    if (!collapsed) kids.forEach(c => walk(c.id, depth + 1));
-  })('project-buddy', 0);
+  }
+  function ancestorNames(b){
+    const parts = [];
+    let p = effParent(b);
+    while (p) {
+      const pb = byId[p];
+      if (!pb) break;
+      parts.unshift(dispName(pb));
+      p = effParent(pb);
+    }
+    return parts;
+  }
+
+  if (filterMode) {
+    const ordered = [];
+    const seen = {};
+    (function collect(id){
+      const b = byId[id]; if (!b) return;
+      if (matchIds[b.id] && !seen[b.id]) { ordered.push(b); seen[b.id] = true; }
+      (kidsOf[id] || []).forEach(c => collect(c.id));
+    })('project-buddy');
+    Object.values(byId).forEach(b => {
+      if (matchIds[b.id] && !seen[b.id]) { ordered.push(b); seen[b.id] = true; }
+    });
+    if (!ordered.length) {
+      s += '<p class="fineprint">No matching buddies.</p>';
+    } else {
+      ordered.forEach(b => { s += projRowHtml(b, 0, { flat: true, path: ancestorNames(b) }); });
+    }
+  } else {
+    (function walk(id, depth){
+      const b = byId[id]; if (!b) return;
+      const kids = kidsOf[id] || [];
+      const collapsed = !!S.projCollapsed[id];
+      s += projRowHtml(b, depth, { flat: false });
+      if (!collapsed) kids.forEach(c => walk(c.id, depth + 1));
+    })('project-buddy', 0);
+  }
   s += '</div></section>';
   const vp = document.getElementById('view-projects');
   vp.innerHTML = s;
