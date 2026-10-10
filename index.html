@@ -462,20 +462,50 @@ body.standalone .sa-bar{display:flex}
   #sb-resize{display:none}
   #sb-scrim{display:none;position:fixed;inset:0;z-index:94;background:rgba(0,0,0,.45);opacity:0;transition:opacity .25s}
   #sb-scrim.show{display:block;opacity:1}
-  #main{padding:72px 12px 60px}
-  /* Tree becomes clean vertical cards */
-  .tree,.tree ul{display:block;padding:0;margin:0}
-  .tree ul{padding-top:0}
-  .tree li{display:block;padding:0;text-align:left}
+  /* Comfortable gutters; never let full-bleed tree margins escape the viewport */
+  html,body{overflow-x:hidden}
+  #main{
+    padding:72px 16px 60px;
+    padding-left:max(16px, env(safe-area-inset-left, 0px));
+    padding-right:max(16px, env(safe-area-inset-right, 0px));
+    overflow-x:hidden;max-width:100%;box-sizing:border-box}
+  body.standalone #main{
+    padding:24px 16px 72px;
+    padding-left:max(16px, env(safe-area-inset-left, 0px));
+    padding-right:max(16px, env(safe-area-inset-right, 0px));
+    max-width:100%}
+  /* Desktop #view-tree uses negative margins to cancel #main padding — reset on mobile
+     or cards paint past the viewport (clipped titles/tags, dividers off-screen). */
+  #view-tree{
+    margin:0 !important;height:auto;overflow:visible;max-width:100%;
+    width:100%;box-sizing:border-box}
+  #view-tree #zoomwrap,.treewrap{display:block;max-width:100%;width:100%;box-sizing:border-box}
+  #view-tree .chart{overflow-x:hidden;padding:8px 0 24px;max-width:100%;box-sizing:border-box}
+  #treezoom{
+    height:auto;max-height:none;overflow:visible !important;cursor:default;
+    border:none;max-width:100%;width:100%;box-sizing:border-box}
+  #zoombar{display:none}
+  /* Tree: stacked cards (title → desc → tag), full width inside gutters — not a 3-col row */
+  .tree,.tree ul{display:block;padding:0;margin:0;max-width:100%}
+  .tree ul{padding:4px 0 0 12px;margin-left:4px;border-left:2px solid var(--border2)}
+  .tree li{display:block;padding:0;text-align:left;max-width:100%;box-sizing:border-box}
   .tree li::before,.tree li::after,.tree ul ul::before,.root-stub{display:none}
-  .node{display:flex;align-items:center;gap:12px;width:auto;margin:0 0 8px;padding:14px 16px;
-    border-radius:14px;min-height:56px}
-  .node.root{width:auto}
+  .node{
+    display:flex !important;flex-direction:column !important;align-items:flex-start !important;
+    gap:6px;width:100% !important;max-width:100% !important;box-sizing:border-box;
+    margin:0 0 8px;padding:12px 14px;border-radius:14px;min-height:0;text-align:left}
+  .node.root{width:100% !important;max-width:100% !important}
+  .node .desc{font-size:14px;line-height:1.4;margin:0;width:100%;max-width:100%}
+  .node .tag{margin-top:2px;flex:none;max-width:100%;white-space:nowrap}
   .node .n-icon{font-size:24px;flex:none}
   .node .n-name{font-size:16px;font-weight:600}
   .standalones .grid{display:block}
-  #treezoom{height:auto;max-height:none;overflow:visible;cursor:default}
-  #zoombar{display:none}
+  .subkids{padding-left:12px;max-width:100%;box-sizing:border-box}
+  .subkids .node{width:100% !important}
+  /* Buddy-panel mini tree (Project Buddy detail) — same width rules */
+  .bp-tree-wrap{max-width:100%;box-sizing:border-box;height:auto;min-height:240px;overflow-x:hidden}
+  .bp-tree-wrap .node{width:100% !important;max-width:100% !important}
+  #view-buddy.sheet{overflow-x:hidden}
   /* Bottom sheet panel — taller, grabbable */
   #view-buddy.sheet{position:fixed;left:0;right:0;bottom:0;top:6%;z-index:96;
     background:var(--bg);border-top:1px solid var(--border);border-radius:20px 20px 0 0;
