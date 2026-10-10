@@ -318,6 +318,7 @@ body.standalone .sa-bar{display:flex}
 #view-buddy.panel #bp-close,#view-buddy.sheet #bp-close{display:inline-block}
 /* ---------- Project view: stat tiles + buddy homepage embed ---------- */
 #project-tiles{display:flex;gap:14px;margin:2px auto 20px;max-width:860px;flex-wrap:wrap}
+#project-status-tiles{display:flex;gap:14px;margin:2px auto 20px;max-width:860px;flex-wrap:wrap}
 .ptile{flex:1 1 170px;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 18px 12px;position:relative;overflow:hidden;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
 .ptile:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.12)}
 .ptile::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--tint)}
@@ -1056,7 +1057,7 @@ function tileHtml(label, num, tint, sub, fkey, sel, tip){
     + '<div class="ptile-num">' + escHtml(String(num)) + '</div>'
     + '<div class="ptile-sub">' + escHtml(sub) + '</div></div>';
 }
-let projFilter = null, clFilter = null, planFilter = null, manifestFilter = null;
+let projFilter = null, clFilter = null, planFilter = null, manifestFilter = null, statusFilter = null;
 function applyManifestFilter(){
   document.querySelectorAll('#view-manifest .proj-row').forEach(r => {
     const isAuto = !!r.querySelector('.st-auto');
@@ -1376,18 +1377,27 @@ function renderProjects(){
   if (!S.projCollapsed || typeof S.projCollapsed !== 'object') S.projCollapsed = {};
   let unseen = 0, fresh = 0, cleared = 0;
   const weekAgo = Date.now() - 7 * 864e5;
+  const statusCounts = {};
   Object.values(byId).forEach(b => {
+    const st = b.status || 'Unknown';
+    statusCounts[st] = (statusCounts[st] || 0) + 1;
     (b.attention || []).forEach(a => {
       if (S.seen[a.id]) cleared++; else unseen++;
       const t = Date.parse(a.date || '');
       if (t && t >= weekAgo) fresh++;
     });
   });
+  // Status tint colors (match the pills)
+  const statusTints = {'Active':'#1f6feb','Live · M2 shipped':'#2f9e44','Live · pre-alpha':'#2f9e44','New':'#d97a1f','Brief review':'#a371f7','PRD review':'#a371f7','Pilot':'#1f6feb','Spec review':'#a371f7'};
+  const statusOrder = Object.keys(statusCounts).sort();
   let s = '<section class="projects-view" style="margin-top:24px">'
     + '<div id="project-tiles">'
     + tileHtml('TO REVIEW', unseen, '#d43d2a', 'Needs your attention', 'unseen', projFilter === 'unseen')
     + tileHtml('NEW', fresh, '#d97a1f', 'Added in the last 7 days', 'fresh', projFilter === 'fresh')
     + tileHtml('CLEARED', cleared, '#2f9e44', 'Reviewed & cleared', 'cleared', projFilter === 'cleared')
+    + '</div>'
+    + '<div id="project-status-tiles" style="margin-top:12px">'
+    + statusOrder.map(st => tileHtml(st.toUpperCase(), statusCounts[st], statusTints[st] || '#8b949e', st + ' projects', 'status:' + st, statusFilter === st, 'Click to filter by ' + st + ' status. Click again to clear.')).join('')
     + '</div>'
     + '<h2>Projects by Buddy</h2>'
     + '<p class="sub">Every buddy, in hierarchy order, with its current status.</p><div class="proj-list">';
@@ -1407,13 +1417,20 @@ function renderProjects(){
       let x = b;
       while (x) { showIds[x.id] = true; const p = effParent(x); x = p ? byId[p] : null; }
     });
+  } else if (statusFilter) {
+    showIds = {};
+    Object.values(byId).forEach(b => {
+      if ((b.status || 'Unknown') !== statusFilter) return;
+      let x = b;
+      while (x) { showIds[x.id] = true; const p = effParent(x); x = p ? byId[p] : null; }
+    });
   }
   (function walk(id, depth){
     const b = byId[id]; if (!b) return;
     if (showIds && !showIds[id]) return;
     const kids = kidsOf[id] || [];
     const hasKids = kids.length > 0;
-    const collapsed = projFilter ? false : !!S.projCollapsed[id];
+    const collapsed = (projFilter || statusFilter) ? false : !!S.projCollapsed[id];
     s += '<div class="proj-row d' + Math.min(depth, 3) + '" data-buddy="' + b.id + '">'
       + (hasKids ? '<span class="parrow ' + (collapsed ? '' : 'expanded') + '" data-proj-toggle="' + b.id + '">\u203a</span>' : '')
       + (depth ? '<span class="dot">\u2514</span>' : '')
@@ -2462,6 +2479,14 @@ document.addEventListener('click', e => {
   const projTile = e.target.closest('#project-tiles [data-tile]');
   if (projTile) {
     projFilter = projFilter === projTile.dataset.tile ? null : projTile.dataset.tile;
+    renderProjects(); return;
+  }
+  const statusTile = e.target.closest('#project-status-tiles [data-tile]');
+  if (statusTile) {
+    const st = statusTile.dataset.tile.replace(/^status:/, '');
+    statusFilter = statusFilter === st ? null : st;
+    // Clear the attention filter when using status filter (mutually exclusive)
+    if (statusFilter) projFilter = null;
     renderProjects(); return;
   }
   const clTile = e.target.closest('#changelog-tiles [data-tile]');
