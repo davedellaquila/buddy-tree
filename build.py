@@ -1856,8 +1856,16 @@ document.addEventListener('keydown', e => {
     }
     const vb = document.getElementById('view-buddy');
     if (vb && vb.classList.contains('active')) {
-      // Don't close if user is editing text
-      if (e.target && e.target.closest && e.target.closest('input,textarea,[contenteditable="true"]')) return;
+      // Don't close if user is editing text — check both event target and focused element
+      const ae = document.activeElement;
+      const inField = (e.target && e.target.closest && e.target.closest('input,textarea,select,[contenteditable="true"],[contenteditable=""]'))
+        || (ae && ae.closest && ae.closest('input,textarea,select,[contenteditable="true"],[contenteditable=""]'));
+      if (inField) {
+        // Blur the field instead of closing the panel
+        if (ae && ae.blur) ae.blur();
+        e.preventDefault();
+        return;
+      }
       closeDetail();
       e.preventDefault();
       return;
