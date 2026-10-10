@@ -12,6 +12,11 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
   handler so row navigation can't swallow it).
 - **Centered changelog** — the changelog content is now centered in the
   viewport (max-width 760px) instead of hugging the left edge.
+- **Keyboard nav split** — arrow keys now move only through the buddy
+  (project) rows: up/down steps through them, left jumps to the first,
+  right to the last. The view buttons (Tree, Projects, Plans, Manifest,
+  Changelog) are reached with number keys 1–9 instead of sharing the
+  arrow-key list.
 
 ### Added
 - **Light / Dark / System theme** — a three-way segmented picker under
