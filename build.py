@@ -1431,22 +1431,25 @@ document.addEventListener('keydown', e => {
   if (e.key === '+' || e.key === '=') { S.zoom = Math.min(160, (S.zoom || 100) + 5); save(); applyZoom(); return; }
   if (e.key === '-' || e.key === '_') { S.zoom = Math.max(50, (S.zoom || 100) - 5); save(); applyZoom(); return; }
   if (e.key === '0') { zoomToFit(); return; }
+  if (/^[1-9]$/.test(e.key)) {
+    const vbtns = Array.from(document.querySelectorAll('#view-nav .navbtn[data-view]'));
+    const vi = parseInt(e.key, 10) - 1;
+    if (vi < vbtns.length) { e.preventDefault(); show('view:' + vbtns[vi].dataset.view); }
+    return;
+  }
   if (!['ArrowDown','ArrowUp','ArrowLeft','ArrowRight'].includes(e.key)) return;
-  const vbtns = Array.from(document.querySelectorAll('#view-nav .navbtn[data-view]'));
   const rows = Array.from(document.querySelectorAll('#buddy-nav [data-buddy]'));
-  const total = vbtns.length + rows.length;
+  const total = rows.length;
   if (!total) return;
   e.preventDefault();
   let pos = -1;
   const sel = S.sel || '';
-  if (sel.startsWith('view:')) pos = vbtns.findIndex(b => b.dataset.view === sel.slice(5));
-  else if (sel.startsWith('buddy:')) { const ri = rows.findIndex(r => r.dataset.buddy === sel.slice(6)); if (ri >= 0) pos = vbtns.length + ri; }
+  if (sel.startsWith('buddy:')) pos = rows.findIndex(r => r.dataset.buddy === sel.slice(6));
   if (e.key === 'ArrowDown') pos = (pos + 1 + total) % total;
   else if (e.key === 'ArrowUp') pos = (pos - 1 + total) % total;
   else if (e.key === 'ArrowLeft') pos = 0;
   else if (e.key === 'ArrowRight') pos = total - 1;
-  if (pos < vbtns.length) show('view:' + vbtns[pos].dataset.view);
-  else selectProject(rows[pos - vbtns.length].dataset.buddy);
+  if (pos >= 0 && pos < rows.length) selectProject(rows[pos].dataset.buddy);
 });
 /* ---------- sidebar resize ---------- */
 (function initSbResize(){
