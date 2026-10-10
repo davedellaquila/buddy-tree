@@ -1378,7 +1378,7 @@ function renderProjects(){
     Object.values(byId).forEach(b => {
       if (!matches(b)) return;
       let x = b;
-      while (x) { showIds[x.id] = true; x = x.parent ? byId[x.parent] : null; }
+      while (x) { showIds[x.id] = true; const p = effParent(x); x = p ? byId[p] : null; }
     });
   }
   (function walk(id, depth){
