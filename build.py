@@ -649,7 +649,7 @@ function renderChangelog(){
     const m = TYPE_META[t] || [t.toUpperCase(), '#57606a'];
     return tileHtml(m[0], typeCounts[t], m[1], 'changes logged', t, clFilter === t);
   }).join('');
-  let h = '<section class="changelog" style="margin:24px auto 0;max-width:760px">'
+  let h = '<section class="changelog" style="margin:24px auto 0;max-width:860px">'
     + (typeTiles ? '<div id="changelog-tiles" style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">' + typeTiles + '</div>' : '')
     + '<h2>Changelog</h2>'
     + '<p class="sub">Every change made in this dashboard, newest first.</p>';
@@ -1028,7 +1028,17 @@ function tileHtml(label, num, tint, sub, fkey, sel){
     + '<div class="ptile-num">' + escHtml(String(num)) + '</div>'
     + '<div class="ptile-sub">' + escHtml(sub) + '</div></div>';
 }
-let projFilter = null, clFilter = null, planFilter = null;
+let projFilter = null, clFilter = null, planFilter = null, manifestFilter = null;
+function applyManifestFilter(){
+  document.querySelectorAll('#view-manifest .proj-row').forEach(r => {
+    const isAuto = !!r.querySelector('.st-auto');
+    const show = !manifestFilter || (manifestFilter === 'auto' ? isAuto : !isAuto);
+    r.style.display = show ? '' : 'none';
+  });
+  document.querySelectorAll('#manifest-tiles .ptile').forEach(t => {
+    t.classList.toggle('sel', t.dataset.tile === manifestFilter);
+  });
+}
 function applyPlanFilter(){
   document.querySelectorAll('#view-plans .proj-row[data-status]').forEach(r => {
     r.style.display = (!planFilter || r.dataset.status === planFilter) ? '' : 'none';
@@ -2350,6 +2360,11 @@ document.addEventListener('click', e => {
   if (planTile) {
     planFilter = planFilter === planTile.dataset.tile ? null : planTile.dataset.tile;
     applyPlanFilter(); return;
+  }
+  const manTile = e.target.closest('#manifest-tiles [data-tile]');
+  if (manTile) {
+    manifestFilter = manifestFilter === manTile.dataset.tile ? null : manTile.dataset.tile;
+    applyManifestFilter(); return;
   }
   const projRow = e.target.closest('#view-projects .proj-row[data-buddy]');
   if (projRow) {
