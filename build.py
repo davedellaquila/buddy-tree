@@ -142,6 +142,7 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 #bp-resize::after{content:'';width:7px;height:56px;border-radius:3px;background:#6e7681}
 #bp-resize:hover::after{background:#58a6ff}
 #bp-resize:hover{background:rgba(31,111,235,.1)}
+#view-buddy.active:not(.panel):not(.sheet) #bp-resize{display:none}
 .pupload{height:150px;min-width:120px;border-radius:10px;border:1px dashed #30363d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:#0d1117;flex:0 0 auto}
 .pupload .pbar{width:80px;height:6px;background:#21262d;border-radius:3px;overflow:hidden}
 .pupload .pbar > div{height:100%;background:#1f6feb;border-radius:3px;transition:width .2s}
@@ -1183,14 +1184,16 @@ document.addEventListener('keydown', e => {
     if (btn && btn.dataset.view) { show('view:' + btn.dataset.view); e.preventDefault(); }
   }
 });
-function show(sel, push){
+let curBuddyMode = 'overlay';
+function show(sel, push, mode){
   if (push !== false && S.sel && sel !== S.sel) { navHist.push(S.sel); if (navHist.length > 60) navHist.shift(); }
   S.sel = sel; save();
   const h = hashFor(sel);
   try { if (typeof location !== 'undefined' && location.hash !== h) location.hash = h; } catch (e) {}
   document.body.classList.toggle('standalone', isStandalone());
   const vb = document.getElementById('view-buddy');
-  const asOverlay = sel.startsWith('buddy:') && !isStandalone();
+  if (sel.startsWith('buddy:') && mode) curBuddyMode = mode;
+  const asOverlay = sel.startsWith('buddy:') && !isStandalone() && curBuddyMode !== 'center';
   if (asOverlay) {
     vb.classList.add('active');
     vb.classList.toggle('panel', window.innerWidth >= 640);
@@ -1205,6 +1208,7 @@ function show(sel, push){
       renderPlan(sel.slice(5));
     } else {
       vb.classList.add('active');
+      vb.style.width = '';
       renderBuddy(sel.slice(6));
     }
   }
@@ -1233,7 +1237,7 @@ document.addEventListener('keydown', e => {
   else if (e.key === 'ArrowLeft') idx = 0;
   else if (e.key === 'ArrowRight') idx = items.length - 1;
   idx = Math.max(0, Math.min(items.length - 1, idx));
-  show('buddy:' + items[idx].dataset.buddy);
+  show('buddy:' + items[idx].dataset.buddy, true, 'center');
 });
 /* ---------- sidebar resize ---------- */
 (function initSbResize(){
@@ -1837,7 +1841,7 @@ document.addEventListener('click', e => {
   const sb2 = document.getElementById('sidebar');
   if (sb2) sb2.classList.remove('open');
   const bb = e.target.closest('[data-buddy]');
-  if (bb) { show('buddy:' + bb.dataset.buddy); return; }
+  if (bb) { show('buddy:' + bb.dataset.buddy, true, e.target.closest('#buddy-nav') ? 'center' : 'overlay'); return; }
   const sb = e.target.closest('[data-seen]');
   if (sb) { S.seen[sb.dataset.seen] = Date.now(); save(); renderBuddy(S.sel.slice(6)); renderNav(); return; }
   const sa = e.target.closest('[data-seen-all]');

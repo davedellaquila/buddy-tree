@@ -15,6 +15,13 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
   buddy page and in field settings.
 
 ### Added
+- **Sidebar opens buddies in the center** — clicking a buddy in the left
+  sidebar (or arrow-keying through the list) now shows that buddy's
+  homepage in the central view instead of a right-side overlay. Clicks
+  from the tree, Projects list, and other in-content links still open the
+  overlay peek panel; Prev/Next and breadcrumb links follow whichever
+  presentation is active. The panel resize handle is hidden in center
+  mode.
 - **Repo slug eyebrow** — the small label above the buddy name on the
   detail page now shows the buddy's true Git repo slug from the registry
   (e.g. `buddy-tree`), in monospace with a tooltip naming the full
