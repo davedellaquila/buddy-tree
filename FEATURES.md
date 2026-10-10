@@ -3,8 +3,8 @@
 Living list of every feature in the dashboard. Update this file when a feature
 ships or changes — it's the source of truth for future documentation.
 
-Repo: https://github.com/davedellaquila/buddy-tree
-Live: https://davedellaquila.github.io/buddy-tree/
+Repo: https://github.com/davedellaquila/buddy-system
+Live: https://davedellaquila.github.io/buddy-system/
 Build: `build.py` generates `index.html` from `buddies.json` + `plans.json`.
 
 ---
