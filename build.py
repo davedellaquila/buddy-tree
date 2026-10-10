@@ -129,9 +129,10 @@ body{padding:0}
 .cl-row{display:flex;gap:12px;align-items:flex-start;padding:14px 4px;border-bottom:1px solid var(--border2)}
 .cl-ic{font-size:15px;line-height:1.45;flex:0 0 auto;width:22px;text-align:center}
 .cl-body{flex:1;min-width:0}
-.cl-head{font-size:14px;font-weight:600;color:var(--text)}
+.cl-head{display:flex;align-items:baseline;gap:12px;font-size:14px;font-weight:600;color:var(--text)}
 .cl-diff{font-size:12.5px;color:var(--muted);margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.cl-time{font-size:12px;color:var(--faint);white-space:nowrap;flex:0 0 auto;padding-top:3px}
+.cl-title{flex:1;min-width:0}
+.cl-time{font-size:12px;color:var(--faint);white-space:nowrap;font-weight:400;flex:0 0 auto}
 #journal-bar .jtime{color:var(--faint);font-size:11px;margin-left:6px}
 .pdrop{border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;color:var(--muted);font-size:13px;margin-top:10px;cursor:pointer}
 .pdrop.over{border-color:var(--accent);background:var(--wash);color:var(--text)}
@@ -166,10 +167,16 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 .brow:hover .ctog.has-kids{display:inline-flex}
 .ctog.has-kids.collapsed{transform:rotate(-90deg)}
 #field-settings{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2000;
-  background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;width:320px;max-height:80vh;overflow:auto;
-  box-shadow:0 12px 40px var(--scrim);display:none}
-#field-settings.show{display:block}
-#field-settings h3{margin:0 0 12px;font-size:14px}
+  background:var(--panel);border:1px solid var(--border);border-radius:12px;width:340px;max-height:80vh;
+  box-shadow:0 12px 40px var(--scrim);display:none;overflow:hidden}
+#field-settings.show{display:flex;flex-direction:column}
+#field-settings .fset-head{padding:20px 20px 0;cursor:move;user-select:none;-webkit-user-select:none;flex:0 0 auto}
+#field-settings .fset-head h3{margin:0 0 12px;font-size:14px}
+#field-settings .fset-body{padding:0 20px;overflow-y:auto;flex:1 1 auto;min-height:0}
+#field-settings .fset-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:space-between;align-items:center;background:var(--panel);flex:0 0 auto}
+#field-settings .fset-resize{position:absolute;right:3px;bottom:3px;width:14px;height:14px;cursor:nwse-resize;opacity:.55;
+  background:linear-gradient(135deg,transparent 55%,var(--muted) 55%);border-radius:0 0 8px 0}
+#field-settings .fset-resize:hover{opacity:1}
 .fset-row{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--border2);border-radius:8px;margin-bottom:6px;background:var(--bg);cursor:grab}
 .fset-row.dragging{opacity:.5}
 .fset-row .fh{color:var(--muted);cursor:grab;font-size:14px}
@@ -565,11 +572,11 @@ function renderChangelog(){
       return '<div class="cl-row">'
         + '<span class="cl-ic" aria-hidden="true">' + ic + '</span>'
         + '<div class="cl-body">'
-        + '<div class="cl-head">' + escHtml(c.desc) + '</div>'
+        + '<div class="cl-head"><span class="cl-title">' + escHtml(c.desc) + '</span>'
+        + '<span class="cl-time" title="' + escHtml(d.toLocaleString()) + '">'
+        + escHtml(d.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'})) + '</span></div>'
         + (diff ? '<div class="cl-diff">' + diff + '</div>' : '')
         + '</div>'
-        + '<span class="cl-time" title="' + escHtml(d.toLocaleString()) + '">'
-        + escHtml(d.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'})) + '</span>'
         + '</div>';
     }).join('');
     return '<h3 class="cl-day">' + escHtml(dayLabel(g.date)) + '</h3>'
@@ -729,18 +736,69 @@ function renderSettingChecks(){
     });
   });
 }
+function initFsetChrome(m){
+  function applyGeom(){
+    const g = S.fsetGeom || {};
+    if (g.w) m.style.width = g.w + 'px';
+    if (g.h) { m.style.height = g.h + 'px'; m.style.maxHeight = 'none'; }
+    if (g.x !== undefined && g.y !== undefined) {
+      m.style.left = g.x + 'px'; m.style.top = g.y + 'px'; m.style.transform = 'none';
+    }
+  }
+  applyGeom();
+  m._applyGeom = applyGeom;
+  const head = m.querySelector('#fset-drag'), rz = m.querySelector('#fset-resize');
+  head.addEventListener('mousedown', e => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    const r = m.getBoundingClientRect();
+    m.style.left = r.left + 'px'; m.style.top = r.top + 'px'; m.style.transform = 'none';
+    const ox = e.clientX - r.left, oy = e.clientY - r.top;
+    const mv = ev => {
+      m.style.left = Math.max(0, Math.min(window.innerWidth - 120, ev.clientX - ox)) + 'px';
+      m.style.top = Math.max(0, Math.min(window.innerHeight - 80, ev.clientY - oy)) + 'px';
+    };
+    const up = () => {
+      window.removeEventListener('mousemove', mv); window.removeEventListener('mouseup', up);
+      const rr = m.getBoundingClientRect();
+      S.fsetGeom = Object.assign(S.fsetGeom || {}, {x: Math.round(rr.left), y: Math.round(rr.top)});
+      save();
+    };
+    window.addEventListener('mousemove', mv); window.addEventListener('mouseup', up);
+  });
+  rz.addEventListener('mousedown', e => {
+    if (e.button !== 0) return;
+    e.preventDefault(); e.stopPropagation();
+    const r = m.getBoundingClientRect(), sx = e.clientX, sy = e.clientY;
+    const mv = ev => {
+      m.style.width = Math.max(300, Math.min(window.innerWidth - 40, r.width + ev.clientX - sx)) + 'px';
+      m.style.height = Math.max(220, Math.min(window.innerHeight - 40, r.height + ev.clientY - sy)) + 'px';
+      m.style.maxHeight = 'none';
+    };
+    const up = () => {
+      window.removeEventListener('mousemove', mv); window.removeEventListener('mouseup', up);
+      const rr = m.getBoundingClientRect();
+      S.fsetGeom = Object.assign(S.fsetGeom || {}, {w: Math.round(rr.width), h: Math.round(rr.height)});
+      save();
+    };
+    window.addEventListener('mousemove', mv); window.addEventListener('mouseup', up);
+  });
+}
 function openFieldSettings(){
   let m = document.getElementById('field-settings');
   if (!m) {
     m = document.createElement('div'); m.id = 'field-settings';
-    m.innerHTML = '<h3>Buddy fields</h3><p class="fineprint" style="margin-bottom:12px">Drag to reorder. Uncheck to hide.</p><div id="fset-list"></div>'
+    m.innerHTML = '<div class="fset-head" id="fset-drag"><h3>Buddy fields</h3><p class="fineprint" style="margin-bottom:12px">Drag to reorder. Uncheck to hide.</p></div>'
+      + '<div class="fset-body"><div id="fset-list"></div>'
       + '<h3 style="margin-top:18px">Main views</h3><p class="fineprint" style="margin-bottom:12px">Drag to reorder. Number keys 1–9 follow this order.</p><div id="vset-list"></div>'
-      + '<div id="fset-settings" style="margin-top:12px"></div>'
-      + '<div style="margin-top:12px;display:flex;gap:8px;justify-content:space-between;align-items:center">'
+      + '<div id="fset-settings" style="margin-top:12px"></div></div>'
+      + '<div class="fset-footer">'
       + '<div style="display:flex;gap:8px"><button class="linkbtn" id="fset-reset" title="Restore all settings to factory defaults">Reset to Factory Defaults</button>'
       + '<button class="linkbtn" id="fset-update" title="Save current settings as the new factory defaults">Update Factory Defaults</button></div>'
-      + '<button class="linkbtn" id="fset-close">Done</button></div>';
+      + '<button class="linkbtn" id="fset-close">Done</button></div>'
+      + '<div class="fset-resize" id="fset-resize" title="Drag to resize"></div>';
     document.body.appendChild(m);
+    initFsetChrome(m);
     m.querySelector('#fset-close').addEventListener('click', () => m.classList.remove('show'));
     renderSettingChecks();
     m.querySelector('#fset-reset').addEventListener('click', () => {

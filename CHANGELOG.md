@@ -3,6 +3,13 @@
 All notable changes to the Buddies dashboard and buddy system. Newest first.
 `FEATURES.md` describes the current state; this file describes how it got there.
 
+## 2026-10-10 (Changelog row layout)
+
+### Changed
+- **Changelog rows stack title over detail** — the timestamp moved to the
+  end of the title line (small, muted); the diff sits underneath, flush
+  left with the title, full width. No more three-column jaggedness.
+
 ## 2026-10-10 (Theme setting)
 
 ### Fixed
