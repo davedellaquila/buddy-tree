@@ -306,19 +306,24 @@ body.standalone .sa-bar{display:flex}
 #view-buddy.panel.active,#view-buddy.sheet.active{display:block}
 #main .view{display:none}
 #main .view.active{display:block}
+#main #view-project.active{display:flex;flex-direction:column;min-height:calc(100vh - 116px)}
 #bp-close{display:none}
 #view-buddy.panel #bp-close,#view-buddy.sheet #bp-close{display:inline-block}
-/* ---------- buddy homepage embed (Project view) ---------- */
-#homepage-wrap{display:flex;flex-direction:column;height:100%;min-height:0;margin:0}
-#main.homepage-mode{padding:0}
-#main.homepage-mode #view-buddy{padding:0}
-#homepage-bar{display:flex;align-items:center;gap:10px;padding:10px 16px 8px;color:var(--muted);font-size:13px}
-#homepage-title{font-weight:600;color:var(--ink)}
+/* ---------- Project view: stat tiles + buddy homepage embed ---------- */
+#project-tiles{display:flex;gap:14px;margin:2px 0 18px;flex-wrap:wrap}
+.ptile{flex:1 1 170px;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 18px 12px;position:relative;overflow:hidden}
+.ptile::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--tint)}
+.ptile-label{font-size:11px;letter-spacing:.14em;font-weight:700;color:var(--muted)}
+.ptile-num{font-size:42px;font-weight:800;color:var(--tint);line-height:1.25}
+.ptile-sub{font-size:13px;color:var(--muted)}
+#homepage-wrap{flex:1;display:flex;flex-direction:column;min-height:480px}
+#homepage-bar{display:flex;align-items:center;gap:10px;padding:2px 2px 10px;color:var(--muted);font-size:13px}
+#homepage-title{font-weight:600;color:var(--text)}
 #homepage-meta{font-size:12px}
 #homepage-src{margin-left:auto;font-size:13px;color:var(--accent);text-decoration:none;white-space:nowrap}
 #homepage-src:hover{text-decoration:underline}
-#homepage-frame{flex:1;width:100%;min-height:0;border:0;border-radius:0;background:#fff;display:block}
-@media (max-width:760px){#homepage-wrap{height:100%}}
+#homepage-frame{flex:1;width:100%;min-height:0;border:1px solid var(--border);border-radius:12px;background:#fff;display:block}
+@media (max-width:760px){#main #view-project.active{min-height:calc(100vh - 88px)}}
 
 .pstrip img{height:150px;border-radius:10px;border:1px solid var(--border);display:block}
 .pstrip img:hover{border-color:var(--accent)}
@@ -962,69 +967,87 @@ function initPanelResize(){
     save(); sx = null;
   });
 }
-function hideHomepage(){
-  const wrap = document.getElementById('homepage-wrap');
-  if (wrap) wrap.style.display = 'none';
-  const home = document.getElementById('buddy-home');
-  if (home) home.style.display = '';
-  const mn = document.getElementById('main');
-  if (mn) mn.classList.remove('homepage-mode');
+function projTile(label, num, tint, sub){
+  const t = document.createElement('div');
+  t.className = 'ptile';
+  t.style.setProperty('--tint', tint);
+  const l = document.createElement('div');
+  l.className = 'ptile-label';
+  l.textContent = label;
+  const n = document.createElement('div');
+  n.className = 'ptile-num';
+  n.textContent = String(num);
+  const s = document.createElement('div');
+  s.className = 'ptile-sub';
+  s.textContent = sub;
+  t.appendChild(l); t.appendChild(n); t.appendChild(s);
+  return t;
 }
-function renderHomepage(b){
-  hideHomepage();
-  const bar2 = document.getElementById('journal-bar');
-  if (bar2) bar2.classList.remove('show');
-  const mn = document.getElementById('main');
-  if (mn) mn.classList.add('homepage-mode');
-  const vb = document.getElementById('view-buddy');
-  const home = document.getElementById('buddy-home');
-  if (home) home.style.display = 'none';
-  let wrap = document.getElementById('homepage-wrap');
-  if (!wrap) {
-    wrap = document.createElement('div');
+function renderProjectView(){
+  const pv = document.getElementById('view-project');
+  if (!pv) return;
+  const b = byId[projectId()] || {};
+  pv.innerHTML = '';
+  const attn = b.attention || [];
+  const unseen = attn.filter(a => !S.seen[a.id]).length;
+  const weekAgo = Date.now() - 7 * 864e5;
+  const fresh = attn.filter(a => { const t = Date.parse(a.date || ''); return t && t >= weekAgo; }).length;
+  const cleared = attn.filter(a => S.seen[a.id]).length;
+  const tiles = document.createElement('div');
+  tiles.id = 'project-tiles';
+  tiles.appendChild(projTile('TO REVIEW', unseen, '#d43d2a', 'Needs your attention'));
+  tiles.appendChild(projTile('NEW', fresh, '#d97a1f', 'Added in the last 7 days'));
+  tiles.appendChild(projTile('CLEARED', cleared, '#2f9e44', 'Reviewed & cleared'));
+  pv.appendChild(tiles);
+  if (b.homepage) {
+    const bar2 = document.getElementById('journal-bar');
+    if (bar2) bar2.classList.remove('show');
+    const wrap = document.createElement('div');
     wrap.id = 'homepage-wrap';
-    vb.appendChild(wrap);
+    const bar = document.createElement('div');
+    bar.id = 'homepage-bar';
+    const title = document.createElement('span');
+    title.id = 'homepage-title';
+    title.textContent = (b.icon ? b.icon + ' ' : '') + b.name;
+    bar.appendChild(title);
+    const meta = document.createElement('span');
+    meta.id = 'homepage-meta';
+    meta.textContent = 'homepage' + (b.homepageSynced ? ' \u00b7 mirrored ' + b.homepageSynced : '');
+    bar.appendChild(meta);
+    if (b.homepageSource) {
+      const a = document.createElement('a');
+      a.id = 'homepage-src';
+      a.href = b.homepageSource;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = 'Open on Muse \u2197';
+      bar.appendChild(a);
+    }
+    const frame = document.createElement('iframe');
+    frame.id = 'homepage-frame';
+    frame.src = b.homepage;
+    frame.title = b.name + ' homepage';
+    frame.addEventListener('load', () => {
+      try {
+        frame.contentWindow.addEventListener('keydown', e => {
+          if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) {
+            document.dispatchEvent(new KeyboardEvent('keydown', {key: e.key, bubbles: true, cancelable: true}));
+            e.preventDefault();
+          }
+        });
+      } catch (err) {}
+    });
+    wrap.appendChild(bar);
+    wrap.appendChild(frame);
+    pv.appendChild(wrap);
+  } else {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'display:flex;align-items:center;justify-content:center;height:40vh;color:var(--muted);font-size:15px';
+    empty.textContent = 'No homepage for this project.';
+    pv.appendChild(empty);
   }
-  wrap.style.display = 'flex';
-  wrap.innerHTML = '';
-  const bar = document.createElement('div');
-  bar.id = 'homepage-bar';
-  const title = document.createElement('span');
-  title.id = 'homepage-title';
-  title.textContent = (b.icon ? b.icon + ' ' : '') + b.name;
-  bar.appendChild(title);
-  const meta = document.createElement('span');
-  meta.id = 'homepage-meta';
-  meta.textContent = 'homepage' + (b.homepageSynced ? ' · mirrored ' + b.homepageSynced : '');
-  bar.appendChild(meta);
-  if (b.homepageSource) {
-    const a = document.createElement('a');
-    a.id = 'homepage-src';
-    a.href = b.homepageSource;
-    a.target = '_blank';
-    a.rel = 'noopener';
-    a.textContent = 'Open on Muse ↗';
-    bar.appendChild(a);
-  }
-  const frame = document.createElement('iframe');
-  frame.id = 'homepage-frame';
-  frame.src = b.homepage;
-  frame.title = b.name + ' homepage';
-  frame.addEventListener('load', () => {
-    try {
-      frame.contentWindow.addEventListener('keydown', e => {
-        if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) {
-          document.dispatchEvent(new KeyboardEvent('keydown', {key: e.key, bubbles: true, cancelable: true}));
-          e.preventDefault();
-        }
-      });
-    } catch (err) {}
-  });
-  wrap.appendChild(bar);
-  wrap.appendChild(frame);
 }
 function renderBuddy(id){
-  hideHomepage();
   const b = byId[id]; if(!b) return;
   const items = (b.attention || []).slice().sort((x,y) => (S.seen[x.id]?1:0) - (S.seen[y.id]?1:0));
   let arts = '';
@@ -1508,7 +1531,6 @@ let dragId = null;
   });
 })();
 function renderPlan(id){
-  hideHomepage();
   const p = planById[id]; if(!p) return;
   let docs = '';
   (p.docs || []).forEach(d => { docs += artRow(ICON_LINK, d.label, 'Related document', d.url); });
@@ -1570,31 +1592,27 @@ function show(sel, push){
     vb.classList.toggle('sheet', window.innerWidth < 640);
     renderBuddy(sel.slice(6));
   } else {
-    document.querySelectorAll('#main .view').forEach(v => v.classList.remove('active', 'panel', 'sheet'));
+    // View-menu clicks switch the center view but never dismiss the buddy
+    // detail panel: its visibility is controlled only by buddy selection.
+    const overlayOpen = vb.classList.contains('panel') || vb.classList.contains('sheet');
+    document.querySelectorAll('#main .view').forEach(v => {
+      if (v === vb && overlayOpen) return;
+      v.classList.remove('active', 'panel', 'sheet');
+    });
     if (sel === 'view:project') {
-      const pb = byId[projectId()] || {};
-      if (pb.homepage) {
-        vb.classList.add('active');
-        vb.style.width = '';
-        renderHomepage(pb);
-      } else {
-        hideHomepage();
-        vb.classList.add('active');
-        vb.style.width = '';
-        const home = document.getElementById('buddy-home');
-        if (home) {
-          home.style.display = '';
-          home.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:60vh;color:var(--muted);font-size:15px">No homepage for this project.</div>';
-        }
-      }
+      const pv = document.getElementById('view-project');
+      if (pv) { pv.classList.add('active'); renderProjectView(); }
     } else if (sel.startsWith('view:')) {
       const ev = document.getElementById('view-' + sel.slice(5));
       if (ev) ev.classList.add('active');
       if (sel === 'view:changelog') renderChangelog();
     } else if (sel.startsWith('plan:')) {
+      closeDetail();
+      vb.style.width = '';
       vb.classList.add('active');
       renderPlan(sel.slice(5));
     } else {
+      vb.style.width = '';
       vb.classList.add('active');
       renderBuddy(sel.slice(6));
     }

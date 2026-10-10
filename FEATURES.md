@@ -39,8 +39,10 @@ Build: `build.py` generates `index.html` from `buddies.json` + `plans.json`.
 - **Project view** — shows the current project's homepage in the center;
   clicking a sidebar buddy selects it as the current project. A buddy with
   a `homepage` field loads that page in a full-center frame (with an "Open
-  on Muse ↗" link to its canonical URL); buddies without one show the
-  built-in detail page.
+  on Muse ↗" link to its canonical URL); buddies without one show a
+  "No homepage for this project" empty state. Opens with stat tiles: TO REVIEW / NEW / CLEARED
+  attention counts. Picking a view-menu option never dismisses the
+  right-side buddy panel.
 - **Horizontally resizable** — drag the edge, 220–560 px, width remembered
   per device.
 - **Drag-to-reparent** — drag any sidebar buddy onto a tree node or

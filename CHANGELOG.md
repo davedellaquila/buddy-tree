@@ -3,6 +3,32 @@
 All notable changes to the Buddies dashboard and buddy system. Newest first.
 `FEATURES.md` describes the current state; this file describes how it got there.
 
+## 2026-10-10 (Panel persistence, project tiles)
+
+### Fixed
+- **View-menu clicks no longer dismiss the buddy panel** — picking any
+  option in the top view menu (Tree, Projects, Plans, Manifest, Project,
+  Changelog) now leaves the right-side detail panel exactly as it was.
+  Panel visibility is controlled only by buddy selection (click/Escape/✕).
+  The Project view renders into its own dedicated center container, so a
+  homepage and an open panel coexist.
+- **Narrow center after panel resize** — plan and buddy center views no
+  longer inherit the resized panel's inline width.
+
+### Added
+- **Project stat tiles** — the Project view now opens with three tiles:
+  TO REVIEW (unseen attention items), NEW (added in the last 7 days),
+  CLEARED (reviewed & cleared), in the card style Dave picked. The data
+  behind the tiles is a first guess and easy to rewire.
+
+## 2026-10-10 (Repo renamed buddy-tree → buddy-system)
+
+### Changed
+- **Repo renamed** — `davedellaquila/buddy-tree` is now
+  `davedellaquila/buddy-system`; the live dashboard moved to
+  https://davedellaquila.github.io/buddy-system/ (the old URL 404s).
+  Code, registry, and docs references updated.
+
 ## 2026-10-10 (Buddy homepages)
 
 ### Added
