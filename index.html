@@ -798,7 +798,7 @@ function renderNav(){
       + '<span class="bkind">'+kind+'</span></button>';
     (kidsOf[id] || []).forEach(c => row(c.id, depth+1));
   }
-  ROOT_ORDER.filter(id => { const b = byId[id]; const p = b ? effParent(b) : null; return p === null || p === 'project-buddy'; })
+  ROOT_ORDER.filter(id => { const b = byId[id]; const p = b ? effParent(b) : null; return p === null; })
     .forEach(id => row(id, 0));
   document.getElementById('buddy-nav').innerHTML = h;
   if (Object.keys(S.parents).length) {
@@ -825,7 +825,7 @@ function closeDetail(){
 const FIELD_DEFS = [
   {id:'ingest', label:'Ingest'},
   {id:'attention', label:'Needs your attention'},
-  {id:'mission', label:'What it does'},
+  {id:'mission', label:'About'},
   {id:'photos', label:'Photos'},
   {id:'tree', label:'The Buddy Tree'},
   {id:'artifacts', label:'Artifacts'},
@@ -1040,7 +1040,7 @@ function renderBuddy(id){
     + '<textarea class="notes" id="bp-ingest" placeholder="Dump what’s in your head about '+escHtml(dispName(b))+'…"></textarea>'
     + '<div style="margin-top:8px"><span class="fineprint" id="ingest-status"></span></div>'
     + '<div id="ingest-feed" style="margin-top:8px"></div></div>'
-    + '<div class="bp-sec" data-field="mission"><h3>What it does<span class="info-tip" data-tip="The mission is the brief\u2019s executive summary \u2014 tweak it through the buddy\u2019s chat thread and it updates everywhere.">\u24d8</span></h3><p class="bp-mission">'+escHtml(b.mission)+'</p></div>'
+    + '<div class="bp-sec" data-field="mission"><h3>About<span class="info-tip" data-tip="The mission is the brief\u2019s executive summary \u2014 tweak it through the buddy\u2019s chat thread and it updates everywhere.">\u24d8</span></h3><p class="bp-mission">'+escHtml(b.mission)+'</p></div>'
     + (unseenCount > 0 ? '<div class="bp-sec" data-field="attention"><h3>Needs your attention</h3>'+attn+'</div>' : '')
     + photos
     + (id === 'project-buddy'
@@ -1054,7 +1054,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Saved to the buddy’s repo (docs/notes.md) — visible to everyone with repo access.">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Shared notes…"></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261010.0002</div>'
+    + '<div class="bp-build">Build 20261009.1704</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -1500,7 +1500,7 @@ function renderPlan(id){
     + '<p class="fineprint">Saved on this device. (For your eyes only)</p></div>'
     + '<div class="bp-sec"><h3>Shared notes<span class="info-tip" data-tip="Visible to everyone with access to this project.">\u24d8</span></h3><textarea class="notes" id="bp-shared" placeholder="Shared notes\u2026 (visible to everyone with access)">'+escHtml((S.planShared||{})[id]||'')+'</textarea>'
     + '<p class="fineprint">Shared — visible to everyone with access.</p></div>'
-    + '<div class="bp-build">Build 20261010.0002</div>'
+    + '<div class="bp-build">Build 20261009.1704</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;

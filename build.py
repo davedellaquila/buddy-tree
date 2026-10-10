@@ -272,6 +272,7 @@ body.standalone .sa-bar{display:flex}
 .bp-tagline{color:#8b949e;font-size:15px;margin:8px 0 0}
 .bp-sec{margin-top:30px}
 .bp-sec>h3{font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:#8b949e;margin:0 0 12px}
+.bp-sec[data-field="attention"]>h3{color:#f0b429}
 .bp-mission{font-size:15.5px;line-height:1.7;background:#161b22;border:1px solid #30363d;
   border-radius:12px;padding:16px 18px;margin:0}
 .art-row{display:flex;align-items:center;gap:14px;padding:11px 14px;border:1px solid #21262d;
@@ -457,7 +458,7 @@ function renderNav(){
       + '<span class="bkind">'+kind+'</span></button>';
     (kidsOf[id] || []).forEach(c => row(c.id, depth+1));
   }
-  ROOT_ORDER.filter(id => { const b = byId[id]; const p = b ? effParent(b) : null; return p === null || p === 'project-buddy'; })
+  ROOT_ORDER.filter(id => { const b = byId[id]; const p = b ? effParent(b) : null; return p === null; })
     .forEach(id => row(id, 0));
   document.getElementById('buddy-nav').innerHTML = h;
   if (Object.keys(S.parents).length) {
@@ -484,7 +485,7 @@ function closeDetail(){
 const FIELD_DEFS = [
   {id:'ingest', label:'Ingest'},
   {id:'attention', label:'Needs your attention'},
-  {id:'mission', label:'What it does'},
+  {id:'mission', label:'About'},
   {id:'photos', label:'Photos'},
   {id:'tree', label:'The Buddy Tree'},
   {id:'artifacts', label:'Artifacts'},
@@ -699,7 +700,7 @@ function renderBuddy(id){
     + '<textarea class="notes" id="bp-ingest" placeholder="Dump what\u2019s in your head about '+escHtml(dispName(b))+'\u2026"></textarea>'
     + '<div style="margin-top:8px"><span class="fineprint" id="ingest-status"></span></div>'
     + '<div id="ingest-feed" style="margin-top:8px"></div></div>'
-    + '<div class="bp-sec" data-field="mission"><h3>What it does<span class="info-tip" data-tip="The mission is the brief\\u2019s executive summary \\u2014 tweak it through the buddy\\u2019s chat thread and it updates everywhere.">\\u24d8</span></h3><p class="bp-mission">'+escHtml(b.mission)+'</p></div>'
+    + '<div class="bp-sec" data-field="mission"><h3>About<span class="info-tip" data-tip="The mission is the brief\\u2019s executive summary \\u2014 tweak it through the buddy\\u2019s chat thread and it updates everywhere.">\\u24d8</span></h3><p class="bp-mission">'+escHtml(b.mission)+'</p></div>'
     + (unseenCount > 0 ? '<div class="bp-sec" data-field="attention"><h3>Needs your attention</h3>'+attn+'</div>' : '')
     + photos
     + (id === 'project-buddy'
