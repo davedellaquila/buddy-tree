@@ -61,7 +61,7 @@ body{background:var(--bg);color:var(--text)}
 body{padding:0}
 .app{display:flex;min-height:100vh;align-items:stretch}
 #sidebar{width:308px;flex:0 0 308px;background:var(--bg);border-right:1px solid var(--border2);
-  padding:0 14px 32px;position:sticky;top:0;height:100vh;overflow-y:auto}
+  padding:0 14px 32px;position:sticky;top:0;height:100vh;overflow-y:auto;overflow-x:hidden;overflow-wrap:break-word}
 #main{flex:1;min-width:0;padding:36px 32px 80px}
 .brand{padding:22px 8px 14px;background:var(--bg)}
 .sb-sticky-head{position:sticky;top:0;z-index:5;background:var(--bg);padding-bottom:4px;border-bottom:1px solid var(--border)}
@@ -301,7 +301,7 @@ body.standalone .sa-bar{display:flex}
   /* Bottom sheet panel — taller, grabbable */
   #view-buddy.sheet{position:fixed;left:0;right:0;bottom:0;top:6%;z-index:96;
     background:var(--bg);border-top:1px solid var(--border);border-radius:20px 20px 0 0;
-    overflow-y:auto;padding:8px 18px 60px;box-shadow:0 -12px 40px rgba(0,0,0,.35);
+    overflow-y:auto;overflow-x:hidden;padding:8px 18px 60px;box-shadow:0 -12px 40px rgba(0,0,0,.35);
     -webkit-overflow-scrolling:touch}
   #view-buddy.sheet::before{content:'';display:block;width:48px;height:5px;border-radius:3px;
     background:var(--border);margin:4px auto 14px;flex:none}
@@ -348,13 +348,13 @@ body.standalone .sa-bar{display:flex}
   #view-nav .navbtn{flex:1}
   .node{width:172px}
   #view-buddy.panel{position:fixed;top:0;right:0;bottom:0;width:min(380px,92vw);z-index:60;
-    background:var(--bg);border-left:1px solid var(--border);overflow-y:auto;
+    background:var(--bg);border-left:1px solid var(--border);overflow-y:auto;overflow-x:hidden;
     padding:20px 18px 48px;box-shadow:-8px 0 32px var(--shadow)}
 }
 /* ---- Large: >1100px (desktop) ---- */
 @media (min-width:1101px){
   #view-buddy.panel{position:fixed;top:0;right:0;bottom:0;width:400px;z-index:60;
-    background:var(--bg);border-left:1px solid var(--border);overflow-y:auto;
+    background:var(--bg);border-left:1px solid var(--border);overflow-y:auto;overflow-x:hidden;
     padding:24px 20px 48px;box-shadow:-8px 0 32px var(--shadow)}
 }
 #view-buddy.panel.active,#view-buddy.sheet.active{display:block}
