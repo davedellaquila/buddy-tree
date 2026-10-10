@@ -3,6 +3,17 @@
 All notable changes to the Buddies dashboard and buddy system. Newest first.
 `FEATURES.md` describes the current state; this file describes how it got there.
 
+## 2026-10-10 (Tiles: attention on Projects, types on Changelog)
+
+### Changed
+- **Attention tiles moved to the Projects page** (Dave's idea) — the
+  TO REVIEW / NEW / CLEARED tiles now sit atop the Projects view with
+  global counts across all buddies, instead of the Project Homepage.
+- **Changelog tiles show change types** (Dave's idea) — the Changelog now
+  opens with one tile per change type present in the journal (NOTE EDITS,
+  PHOTOS, MOVES, RENAMES, BRAND), each with its count, replacing the
+  attention tiles there.
+
 ## 2026-10-10 (Panel persistence, project tiles)
 
 ### Fixed

@@ -599,23 +599,17 @@ function dayLabel(d){
 function renderChangelog(){
   const el = document.getElementById('view-changelog');
   if (!el) return;
-  // Global attention summary tiles
-  let unseen = 0, fresh = 0, cleared = 0;
-  const weekAgo = Date.now() - 7 * 864e5;
-  Object.values(byId).forEach(b => {
-    (b.attention || []).forEach(a => {
-      if (S.seen[a.id]) cleared++;
-      else unseen++;
-      const t = Date.parse(a.date || '');
-      if (t && t >= weekAgo) fresh++;
-    });
-  });
+  // Change-type summary tiles
+  const TYPE_META = {notes:['NOTE EDITS','#1f6feb'], photos:['PHOTOS','#8250df'], move:['MOVES','#d97a1f'], rename:['RENAMES','#2f9e44'], brand:['BRAND','#cf222e']};
+  const typeCounts = {};
+  (S.journal || []).forEach(c => { const t = (c && c.type) || 'other'; typeCounts[t] = (typeCounts[t] || 0) + 1; });
+  const typeOrder = Object.keys(TYPE_META).filter(t => typeCounts[t]).concat(Object.keys(typeCounts).filter(t => !TYPE_META[t]));
+  const typeTiles = typeOrder.map(t => {
+    const m = TYPE_META[t] || [t.toUpperCase(), '#57606a'];
+    return tileHtml(m[0], typeCounts[t], m[1], 'changes logged');
+  }).join('');
   let h = '<section class="changelog" style="margin:24px auto 0;max-width:760px">'
-    + '<div id="changelog-tiles" style="display:flex;gap:12px;margin-bottom:20px">'
-    + tileHtml('TO REVIEW', unseen, '#d43d2a', 'Needs your attention')
-    + tileHtml('NEW', fresh, '#d97a1f', 'Added in the last 7 days')
-    + tileHtml('CLEARED', cleared, '#2f9e44', 'Reviewed & cleared')
-    + '</div>'
+    + (typeTiles ? '<div id="changelog-tiles" style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">' + typeTiles + '</div>' : '')
     + '<h2>Changelog</h2>'
     + '<p class="sub">Every change made in this dashboard, newest first.</p>';
   const js = (S.journal || []).slice().reverse();
@@ -987,21 +981,6 @@ function initPanelResize(){
     save(); sx = null;
   });
 }
-function projTile(label, num, tint, sub){
-  const t = document.createElement('div');
-  t.className = 'ptile';
-  t.style.setProperty('--tint', tint);  const l = document.createElement('div');
-  l.className = 'ptile-label';
-  l.textContent = label;
-  const n = document.createElement('div');
-  n.className = 'ptile-num';
-  n.textContent = String(num);
-  const s = document.createElement('div');
-  s.className = 'ptile-sub';
-  s.textContent = sub;
-  t.appendChild(l); t.appendChild(n); t.appendChild(s);
-  return t;
-}
 function tileHtml(label, num, tint, sub){
   return '<div class="ptile" style="--tint:' + tint + ';flex:1">'
     + '<div class="ptile-label">' + escHtml(label) + '</div>'
@@ -1317,7 +1296,22 @@ function renderOrgTree(){
 }
 function renderProjects(){
   if (!S.projCollapsed || typeof S.projCollapsed !== 'object') S.projCollapsed = {};
-  let s = '<section class="projects-view" style="margin-top:24px"><h2>Projects by Buddy</h2>'
+  let unseen = 0, fresh = 0, cleared = 0;
+  const weekAgo = Date.now() - 7 * 864e5;
+  Object.values(byId).forEach(b => {
+    (b.attention || []).forEach(a => {
+      if (S.seen[a.id]) cleared++; else unseen++;
+      const t = Date.parse(a.date || '');
+      if (t && t >= weekAgo) fresh++;
+    });
+  });
+  let s = '<section class="projects-view" style="margin-top:24px">'
+    + '<div id="project-tiles">'
+    + tileHtml('TO REVIEW', unseen, '#d43d2a', 'Needs your attention')
+    + tileHtml('NEW', fresh, '#d97a1f', 'Added in the last 7 days')
+    + tileHtml('CLEARED', cleared, '#2f9e44', 'Reviewed & cleared')
+    + '</div>'
+    + '<h2>Projects by Buddy</h2>'
     + '<p class="sub">Every buddy, in hierarchy order, with its current status.</p><div class="proj-list">';
   (function walk(id, depth){
     const b = byId[id]; if (!b) return;

@@ -40,9 +40,12 @@ Build: `build.py` generates `index.html` from `buddies.json` + `plans.json`.
   clicking a sidebar buddy selects it as the current project. A buddy with
   a `homepage` field loads that page in a full-center frame (with an "Open
   on Muse ↗" link to its canonical URL); buddies without one show a
-  "No homepage for this project" empty state. Opens with stat tiles: TO REVIEW / NEW / CLEARED
-  attention counts. Picking a view-menu option never dismisses the
-  right-side buddy panel.
+  "No homepage for this project" empty state. Picking a view-menu option
+  never dismisses the right-side buddy panel.
+- **Projects view** — hierarchical outline of every buddy with its status;
+  opens with global attention tiles (TO REVIEW / NEW / CLEARED across all
+  buddies). Clicking a row toggles its section and loads the buddy in the
+  right-side panel.
 - **Horizontally resizable** — drag the edge, 220–560 px, width remembered
   per device.
 - **Drag-to-reparent** — drag any sidebar buddy onto a tree node or
@@ -90,7 +93,9 @@ Build: `build.py` generates `index.html` from `buddies.json` + `plans.json`.
   at once.
 - "What changed?" lists each entry with old → new values; expanding it
   marks entries reviewed so the sticky bar only returns for new changes.
-- The **Changelog** main view keeps the full history permanently.
+- The **Changelog** main view keeps the full history permanently, opening
+  with one summary tile per change type present (note edits, photos,
+  moves, renames, brand), each with its count.
 
 ## GitHub integration
 
