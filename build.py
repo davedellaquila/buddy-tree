@@ -845,7 +845,7 @@ function isFieldVisible(fid){
 }
 const SETTING_DEFS = [
   {id:'hideBuddyWord', label:'Hide the word “Buddy” in names', type:'bool', def:false},
-  {id:'autoOpenPanel', label:'Open detail panel when clicking a project row', type:'bool', def:false, tip:'When off, clicking a project row only selects it — use the \u24d8 info icon to open the detail panel.'},
+  {id:'autoOpenPanel', label:'Always open detail panel on buddy click', type:'bool', def:false, tip:'When off (default), the panel auto-opens in every view EXCEPT Project Homepage — there, use the \u24d8 icon. When on, the panel opens on every click in every view.'},
 ];
 function getSetting(id){
   const def = SETTING_DEFS.find(s => s.id === id);
@@ -2665,16 +2665,21 @@ document.addEventListener('click', e => {
       S.projCollapsed[bid] = !S.projCollapsed[bid];
       save(); renderProjects();
     }
-    // Open the detail panel only if the setting is on (default: off — use the ⓘ icon instead)
-    if (S.autoOpenPanel) openBuddy(projRow.dataset.buddy);
+    // View-aware panel behavior: Projects list is not the homepage view, so rows
+    // open the panel by default (consistent with sidebar clicks in other views).
+    const wantPanel = S.autoOpenPanel || S.view !== 'project';
+    if (wantPanel) openBuddy(projRow.dataset.buddy);
     else selectBuddy(projRow.dataset.buddy);
     return;
   }
   const bb = e.target.closest('[data-buddy]');
   // Don't re-open the buddy when clicking an editable field (e.g. the name)
-  // Clicking a buddy selects it; the panel only opens via the ⓘ icon or when autoOpenPanel is on.
+  // Panel behavior is view-aware: in Project Homepage view, clicking selects only
+  // (use the ⓘ icon for the panel). In other views, clicking opens the panel.
+  // The autoOpenPanel setting overrides to always open.
   if (bb && !e.target.closest('[contenteditable="true"]')) {
-    if (S.autoOpenPanel) openBuddy(bb.dataset.buddy);
+    const wantPanel = S.autoOpenPanel || S.view !== 'project';
+    if (wantPanel) openBuddy(bb.dataset.buddy);
     else selectBuddy(bb.dataset.buddy);
     return;
   }
