@@ -11,6 +11,8 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
   Project Buddy, so every direct child (and its subtree) appeared twice
   (e.g. searching "nan" showed Nancy and Finance twice). Top level now only
   lists parentless buddies; children render once, nested.
+- **"What it does" → "About"** — the mission field's label renamed on the
+  buddy page and in field settings.
 
 ### Added
 - **Per-dump actions** — every ingest dump tile now has edit (✏️) and
