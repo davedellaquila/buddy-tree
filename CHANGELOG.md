@@ -6,6 +6,12 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
 ## 2026-10-10 (Panel persistence, project tiles)
 
 ### Fixed
+- **Views-list selection is independent** — the highlighted view now only
+  changes when the user picks a view (view-menu click or number-key
+  shortcut). Buddy/plan selection and panel open/close never move it;
+  tracked in a dedicated `S.view` instead of deriving it from `S.sel`.
+
+### Fixed
 - **View-menu clicks no longer dismiss the buddy panel** — picking any
   option in the top view menu (Tree, Projects, Plans, Manifest, Project,
   Changelog) now leaves the right-side detail panel exactly as it was.

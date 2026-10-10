@@ -467,7 +467,7 @@ function buildKids(){
 }
 const LS_KEY = 'buddyTree.v3';
 const SB_DEFAULT_W = 308;
-let S = {seen:{}, notes:{}, names:{}, parents:{}, zoom:100, sel:'view:tree'};
+let S = {seen:{}, notes:{}, names:{}, parents:{}, zoom:100, sel:'view:tree', view:'tree'};
 try { Object.assign(S, JSON.parse(localStorage.getItem(LS_KEY) || '{}')); } catch(e) {}
 S.parents = S.parents || {};
 S.zoom = S.zoom || 100;
@@ -534,6 +534,9 @@ function getViewOrder(){
   S.viewOrder = clean;
   return clean;
 }
+// The views-list selection changes ONLY on view interaction (view-menu clicks,
+// number-key shortcuts, initial load). Buddy/plan selection never touches it.
+if (!S.view || VIEW_DEFS.every(v => v[0] !== S.view)) S.view = (typeof S.sel === 'string' && S.sel.indexOf('view:') === 0) ? S.sel.slice(5) : 'tree';
 function projectId(){
   const id = S.projectId;
   return (id && byId[id]) ? id : 'project-buddy';
@@ -649,7 +652,7 @@ function renderChangelog(){
 function renderNav(){
   const views = getViewOrder().map(id => VIEW_DEFS.find(v => v[0] === id)).filter(Boolean);
   document.getElementById('view-nav').innerHTML = views.map(([v,l,ic]) =>
-    '<button class="navbtn'+(S.sel==='view:'+v?' sel':'')+'" data-view="'+v+'"><span class="nic">'+ic+'</span>'+l+'</button>').join('');
+    '<button class="navbtn'+(S.view===v?' sel':'')+'" data-view="'+v+'"><span class="nic">'+ic+'</span>'+l+'</button>').join('');
   const q = (document.getElementById('buddy-search').value || '').toLowerCase().trim();
   const words = q.split(/\s+/).filter(Boolean);
   let h = '';
@@ -1591,7 +1594,9 @@ document.addEventListener('keydown', e => {
 });
 function show(sel, push){
   if (push !== false && S.sel && sel !== S.sel) { navHist.push(S.sel); if (navHist.length > 60) navHist.shift(); }
-  S.sel = sel; save();
+  S.sel = sel;
+  if (sel.indexOf('view:') === 0) S.view = sel.slice(5);
+  save();
   const h = hashFor(sel);
   try { if (typeof location !== 'undefined' && location.hash !== h) location.hash = h; } catch (e) {}
   document.body.classList.toggle('standalone', isStandalone());
