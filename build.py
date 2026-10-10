@@ -2239,7 +2239,7 @@ document.addEventListener('click', e => {
       const bid = pt.dataset.projToggle;
       if (!S.projCollapsed || typeof S.projCollapsed !== 'object') S.projCollapsed = {};
       S.projCollapsed[bid] = !S.projCollapsed[bid];
-      save(); renderProjects(); return;
+      save(); renderProjects();
     }
     openBuddy(projRow.dataset.buddy); return;
   }
