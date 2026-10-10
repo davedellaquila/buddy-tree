@@ -1449,18 +1449,28 @@ function editDump(id, idx, btn){
   const acts = tile.querySelector('.dump-actions');
   if (acts) acts.style.display = 'none';
   textDiv.innerHTML = '<textarea class="notes" style="min-height:90px">' + escHtml(e.body) + '</textarea>'
-    + '<div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-end">'
-    + '<button class="linkbtn" data-ecancel>Cancel</button>'
-    + '<button class="linkbtn" data-esave>Save</button></div>';
+    + '<div class="fineprint" data-dump-status style="margin-top:4px;min-height:16px"></div>';
   const ta = textDiv.querySelector('textarea');
+  const st = textDiv.querySelector('[data-dump-status]');
   ta.focus();
-  textDiv.querySelector('[data-ecancel]').addEventListener('click', function(){ renderIngestFeed(id); });
-  textDiv.querySelector('[data-esave]').addEventListener('click', async function(){
-    const v = ta.value.trim();
-    if (!v) { toast('Dump text is empty.'); return; }
-    try { await saveDumpBody(id, idx, v); toast('Dump updated.'); }
-    catch (err) { toast('Save failed: ' + (err.message || err)); return; }
-    renderIngestFeed(id);
+  ta.selectionStart = ta.selectionEnd = ta.value.length;
+  let t = null;
+  ta.addEventListener('input', function(){
+    clearTimeout(t);
+    if (st) st.textContent = 'Saving…';
+    t = setTimeout(function(){
+      const v = ta.value.trim();
+      if (!v) { if (st) st.textContent = 'Dump text is empty — kept the last saved version.'; return; }
+      saveDumpBody(id, idx, v).then(function(){
+        entries[idx].body = v;
+        if (st) st.textContent = 'Saved ✓';
+      }).catch(function(err){
+        if (st) st.textContent = 'Save failed: ' + (err.message || err);
+      });
+    }, 900);
+  });
+  ta.addEventListener('keydown', function(ev){
+    if (ev.key === 'Escape') { ev.stopPropagation(); renderIngestFeed(id); }
   });
 }
 /* ---------- GitHub repo write-back (photos + shared notes) ---------- */

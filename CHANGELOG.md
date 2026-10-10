@@ -8,10 +8,11 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
 ### Added
 - **Per-dump actions** — every ingest dump tile now has edit (✏️) and
   delete (🗑️) buttons in its upper-right corner (trash on the far right,
-  pencil to its left). Edit opens the full text inline with Save/Cancel;
-  delete asks for confirmation. Both work against the buddy repo's
-  `docs/ingest.md` and the localStorage fallback, preserving timestamps
-  and the file header.
+  pencil to its left). Edit opens the full text inline and auto-saves as
+  you type (debounced, with a Saving…/Saved status line — same treatment
+  as shared notes); delete asks for confirmation. Both work against the
+  buddy repo's `docs/ingest.md` and the localStorage fallback, preserving
+  timestamps and the file header.
 - **No more phantom highlighting** — text selection disabled on the chart
   tiles (was leaving blue selection blocks when panning/zooming).
 - **Sidebar buddy search** — filter the buddy list by keywords (AND match
