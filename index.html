@@ -796,7 +796,7 @@ function renderNav(){
       + '<span class="bkind">'+kind+'</span></button>';
     (kidsOf[id] || []).forEach(c => row(c.id, depth+1));
   }
-  ROOT_ORDER.filter(id => { const b = byId[id]; const p = b ? effParent(b) : null; return p === null || p === 'project-buddy'; })
+  ROOT_ORDER.filter(id => { const b = byId[id]; const p = b ? effParent(b) : null; return p === null; })
     .forEach(id => row(id, 0));
   document.getElementById('buddy-nav').innerHTML = h;
   if (Object.keys(S.parents).length) {
