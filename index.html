@@ -413,28 +413,73 @@ body.standalone .sa-bar{display:flex}
 /* ---- Small: <640px (iPhone) ---- */
 @media (max-width:639px){
   .app{display:block}
-  #menu-btn{display:block;position:fixed;top:12px;left:12px;z-index:90;background:var(--panel);
-    border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:18px;
-    width:44px;height:44px;cursor:pointer}
+  /* Prevent iOS auto-zoom on input focus */
+  input, textarea, select{font-size:16px !important}
+  #menu-btn{display:flex;align-items:center;justify-content:center;position:fixed;top:12px;left:12px;z-index:90;
+    background:var(--panel);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:20px;
+    width:48px;height:48px;cursor:pointer;box-shadow:0 2px 12px var(--shadow)}
+  /* Sidebar drawer with scrim */
   #sidebar{position:fixed;left:0;top:0;bottom:0;z-index:95;height:100vh;height:100dvh;
-    transform:translateX(-105%);transition:transform .25s ease;width:300px;flex:none}
-  #sidebar.open{transform:none;box-shadow:8px 0 32px var(--shadow)}
+    transform:translateX(-105%);transition:transform .28s cubic-bezier(.32,.72,.35,1);width:min(85vw,340px);flex:none}
+  #sidebar.open{transform:none;box-shadow:12px 0 40px rgba(0,0,0,.35)}
   #sb-resize{display:none}
-  #main{padding:68px 14px 60px}
+  #sb-scrim{display:none;position:fixed;inset:0;z-index:94;background:rgba(0,0,0,.45);opacity:0;transition:opacity .25s}
+  #sb-scrim.show{display:block;opacity:1}
+  #main{padding:72px 12px 60px}
+  /* Tree becomes clean vertical cards */
   .tree,.tree ul{display:block;padding:0;margin:0}
   .tree ul{padding-top:0}
   .tree li{display:block;padding:0;text-align:left}
   .tree li::before,.tree li::after,.tree ul ul::before,.root-stub{display:none}
-  .node{display:block;width:auto;margin:0 0 10px}
+  .node{display:flex;align-items:center;gap:12px;width:auto;margin:0 0 8px;padding:14px 16px;
+    border-radius:14px;min-height:56px}
   .node.root{width:auto}
+  .node .n-icon{font-size:24px;flex:none}
+  .node .n-name{font-size:16px;font-weight:600}
   .standalones .grid{display:block}
   #treezoom{height:auto;max-height:none;overflow:visible;cursor:default}
   #zoombar{display:none}
-  #view-buddy.sheet{position:fixed;left:0;right:0;bottom:0;top:10%;z-index:96;
-    background:var(--bg);border-top:1px solid var(--border);border-radius:18px 18px 0 0;
-    overflow-y:auto;padding:10px 16px 48px;box-shadow:0 -8px 32px var(--shadow)}
-  #view-buddy.sheet::before{content:'';display:block;width:44px;height:5px;border-radius:3px;
-    background:var(--border);margin:2px auto 12px}
+  /* Bottom sheet panel — taller, grabbable */
+  #view-buddy.sheet{position:fixed;left:0;right:0;bottom:0;top:6%;z-index:96;
+    background:var(--bg);border-top:1px solid var(--border);border-radius:20px 20px 0 0;
+    overflow-y:auto;padding:8px 18px 60px;box-shadow:0 -12px 40px rgba(0,0,0,.35);
+    -webkit-overflow-scrolling:touch}
+  #view-buddy.sheet::before{content:'';display:block;width:48px;height:5px;border-radius:3px;
+    background:var(--border);margin:4px auto 14px;flex:none}
+  /* Tiles: 2-column grid */
+  #project-tiles,#changelog-tiles,#plans-tiles,#manifest-tiles,#project-status-tiles{display:grid !important;
+    grid-template-columns:1fr 1fr;gap:10px;max-width:none;margin:0 0 18px}
+  #project-tiles .ptile,#changelog-tiles .ptile,#plans-tiles .ptile,#manifest-tiles .ptile{flex:none !important;max-width:none !important}
+  .ptile{padding:14px 12px;border-radius:14px}
+  .ptile-num{font-size:28px}
+  /* Plans: single column cards */
+  .plan-grid{display:block;max-width:none}
+  .plan-card{margin-bottom:12px}
+  /* Projects outline: larger touch targets */
+  .proj-row{padding:14px 12px;min-height:52px;border-radius:12px}
+  .proj-row .pname{font-size:15px}
+  /* Changelog entries */
+  .cl-entry{padding:14px 12px}
+  /* View nav: horizontal scroll */
+  #view-nav{display:flex;gap:6px;overflow-x:auto;padding:4px 2px;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none}
+  #view-nav::-webkit-scrollbar{display:none}
+  #view-nav .navbtn{flex:none;padding:10px 16px;font-size:14px;border-radius:12px;min-height:44px}
+  /* Buddy list in sidebar */
+  #buddy-nav .brow{min-height:52px;padding:10px 12px;border-radius:12px;font-size:15px}
+  /* Search: full width, proper size */
+  #buddy-search{font-size:16px;padding:12px 14px;border-radius:12px;width:100%}
+  /* Settings gear: ensure reachable */
+  #settings-btn{width:48px;height:48px;font-size:20px}
+  /* Homepage iframe: fill safely */
+  #view-project.active{min-height:calc(100dvh - 140px)}
+  #homepage-frame{min-height:60vh}
+  /* Detail panel content */
+  .bp-wrap{padding:4px 2px}
+  .bp-name{font-size:22px}
+  /* Ensure buttons are tappable */
+  button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .icon-btn,button.icon{width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center}
 }
 /* ---- Medium: 640-1100px (iPad) ---- */
 @media (min-width:640px) and (max-width:1100px){
@@ -577,6 +622,7 @@ body.standalone .sa-bar{display:flex}
 <body>
 <div class="app">
 <button id="menu-btn" aria-label="Open menu">☰</button>
+<div id="sb-scrim"></div>
 <aside id="sidebar"><button id="sb-gear" title="Settings (⌘,)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
 <div id="sb-resize" title="Drag left or right to resize the sidebar. Double-click to reset to default width."></div>
   <div class="brand"><div class="eyebrow">Project Buddy &middot; macro view</div><h1 id="brand-name" title="Click to rename">Buddies</h1><div class="bcount">43 buddies &middot; one family</div></div>
@@ -1623,7 +1669,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Anybody with repo access can see this note. Saved to the buddy’s repo (docs/notes.md).">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Anybody with repo access can see this note."></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261009.2048</div>'
+    + '<div class="bp-build">Build 20261009.2057</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -2153,7 +2199,7 @@ function renderPlan(id){
     + '<p class="fineprint">Saved on this device. (For your eyes only)</p></div>'
     + '<div class="bp-sec"><h3>Shared notes<span class="info-tip" data-tip="Visible to everyone with access to this project.">\u24d8</span></h3><textarea class="notes" id="bp-shared" placeholder="Shared notes\u2026 (visible to everyone with access)">'+escHtml((S.planShared||{})[id]||'')+'</textarea>'
     + '<p class="fineprint">Shared — visible to everyone with access.</p></div>'
-    + '<div class="bp-build">Build 20261009.2048</div>'
+    + '<div class="bp-build">Build 20261009.2057</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
@@ -2876,7 +2922,7 @@ function initGear(){
 // has a newer build than the one currently loaded (helps Safari web apps
 // and other containers without a hard-refresh shortcut).
 function initVersionCheck(){
-  const myBuild = '20261009.2048';
+  const myBuild = '20261009.2057';
   async function check(){
     try {
       const r = await fetch('version.txt?_=' + Date.now(), {cache: 'no-store'});
@@ -2964,7 +3010,8 @@ async function loadSharedNotes(id){
 document.addEventListener('click', e => {
   if (e.target.closest && e.target.closest('#bp-icon')) { const m = S.sel.match(/^buddy:(.+)$/); if (m) openAvatarPicker(m[1], e.target.closest('#bp-icon')); return; }
   if (e.target.closest && (e.target.closest('#bp-close') || e.target.closest('#bp-close-x'))) { closeDetail(); return; }
-  if (e.target.closest && e.target.closest('#menu-btn')) { document.getElementById('sidebar').classList.toggle('open'); return; }
+  if (e.target.closest && e.target.closest('#menu-btn')) { const sb=document.getElementById('sidebar'); sb.classList.toggle('open'); const sc=document.getElementById('sb-scrim'); if(sc) sc.classList.toggle('show', sb.classList.contains('open')); return; }
+  if (e.target.closest && e.target.closest('#sb-scrim')) { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sb-scrim').classList.remove('show'); return; }
   if (e.target.closest && e.target.closest('#ghtok2-save')) {
     const v = document.getElementById('ghtok2').value.trim();
     if (!v) return;
@@ -3001,7 +3048,7 @@ document.addEventListener('click', e => {
     return;
   }
   const vb = e.target.closest('[data-view]');
-  if (vb) { show('view:' + vb.dataset.view); return; }
+  if (vb) { show('view:' + vb.dataset.view); if (window.innerWidth < 640) { const sbo=document.getElementById('sidebar'); if(sbo) sbo.classList.remove('open'); const sco=document.getElementById('sb-scrim'); if(sco) sco.classList.remove('show'); } return; }
   const pb = e.target.closest('[data-plan]');
   if (pb) { e.preventDefault(); show('plan:' + pb.dataset.plan); return; }
   const sb2 = document.getElementById('sidebar');
@@ -3086,6 +3133,8 @@ document.addEventListener('click', e => {
     const wantPanel = S.autoOpenPanel || S.view !== 'project';
     if (wantPanel) openBuddy(bb.dataset.buddy);
     else selectBuddy(bb.dataset.buddy);
+    // On iPhone, close the drawer after picking a buddy
+    if (window.innerWidth < 640) { const sbo=document.getElementById('sidebar'); if(sbo) sbo.classList.remove('open'); const sco=document.getElementById('sb-scrim'); if(sco) sco.classList.remove('show'); }
     return;
   }
   const sb = e.target.closest('[data-seen]');
