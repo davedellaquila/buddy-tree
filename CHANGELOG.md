@@ -26,6 +26,10 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
   System setting is honored again.
 - **Right panel width clamped** — the buddy detail panel can no longer be
   resized (or reset) to a huge width; max is 560px.
+- **Buddy clicks open the right overlay panel** — clicking a buddy in the
+  sidebar (or arrow-keying to one, or picking from search) now opens its
+  details in the narrow right overlay panel, not the wide center view.
+  The center view is for the main views; buddy details live on the right.
 - **Projects-view chevrons** — chevrons now render only on rows that have
   children (no more dead chevrons on leaf rows), and clicking one reliably
   collapses/expands its section (toggle moved into the central click
