@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♨️</text></svg>" />
+  <title>Hot Tub Buddy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f3f7f7;
+      --surface: #ffffff;
+      --surface-soft: #eef4f4;
+      --ink: #15222a;
+      --muted: #54646d;
+      --faint: #83929a;
+      --line: #d9e3e4;
+      --teal: #0e7c7b;
+      --teal-deep: #0a5f5e;
+      --teal-soft: #e0f2f1;
+      --amber: #b0651f;
+      --amber-soft: #fdf0dd;
+      --red: #b3382e;
+      --red-soft: #fdecea;
+      --green: #2a7a4b;
+      --green-soft: #e4f4ea;
+      --shadow: 0 18px 46px rgba(14, 90, 89, .10);
+      --serif: "Lora", Georgia, serif;
+      --sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0d1517;
+        --surface: #16211f;
+        --surface-soft: #1e2b29;
+        --ink: #eef4f3;
+        --muted: #aebdba;
+        --faint: #8a9a97;
+        --line: #2a3835;
+        --teal: #3fb3b0;
+        --teal-deep: #2a8f8d;
+        --teal-soft: #173332;
+        --amber: #d99a4e;
+        --amber-soft: #2e2416;
+        --red: #e07a6d;
+        --red-soft: #33201e;
+        --green: #6fc78f;
+        --green-soft: #16281d;
+        --shadow: 0 18px 46px rgba(0, 0, 0, .35);
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.55;
+    }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 28px 20px 60px; }
+
+    .hero {
+      background: linear-gradient(135deg, var(--teal-deep), var(--teal));
+      color: #fff;
+      border-radius: 22px;
+      padding: 34px 30px 30px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: "♨️";
+      position: absolute; right: 18px; top: 8px;
+      font-size: 120px; opacity: .18; transform: rotate(8deg);
+    }
+    .hero h1 {
+      font-family: var(--serif); font-weight: 600;
+      font-size: 34px; margin: 0 0 4px; letter-spacing: -.01em;
+    }
+    .hero .sub { color: rgba(255,255,255,.85); font-size: 15px; margin: 0 0 14px; }
+    .hero .mission { font-size: 17px; font-weight: 600; margin: 0; max-width: 520px; }
+    .status {
+      display: inline-block; margin-top: 16px;
+      background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.35);
+      padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 700;
+      color: #fff;
+    }
+
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; }
+    @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+    .card.full { grid-column: 1 / -1; }
+    .card h2 {
+      font-family: var(--serif); font-size: 20px; font-weight: 600;
+      margin: 0 0 12px; display: flex; align-items: center; gap: 10px;
+    }
+    .card h2 .emoji { font-size: 22px; }
+    .card p { margin: 0 0 10px; color: var(--muted); font-size: 14.5px; }
+    .card p:last-child { margin-bottom: 0; }
+    .card strong { color: var(--ink); }
+
+    .pill-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+    .pill-list li {
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 12px; padding: 12px 14px; font-size: 14.5px;
+    }
+    .pill-list li .tag {
+      display: inline-block; font-size: 11.5px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: .05em; border-radius: 6px; padding: 2px 8px; margin-bottom: 6px;
+    }
+    .tag.attn { background: var(--amber-soft); color: var(--amber); }
+    .tag.open { background: var(--red-soft); color: var(--red); }
+    .tag.ok { background: var(--green-soft); color: var(--green); }
+
+    .kv { display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; font-size: 14.5px; }
+    .kv dt { color: var(--faint); font-weight: 600; white-space: nowrap; }
+    .kv dd { margin: 0; }
+    .kv dd .big { font-weight: 800; color: var(--ink); font-size: 16px; }
+
+    .rhythm { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0; }
+    .rhythm li {
+      display: flex; gap: 14px; padding: 10px 0;
+      border-bottom: 1px dashed var(--line); font-size: 14.5px;
+    }
+    .rhythm li:last-child { border-bottom: 0; }
+    .rhythm .when {
+      flex: 0 0 118px; font-weight: 800; font-size: 12.5px; text-transform: uppercase;
+      letter-spacing: .04em; color: var(--teal); padding-top: 2px;
+    }
+
+    .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+    .links a {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--teal-soft); color: var(--teal-deep);
+      text-decoration: none; font-weight: 700; font-size: 14px;
+      padding: 10px 16px; border-radius: 999px; border: 1px solid transparent;
+    }
+    @media (prefers-color-scheme: dark) { .links a { color: var(--teal); } }
+    .links a:hover { border-color: var(--teal); }
+
+    .foot { text-align: center; color: var(--faint); font-size: 12.5px; margin-top: 34px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header class="hero">
+      <h1>♨️ Hot Tub Buddy</h1>
+      <p class="sub">Sundance Optima 880 · treatments &amp; chemistry · child of Cabin Buddy</p>
+      <p class="mission">The tub is always safe, clean, and ready to soak.</p>
+      <span class="status">Status: Brief review</span>
+    </header>
+
+    <div class="grid">
+
+      <section class="card full">
+        <h2><span class="emoji">👀</span> Needs Dave's attention</h2>
+        <ul class="pill-list">
+          <li><span class="tag open">Waiting on you</span><br>
+            <strong>When was the tub last treated?</strong> Asked 2026-10-09 — still unknown. The treatment log starts with your answer.</li>
+          <li><span class="tag open">Before ordering</span><br>
+            <strong>Verify the inner-filter part number</strong> — 6540-502S vs 6473-453 for 2024+ 880-series. Confirm with the dealer before any filter order.</li>
+          <li><span class="tag attn">Open question</span><br>
+            <strong>Chlorine or bromine setup?</strong> Chemistry targets differ — the brief needs this nailed down.</li>
+          <li><span class="tag attn">Review</span><br>
+            The <strong>product brief</strong> is in your court. Next steps follow your review — no PRD or business-plan placeholders until then.</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2><span class="emoji">📋</span> What I track</h2>
+        <ul class="pill-list">
+          <li><span class="tag ok">Live</span><br><strong>Treatment schedule + reminders</strong> — Saturday-morning treatment reminders are running.</li>
+          <li><span class="tag ok">Live</span><br><strong>Treatment &amp; usage log</strong> — just tell me "treated the hot tub" or "used the hot tub" and it's logged.</li>
+          <li><span class="tag ok">Live</span><br><strong>Research knowledge base</strong> — chemistry, filters, suppliers, best prices. Grows with every question you ask.</li>
+          <li><span class="tag ok">Live</span><br><strong>Reorders on request</strong> — filters, chemicals, whatever's needed. Nothing gets purchased without your approval.</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2><span class="emoji">🧪</span> Chemistry targets</h2>
+        <dl class="kv">
+          <dt>pH</dt><dd><span class="big">7.4 – 7.6</span></dd>
+          <dt>Free chlorine</dt><dd><span class="big">≥ 1.0 ppm</span></dd>
+          <dt>Total alkalinity</dt><dd><span class="big">100 – 120 ppm</span></dd>
+          <dt>Calcium hardness</dt><dd><span class="big">150 – 250 ppm</span></dd>
+        </dl>
+        <p style="margin-top:12px">Targets for the 880-series schedule; adjusted once the chlorine/bromine question is settled.</p>
+      </section>
+
+      <section class="card full">
+        <h2><span class="emoji">🔁</span> The maintenance rhythm</h2>
+        <ul class="rhythm">
+          <li><span class="when">Every soak</span><span>Shock + sanitizer after each soak</span></li>
+          <li><span class="when">Weekly</span><span>Test &amp; treat — minimum even when idle (Saturday reminders live)</span></li>
+          <li><span class="when">Monthly</span><span>Filter rinse</span></li>
+          <li><span class="when">Quarterly</span><span>Inner-core (6540-502S) + SunPurity cartridge replacement</span></li>
+          <li><span class="when">Every 3–6 mo</span><span>Drain &amp; refill</span></li>
+          <li><span class="when">Annual</span><span>CLEARRAY bulb replacement</span></li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2><span class="emoji">🔧</span> Filters &amp; supplies</h2>
+        <dl class="kv">
+          <dt>Single cartridge</dt><dd><strong>6540-488S</strong> — ~8.5″ dia × 19″, 125 sq ft<br>
+            <span style="color:var(--muted)">$58.19 compatible (AllFilters) · $94.99 OEM (Ideal Pool &amp; Spa)</span></dd>
+          <dt>Two-stage set</dt><dd><strong>6540-501S / 6473-165S</strong> outer + disposable inner <strong>6540-502S</strong><br>
+            <span style="color:var(--muted)">Set ~$61–66</span></dd>
+          <dt>Local supplier</dt><dd><strong>Up Country Pool Center</strong>, 100 CA-49, Jackson<br>
+            <span style="color:var(--muted)">(209) 223-1888 — carries Sundance</span></dd>
+        </dl>
+      </section>
+
+      <section class="card">
+        <h2><span class="emoji">🎙️</span> Voice control</h2>
+        <p>The <strong>smarttub-control</strong> prototype gives the tub a voice: a CLI plus a localhost HTTP bridge driving Siri Shortcuts — status, lights, jets, temp, energy.</p>
+        <p>Private repo <strong>davedellaquila/smarttub-control</strong>; Shortcut recipes and the launchd always-on setup live in its SHORTCUTS.md.</p>
+      </section>
+
+      <section class="card full">
+        <h2><span class="emoji">🔗</span> Everything that exists</h2>
+        <div class="links">
+          <a href="https://docs.google.com/document/d/1BDcst37j2FftKqzY-Tz-ecQLtYc5OnR3kmY6xmn80Sg/edit">📄 Product Brief</a>
+          <a href="https://github.com/davedellaquila/hot-tub-buddy">🐙 hot-tub-buddy repo</a>
+          <a href="https://github.com/davedellaquila/smarttub-control">🎙️ smarttub-control</a>
+        </div>
+        <p style="margin-top:14px">Child of <strong>Cabin Buddy</strong>, which sits under <strong>Property Buddy</strong> — knowledge flows both directions.</p>
+      </section>
+
+    </div>
+
+    <p class="foot">Hot Tub Buddy · designed by me, for the dashboard · updated 2026-10-09</p>
+  </div>
+</body>
+</html>
