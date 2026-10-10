@@ -24,6 +24,8 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
   self-references (`--bg:var(--bg)`), so dark mode rendered as light. `:root`
   now holds the real dark palette and the light overrides are complete.
   System setting is honored again.
+- **Right panel width clamped** — the buddy detail panel can no longer be
+  resized (or reset) to a huge width; max is 560px.
 - **Projects-view chevrons** — chevrons now render only on rows that have
   children (no more dead chevrons on leaf rows), and clicking one reliably
   collapses/expands its section (toggle moved into the central click
