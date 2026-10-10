@@ -2266,6 +2266,32 @@ function initGear(){
   const g = document.getElementById('sb-gear');
   if (g && !g.dataset.init) { g.dataset.init = '1'; g.addEventListener('click', () => openFieldSettings()); }
 }
+// Checks for a newer deployed version; shows an update banner if the server
+// has a newer build than the one currently loaded (helps Safari web apps
+// and other containers without a hard-refresh shortcut).
+function initVersionCheck(){
+  const myBuild = '__BUILD__';
+  async function check(){
+    try {
+      const r = await fetch('version.txt?_=' + Date.now(), {cache: 'no-store'});
+      if (!r.ok) return;
+      const serverBuild = (await r.text()).trim();
+      if (serverBuild && serverBuild !== myBuild && !document.getElementById('update-banner')) {
+        const b = document.createElement('div');
+        b.id = 'update-banner';
+        b.innerHTML = '<span>A newer version of Buddies is available (' + escHtml(serverBuild) + ').</span> '
+          + '<button id="update-now" style="margin-left:12px;padding:6px 14px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:600;cursor:pointer">Update now</button>';
+        b.style.cssText = 'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:9999;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 18px;box-shadow:0 8px 32px rgba(0,0,0,.3);display:flex;align-items:center;font-size:14px';
+        document.body.appendChild(b);
+        document.getElementById('update-now').addEventListener('click', () => {
+          location.href = location.pathname + '?v=' + Date.now() + location.hash;
+        });
+      }
+    } catch (e) {}
+  }
+  check();
+  setInterval(check, 5 * 60 * 1000);
+}
 function initSearch(){
   const bs = document.getElementById('buddy-search');
   if (bs && !bs.dataset.init) {
@@ -2438,6 +2464,7 @@ initTokenPill();
 updateTokenGating();
 initSearch();
 initGear();
+initVersionCheck();
 initPlansToggle();
 """
     js = js.replace("BUDDIES_JSON", buddies_js).replace("ORDER_JSON", order_js).replace("PLANS_JSON", plans_js)
@@ -2490,6 +2517,7 @@ initPlansToggle();
     out = out.replace("NBUD", str(n_buddies))
     out = out.replace("__BUILD__", BUILD_NUM)
     open(f"{HERE}/index.html", "w").write(out)
+    open(f"{HERE}/version.txt", "w").write(BUILD_NUM)
     print("wrote index.html", len(out), "bytes")
 
 
