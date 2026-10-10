@@ -20,6 +20,10 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
 ## 2026-10-10 (Theme setting)
 
 ### Fixed
+- **Dark mode actually dark** — the theme's `:root` variables were circular
+  self-references (`--bg:var(--bg)`), so dark mode rendered as light. `:root`
+  now holds the real dark palette and the light overrides are complete.
+  System setting is honored again.
 - **Projects-view chevrons** — chevrons now render only on rows that have
   children (no more dead chevrons on leaf rows), and clicking one reliably
   collapses/expands its section (toggle moved into the central click
