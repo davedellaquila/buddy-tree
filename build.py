@@ -769,6 +769,7 @@ const FIELD_DEFS = [
   {id:'ingest', label:'Ingest'},
   {id:'attention', label:'Needs your attention'},
   {id:'mission', label:'About'},
+  {id:'homepage', label:'Homepage URL'},
   {id:'photos', label:'Photos'},
   {id:'tree', label:'The Buddy Tree'},
   {id:'artifacts', label:'Artifacts'},
@@ -1181,6 +1182,7 @@ function renderBuddy(id){
     + '<div style="margin-top:8px"><span class="fineprint" id="ingest-status"></span></div>'
     + '<div id="ingest-feed" style="margin-top:8px"></div></div>'
     + '<div class="bp-sec" data-field="mission"><h3>About<span class="info-tip" data-tip="The mission is the brief\\u2019s executive summary \\u2014 tweak it through the buddy\\u2019s chat thread and it updates everywhere.">\\u24d8</span></h3><p class="bp-mission">'+escHtml(b.mission)+'</p></div>'
+    + (b.homepage ? '<div class="bp-sec" data-field="homepage"><h3>Homepage</h3><div style="display:flex;align-items:center;gap:8px"><a href="'+escHtml(b.homepage)+'" target="_blank" rel="noopener" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escHtml(b.homepage)+'</a><button class="linkbtn" data-copy-hp="'+escHtml(b.homepage)+'" title="Copy homepage URL">Copy</button></div></div>' : '')
     + (unseenCount > 0 ? '<div class="bp-sec" data-field="attention"><h3>Needs your attention</h3>'+attn+'</div>' : '')
     + photos
     + (id === 'project-buddy'
@@ -2477,6 +2479,20 @@ document.addEventListener('click', e => {
       save(); renderProjects();
     }
     openBuddy(projRow.dataset.buddy); return;
+  }
+  // Copy homepage URL button
+  const cph = e.target.closest('[data-copy-hp]');
+  if (cph) {
+    e.preventDefault(); e.stopPropagation();
+    const url = cph.dataset.copyHp;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => { cph.textContent = 'Copied!'; setTimeout(() => { cph.textContent = 'Copy'; }, 1500); });
+    } else {
+      const ta = document.createElement('textarea'); ta.value = url; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); cph.textContent = 'Copied!'; setTimeout(() => { cph.textContent = 'Copy'; }, 1500); } catch (err) {}
+      ta.remove();
+    }
+    return;
   }
   const bb = e.target.closest('[data-buddy]');
   // Don't re-open the buddy when clicking an editable field (e.g. the name)
