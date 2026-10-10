@@ -631,6 +631,9 @@ function selectBuddy(id){
   if (!byId[id]) return;
   const b = byId[id];
   // Select the buddy and update the main view, WITHOUT opening the right-side panel.
+  // But if the panel is already open, refresh it to show the newly selected buddy.
+  const vb = document.getElementById('view-buddy');
+  const panelOpen = vb && vb.classList.contains('active');
   if (S.view === 'project') {
     S.projectId = id; save();
     renderProjectView();
@@ -645,6 +648,8 @@ function selectBuddy(id){
       show('buddy:' + id);
     }
   }
+  // If the detail panel is open, update it to the new buddy
+  if (panelOpen) renderBuddy(id);
 }
 function openBuddy(id){
   if (!byId[id]) return;
