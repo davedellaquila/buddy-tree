@@ -883,6 +883,24 @@
       "attention": [],
       "icon": "\ud83d\ude99",
       "photos": []
+    },
+    {
+      "id": "astro",
+      "name": "Astro",
+      "icon": "\ud83d\ude80",
+      "kind": "assistant",
+      "parent": "project-buddy",
+      "mission": "Dave's personal AI assistant and builder-in-residence. Ships at burst cadence.",
+      "tagline": "Builds things, verifies with receipts, ships at night",
+      "status": "Active",
+      "statusClass": "st-active",
+      "homepage": "astro/",
+      "homepageSynced": "2026-10-10",
+      "brief": "",
+      "repo": "",
+      "docs": [],
+      "photos": [],
+      "attention": []
     }
   ]
 }
