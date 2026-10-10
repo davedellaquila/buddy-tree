@@ -2617,6 +2617,7 @@ function initVersionCheck(){
         b.style.cssText = 'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:9999;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 18px;box-shadow:0 8px 32px rgba(0,0,0,.3);display:flex;align-items:center;font-size:14px';
         document.body.appendChild(b);
         document.getElementById('update-now').addEventListener('click', () => {
+          b.remove();
           location.href = location.pathname + '?v=' + Date.now() + location.hash;
         });
         document.getElementById('update-dismiss').addEventListener('click', () => {
