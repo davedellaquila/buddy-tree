@@ -715,6 +715,8 @@ function snapshotSettable(){
     fieldOrder: getFieldOrder().slice(),
     fieldHidden: Object.assign({}, S.fieldHidden || {}),
     viewOrder: getViewOrder().slice(),
+    sbWidth: S.sbWidth || SB_DEFAULT_W,
+    panelWidth: S.panelWidth || SB_DEFAULT_W,
   };
 }
 function resetToFactory(){
@@ -723,7 +725,7 @@ function resetToFactory(){
   if (Array.isArray(f.fieldOrder) && f.fieldOrder.length) S.fieldOrder = f.fieldOrder.slice();
   if (f.fieldHidden && typeof f.fieldHidden === 'object') S.fieldHidden = Object.assign({}, f.fieldHidden);
   if (Array.isArray(f.viewOrder) && f.viewOrder.length) S.viewOrder = f.viewOrder.slice();
-  S.sbWidth = SB_DEFAULT_W; S.panelWidth = SB_DEFAULT_W;
+  S.sbWidth = f.sbWidth || SB_DEFAULT_W; S.panelWidth = f.panelWidth || SB_DEFAULT_W;
   save();
 }
 function updateFactory(){

@@ -1057,6 +1057,8 @@ function snapshotSettable(){
     fieldOrder: getFieldOrder().slice(),
     fieldHidden: Object.assign({}, S.fieldHidden || {}),
     viewOrder: getViewOrder().slice(),
+    sbWidth: S.sbWidth || SB_DEFAULT_W,
+    panelWidth: S.panelWidth || SB_DEFAULT_W,
   };
 }
 function resetToFactory(){
@@ -1065,7 +1067,7 @@ function resetToFactory(){
   if (Array.isArray(f.fieldOrder) && f.fieldOrder.length) S.fieldOrder = f.fieldOrder.slice();
   if (f.fieldHidden && typeof f.fieldHidden === 'object') S.fieldHidden = Object.assign({}, f.fieldHidden);
   if (Array.isArray(f.viewOrder) && f.viewOrder.length) S.viewOrder = f.viewOrder.slice();
-  S.sbWidth = SB_DEFAULT_W; S.panelWidth = SB_DEFAULT_W;
+  S.sbWidth = f.sbWidth || SB_DEFAULT_W; S.panelWidth = f.panelWidth || SB_DEFAULT_W;
   save();
 }
 function updateFactory(){
@@ -1341,7 +1343,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Saved to the buddy’s repo (docs/notes.md) — visible to everyone with repo access.">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Shared notes…"></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261009.1748</div>'
+    + '<div class="bp-build">Build 20261009.1749</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -1777,7 +1779,7 @@ function renderPlan(id){
     + '<p class="fineprint">Saved on this device. (For your eyes only)</p></div>'
     + '<div class="bp-sec"><h3>Shared notes<span class="info-tip" data-tip="Visible to everyone with access to this project.">\u24d8</span></h3><textarea class="notes" id="bp-shared" placeholder="Shared notes\u2026 (visible to everyone with access)">'+escHtml((S.planShared||{})[id]||'')+'</textarea>'
     + '<p class="fineprint">Shared — visible to everyone with access.</p></div>'
-    + '<div class="bp-build">Build 20261009.1748</div>'
+    + '<div class="bp-build">Build 20261009.1749</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
