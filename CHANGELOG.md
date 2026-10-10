@@ -6,6 +6,7 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
 ## 2026-10-10 (Clickable tiles, plans tiles, red trash icon, token gating)
 
 ### Added
+- **Nancy Buddy homepage** — warm living-dossier theme (cream paper, terracotta accents) with attention list, "Who Nan is" fact cards, $1,200/mo grocery stipend panel (under review, linked to the tracker sheet), and interactive notes / reminders / important dates / gift-ideas boards (localStorage). Unknowns stay unknown — relationship to Dave remains unstated.
 - **Clickable summary tiles** (Dave's idea) — clicking a tile filters the
   list below to matching items; clicking the active tile again clears the
   filter. Works on Projects (TO REVIEW / NEW / CLEARED), Changelog
