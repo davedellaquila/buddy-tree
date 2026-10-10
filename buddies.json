@@ -807,6 +807,29 @@
       "icon": "\ud83e\uddd4",
       "photos": [],
       "homepage": "emile-buddy/"
+    {
+      "id": "ron-buddy",
+      "name": "Ron Buddy",
+      "parent": "family-buddy",
+      "kind": "family",
+      "tagline": "Living dossier for Dave's eldest brother",
+      "mission": "Ron Buddy is the one place for everything Dave needs to remember, track, and do regarding Ron: key facts, important dates, notes, reminders, and gift ideas. Ron Dell'Aquila \u2014 Dave's oldest brother, married to Mei-ying; co-selling the Morgan Hill house (18231 Llagas Creek Dr) with Dave and Emile.",
+      "status": "Brief review",
+      "statusClass": "st-brief",
+      "brief": "https://docs.google.com/document/d/1gTz9dlWEqVtoRWXrAfY3f70jPE7PdDLo0ThHcA-rZlo/edit",
+      "repo": "ron-buddy",
+      "docs": [],
+      "attention": [
+        {
+          "id": "ron-buddy-brief",
+          "date": "2026-10-09",
+          "text": "Product brief ready for review \u2014 looks good, edits, or defer? Key active thread: Morgan Hill sale coordination."
+        }
+      ],
+      "icon": "\ud83d\udc68\u200d\ud83e\uddb3",
+      "photos": [],
+      "homepage": "ron-buddy/"
+    },
     },
     {
       "id": "nancy-buddy",
@@ -853,6 +876,34 @@
       "icon": "\ud83d\udc71\u200d\u2640\ufe0f",
       "photos": [],
       "homepage": "jessica-buddy/"
+    },
+    {
+      "id": "sarah-buddy",
+      "name": "Sarah Buddy",
+      "parent": "family-buddy",
+      "kind": "family",
+      "tagline": "Living dossier for Dave's sister-in-law",
+      "mission": "Sarah Buddy is the one place for everything Dave needs to remember, track, and do regarding Sarah \u2014 the wife of his middle brother, Emile: key facts, important dates, notes, reminders, and gift ideas. Dossier just opened; birthdate, occupation, background, and interests still unknown \u2014 flagged, not guessed.",
+      "status": "Brief review",
+      "statusClass": "st-brief",
+      "brief": "https://docs.google.com/document/d/1Vlpp7cPrlTgTIYihvYmBhjea2--HO1lmCAQ7YOjZMNE/edit",
+      "repo": "sarah-buddy",
+      "docs": [],
+      "attention": [
+        {
+          "id": "sarah-buddy-brief",
+          "date": "2026-10-09",
+          "text": "Product brief ready for review \u2014 looks good, edits, or defer?"
+        },
+        {
+          "id": "sarah-buddy-birthdate",
+          "date": "2026-10-09",
+          "text": "Highest-value unknown: Sarah's birthdate unlocks birthday reminders."
+        }
+      ],
+      "icon": "\ud83d\udc8c",
+      "photos": [],
+      "homepage": "sarah-buddy/"
     },
     {
       "id": "pops-buddy",
