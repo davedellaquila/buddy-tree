@@ -1593,7 +1593,7 @@ function show(sel, push){
 }
 /* ---------- keyboard nav ---------- */
 document.addEventListener('keydown', e => {
-  if (e.target && e.target.id === 'buddy-search' && e.key === 'ArrowDown') {
+  if (e.target && e.target.id === 'buddy-search' && (e.key === 'ArrowDown' || e.key === 'Tab')) {
     const first = document.querySelector('#buddy-nav [data-buddy]');
     if (first) { e.preventDefault(); e.target.blur(); openBuddy(first.dataset.buddy); }
     return;
