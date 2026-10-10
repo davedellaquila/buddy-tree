@@ -483,11 +483,13 @@ body.standalone .sa-bar{display:flex}
     -webkit-overflow-scrolling:touch}
   #view-buddy.sheet::before{content:'';display:block;width:48px;height:5px;border-radius:3px;
     background:var(--border);margin:4px auto 14px;flex:none}
-  /* Tiles: 2-column grid */
+  /* Tiles: 2-column grid — clear desktop flex/max-width so status tiles fill cells */
   #project-tiles,#changelog-tiles,#plans-tiles,#manifest-tiles,#project-status-tiles{display:grid !important;
     grid-template-columns:1fr 1fr;gap:10px;max-width:none;margin:0 0 18px}
-  #project-tiles .ptile,#changelog-tiles .ptile,#plans-tiles .ptile,#manifest-tiles .ptile{flex:none !important;max-width:none !important}
+  #project-tiles .ptile,#changelog-tiles .ptile,#plans-tiles .ptile,#manifest-tiles .ptile,#project-status-tiles .ptile{
+    flex:none !important;max-width:none !important;min-width:0;width:auto}
   .ptile{padding:14px 12px;border-radius:14px}
+  .ptile-label,.ptile-sub{overflow-wrap:normal;word-break:normal;hyphens:none}
   .ptile-num{font-size:28px}
   /* Plans: single column cards */
   .plan-grid{display:block;max-width:none}
