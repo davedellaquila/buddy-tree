@@ -61,8 +61,9 @@ body{background:var(--bg);color:var(--text)}
 body{padding:0}
 .app{display:flex;min-height:100vh;align-items:stretch}
 #sidebar{width:308px;flex:0 0 308px;background:var(--bg);border-right:1px solid var(--border2);
-  padding:0 14px 32px;position:sticky;top:0;height:100vh;overflow-y:auto;overflow-x:hidden;overflow-wrap:break-word}
-#main{flex:1;min-width:0;padding:36px 32px 80px}
+  padding:0 14px 32px;position:sticky;top:0;height:100vh;overflow-y:auto;overflow-x:hidden;overflow-wrap:break-word;
+  z-index:40}
+#main{flex:1;min-width:0;padding:36px 32px 80px;position:relative;z-index:1}
 .brand{padding:22px 8px 14px;background:var(--bg)}
 .sb-sticky-head{position:sticky;top:0;z-index:5;background:var(--bg);padding-bottom:4px;border-bottom:1px solid var(--border)}
 .brand .eyebrow{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
@@ -82,6 +83,9 @@ body{padding:0}
 .navbtn:hover{background:var(--hover)}
 .navbtn.sel{background:var(--active);box-shadow:inset 2px 0 0 var(--accent)}
 .navbtn .nic{width:20px;text-align:center;color:var(--muted)}
+/* Views always stack vertically (desktop + iPad); phone keeps the same */
+#view-nav{display:flex;flex-direction:column;gap:2px}
+#view-nav .navbtn{flex:none;width:100%}
 .brow{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:0;
   color:var(--text);font:inherit;font-size:13.5px;padding:6px 10px 6px 8px;border-radius:8px;cursor:pointer}
 .brow:hover{background:var(--hover)}
@@ -117,7 +121,7 @@ body{padding:0}
 #sb-resize::after{content:'';width:7px;height:56px;border-radius:3px;background:var(--faint)}
 #sb-resize:hover::after{background:var(--accent-hi)}
 #sb-resize:hover{background:var(--ghost)}
-@media (max-width:900px){#sb-resize{display:none}}
+@media (max-width:639px){#sb-resize{display:none}}
 .bp-topnav{display:flex;gap:4px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
 .bp-topnav .sep{color:var(--faint);margin:0 2px}
 #journal-bar{display:none;margin:0 0 12px;background:var(--wash);border:1px solid var(--accent);border-radius:10px;padding:9px 13px;font-size:13px}
@@ -193,7 +197,23 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 .fset-row.dragging{opacity:.5}
 .fset-row .fh{color:var(--muted);cursor:grab;font-size:14px}
 .fset-row .fl{flex:1;font-size:13px}
-.fset-row input[type=checkbox]{width:16px;height:16px}
+/* Circle-check settings toggles (checkmark.circle.fill style) */
+.fset-check{display:flex;align-items:center;gap:12px;margin-top:8px;padding:11px 12px;font-size:13.5px;
+  cursor:pointer;border:1px solid var(--border2);border-radius:10px;background:var(--bg);user-select:none;-webkit-user-select:none}
+.fset-check:hover{border-color:var(--border);background:var(--hover)}
+.fset-check:has(input:checked){border-color:color-mix(in srgb, var(--accent) 45%, var(--border));background:var(--wash)}
+#field-settings input[type=checkbox]{
+  -webkit-appearance:none;appearance:none;width:28px;height:28px;margin:0;flex:0 0 28px;
+  border:2px solid var(--border);border-radius:50%;background:var(--panel);cursor:pointer;
+  position:relative;transition:background .15s ease,border-color .15s ease,box-shadow .15s ease,transform .12s ease}
+#field-settings input[type=checkbox]:hover{border-color:var(--accent);background:var(--ghost)}
+#field-settings input[type=checkbox]:checked{background:var(--accent);border-color:var(--accent)}
+#field-settings input[type=checkbox]:checked::after{
+  content:'';position:absolute;left:9px;top:4px;width:6px;height:12px;
+  border:solid var(--on-accent);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+#field-settings input[type=checkbox]:focus-visible{outline:none;box-shadow:0 0 0 3px var(--ghost)}
+#field-settings input[type=checkbox]:active{transform:scale(.92)}
+.fset-row input[type=checkbox]{margin-left:2px}
 .bp-close-x{position:absolute;top:10px;right:10px;z-index:10;width:36px;height:36px;
   background:none;border:none;border-radius:8px;color:var(--muted);font-size:24px;
   cursor:pointer;display:flex;align-items:center;justify-content:center}
@@ -231,9 +251,23 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 body.no-write .pdel,body.no-write [data-dump-del],body.no-write [data-dump-edit]{display:none!important}
 .dumps-body .attn-body{padding-right:64px}
 .dumps.collapsed .dumps-body{display:none}
-#sb-gear{position:absolute;top:10px;right:10px;z-index:10;width:36px;height:36px;background:none;border:none;
-  border-radius:8px;color:var(--muted);font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-#sb-gear:hover{color:var(--text)}
+/* Sidebar top-right tools: gear + close (44px targets, 8px gap — HIG touch spacing) */
+#sb-tools{position:absolute;top:8px;right:8px;z-index:10;display:flex;align-items:center;gap:8px}
+#sb-tools button{width:44px;height:44px;background:none;border:none;border-radius:10px;color:var(--muted);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;-webkit-tap-highlight-color:transparent}
+#sb-tools button:hover{background:var(--hover);color:var(--text)}
+#sb-tools button svg{display:block}
+#sb-gear{color:red}
+#sb-gear:hover{color:red;background:var(--hover)}
+#sb-close{color:var(--faint)}
+#sb-close:hover{color:var(--muted)}
+#sb-close .xmark-x{stroke:var(--bg)}
+#sidebar .brand{padding-right:112px}
+/* Collapsed sidebar (iPad/desktop): hide panel, show hamburger to reopen */
+body.sb-closed #sidebar{display:none}
+body.sb-closed #menu-btn{display:flex;align-items:center;justify-content:center;position:fixed;top:12px;left:12px;z-index:90;
+  background:var(--panel);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:20px;
+  width:48px;height:48px;cursor:pointer;box-shadow:0 2px 12px var(--shadow)}
 #plans-sec.collapsed #plan-nav{display:none}
 #plans-sec #plans-arrow{transform:rotate(90deg);display:inline-block}
 #plans-sec.collapsed #plans-arrow{transform:rotate(0deg)}
@@ -321,11 +355,9 @@ body.standalone .sa-bar{display:flex}
   .proj-row .pname{font-size:15px}
   /* Changelog entries */
   .cl-entry{padding:14px 12px}
-  /* View nav: horizontal scroll */
-  #view-nav{display:flex;gap:6px;overflow-x:auto;padding:4px 2px;-webkit-overflow-scrolling:touch;
-    scrollbar-width:none}
-  #view-nav::-webkit-scrollbar{display:none}
-  #view-nav .navbtn{flex:none;padding:10px 16px;font-size:14px;border-radius:12px;min-height:44px}
+  /* View nav: vertical list with larger touch targets */
+  #view-nav{display:flex;flex-direction:column;gap:2px;overflow:visible;padding:0}
+  #view-nav .navbtn{flex:none;width:100%;padding:10px 12px;font-size:15px;border-radius:12px;min-height:44px}
   /* Buddy list in sidebar */
   #buddy-nav .brow{min-height:52px;padding:10px 12px;border-radius:12px;font-size:15px}
   /* Search: full width, proper size */
@@ -344,12 +376,15 @@ body.standalone .sa-bar{display:flex}
 }
 /* ---- Medium: 640-1100px (iPad) ---- */
 @media (min-width:640px) and (max-width:1100px){
-  #sidebar{width:250px;flex:0 0 250px}
-  #view-nav{display:flex;gap:4px;background:var(--panel);border:1px solid var(--border);
-    border-radius:12px;padding:4px}
-  #view-nav .navbtn{flex:1}
+  /* Keep a real left sidebar — do not stack above main (iPad portrait is ~744–834px). */
+  .app{display:flex;flex-direction:row;align-items:stretch}
+  #sidebar{width:250px;flex:0 0 250px;position:sticky;top:0;height:100vh;height:100dvh;
+    max-height:none;border-right:1px solid var(--border2);border-bottom:0;overflow-y:auto;overflow-x:hidden;
+    z-index:40;background:var(--bg)}
+  #main{flex:1;min-width:0;padding:28px 22px 64px;position:relative;z-index:1}
+  #main.homepage-mode{padding:0}
   .node{width:172px}
-  #view-buddy.panel{position:fixed;top:0;right:0;bottom:0;width:min(380px,92vw);z-index:60;
+  #view-buddy.panel{position:fixed;top:0;right:0;bottom:0;width:min(380px,calc(100vw - 250px));z-index:30;
     background:var(--bg);border-left:1px solid var(--border);overflow-y:auto;overflow-x:hidden;
     padding:20px 18px 48px;box-shadow:-8px 0 32px var(--shadow)}
 }
@@ -464,20 +499,15 @@ body.standalone .sa-bar{display:flex}
 .bp-mini-zoom button:hover{border-color:var(--accent)}
 .linkbtn{background:none;border:0;color:var(--accent);font:inherit;font-size:12.5px;cursor:pointer;padding:0}
 .linkbtn:hover{text-decoration:underline}
-@media (max-width:900px){
-  .app{flex-direction:column}
-  #sidebar{width:auto;flex:none;position:static;height:auto;max-height:46vh;border-right:0;border-bottom:1px solid var(--border2)}
-  #main{padding:24px 18px 64px}
+.grip {
+  position: absolute; top: 4px; left: 4px; z-index: 2;
+  cursor: grab; opacity: .45; color: var(--muted); font-size: 16px; line-height: 1;
+  padding: 8px; user-select: none; -webkit-user-select: none;
 }
-  .grip {
-    position: absolute; top: 4px; left: 4px; z-index: 2;
-    cursor: grab; opacity: .45; color: var(--muted); font-size: 16px; line-height: 1;
-    padding: 8px; user-select: none; -webkit-user-select: none;
-  }
-  .node:hover .grip { opacity: .9; }
-  .grip:hover { opacity: 1 !important; color: var(--text); }
-  .grip:active { cursor: grabbing; }
-  .node{position:relative;}
+.node:hover .grip { opacity: .9; }
+.grip:hover { opacity: 1 !important; color: var(--text); }
+.grip:active { cursor: grabbing; }
+.node{position:relative;}
 """
 
 ICON_DOC = ('<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor"'
@@ -953,7 +983,7 @@ function renderSettingChecks(){
     + '<div class="theme-pick" role="group" aria-label="Theme" style="margin:0"><button data-theme-pick="light" title="Light theme">Light</button><button data-theme-pick="dark" title="Dark theme">Dark</button><button data-theme-pick="system" title="Follow system theme">System</button></div></div>'
     + SETTING_DEFS.map(s => {
     const val = getSetting(s.id);
-    if (s.type === 'bool') return '<label style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13px;cursor:pointer"><input type="checkbox" data-setting="' + s.id + '"' + (val ? ' checked' : '') + '> ' + s.label + '</label>';
+    if (s.type === 'bool') return '<label class="fset-check"><input type="checkbox" data-setting="' + s.id + '"' + (val ? ' checked' : '') + '> <span>' + s.label + '</span></label>';
     return '';
   }).join('');
   wireThemePicks(sdiv);
@@ -2670,6 +2700,27 @@ function initGear(){
   const g = document.getElementById('sb-gear');
   if (g && !g.dataset.init) { g.dataset.init = '1'; g.addEventListener('click', () => openFieldSettings()); }
 }
+function isDrawerNav(){ return window.matchMedia('(max-width:639px)').matches; }
+function isSidebarOpen(){
+  const sb = document.getElementById('sidebar');
+  if (!sb) return false;
+  if (isDrawerNav()) return sb.classList.contains('open');
+  return !document.body.classList.contains('sb-closed');
+}
+function setSidebarOpen(open){
+  const sb = document.getElementById('sidebar');
+  const sc = document.getElementById('sb-scrim');
+  if (!sb) return;
+  if (isDrawerNav()) {
+    document.body.classList.remove('sb-closed');
+    sb.classList.toggle('open', !!open);
+    if (sc) sc.classList.toggle('show', !!open);
+  } else {
+    document.body.classList.toggle('sb-closed', !open);
+    sb.classList.remove('open');
+    if (sc) sc.classList.remove('show');
+  }
+}
 // Checks for a newer deployed version; shows an update banner if the server
 // has a newer build than the one currently loaded (helps Safari web apps
 // and other containers without a hard-refresh shortcut).
@@ -2773,8 +2824,9 @@ async function loadSharedNotes(id){
 document.addEventListener('click', e => {
   if (e.target.closest && e.target.closest('#bp-icon')) { const m = S.sel.match(/^buddy:(.+)$/); if (m) openAvatarPicker(m[1], e.target.closest('#bp-icon')); return; }
   if (e.target.closest && (e.target.closest('#bp-close') || e.target.closest('#bp-close-x'))) { closeDetail(); return; }
-  if (e.target.closest && e.target.closest('#menu-btn')) { const sb=document.getElementById('sidebar'); sb.classList.toggle('open'); const sc=document.getElementById('sb-scrim'); if(sc) sc.classList.toggle('show', sb.classList.contains('open')); return; }
-  if (e.target.closest && e.target.closest('#sb-scrim')) { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sb-scrim').classList.remove('show'); return; }
+  if (e.target.closest && e.target.closest('#sb-close')) { setSidebarOpen(false); return; }
+  if (e.target.closest && e.target.closest('#menu-btn')) { setSidebarOpen(!isSidebarOpen()); return; }
+  if (e.target.closest && e.target.closest('#sb-scrim')) { setSidebarOpen(false); return; }
   if (e.target.closest && e.target.closest('#ghtok2-save')) {
     const v = document.getElementById('ghtok2').value.trim();
     if (!v) return;
@@ -2957,7 +3009,7 @@ initPlansToggle();
 <div class="app">
 <button id="menu-btn" aria-label="Open menu">\u2630</button>
 <div id="sb-scrim"></div>
-<aside id="sidebar"><button id="sb-gear" title="Settings (⌘,)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+<aside id="sidebar"><div id="sb-tools"><button id="sb-gear" title="Settings (⌘,)" aria-label="Settings"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button id="sb-close" title="Close sidebar" aria-label="Close sidebar"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><path class="xmark-x" d="M8.8 8.8l6.4 6.4m0-6.4l-6.4 6.4" fill="none" stroke-width="2.25" stroke-linecap="round"/></svg></button></div>
 <div id="sb-resize" title="Drag left or right to resize the sidebar. Double-click to reset to default width."></div>
   <div class="sb-sticky-head"><div class="brand"><div class="eyebrow">Project Buddy &middot; macro view</div><h1 id="brand-name" title="Click to rename">Buddies</h1><div class="bcount">NBUD buddies &middot; one family</div></div>
   <div class="nav-sec"><h3>Views</h3><div id="view-nav"></div></div></div>
