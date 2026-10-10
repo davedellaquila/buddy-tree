@@ -107,7 +107,7 @@ body{padding:0}
 #treezoom,#view-projects,#view-manifest{touch-action:pan-x pan-y}
 #treezoom.panning,#treezoom.panning *{user-select:none!important;-webkit-user-select:none!important}
 #treezoom,#treezoom *{user-select:none;-webkit-user-select:none}
-#zoombar{position:absolute;top:14px;left:14px;width:54px;height:248px;background:color-mix(in srgb, var(--panel) 72%, transparent);border:1px solid var(--border2);border-radius:12px;z-index:5;box-shadow:0 2px 8px var(--shadow-soft)}
+#zoombar{position:fixed;top:14px;left:calc(var(--sbw, 308px) + 46px);width:54px;height:248px;background:color-mix(in srgb, var(--panel) 72%, transparent);border:1px solid var(--border2);border-radius:12px;z-index:5;box-shadow:0 2px 8px var(--shadow-soft)}
 #zoombar .zt{position:absolute;top:8px;left:0;right:0;text-align:center;font-size:11px;color:var(--muted);cursor:help}
 #zoomrange{position:absolute;left:50%;top:50%;width:188px;margin:0;padding:0;transform:translate(-50%,-50%) rotate(-90deg);accent-color:var(--accent);cursor:pointer}
 #zoombar .zv{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
@@ -1119,7 +1119,7 @@ function applyPanelWidth(){
 }
 function applySbWidth(){
   const sb = document.getElementById('sidebar');
-  if (sb) { const w = S.sbWidth || SB_DEFAULT_W; sb.style.width = w + 'px'; sb.style.flex = '0 0 ' + w + 'px'; }
+  if (sb) { const w = S.sbWidth || SB_DEFAULT_W; sb.style.width = w + 'px'; sb.style.flex = '0 0 ' + w + 'px'; document.documentElement.style.setProperty('--sbw', w + 'px'); }
 }
 function initPanelResize(){
   const vb = document.getElementById('view-buddy');
