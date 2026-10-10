@@ -24,29 +24,29 @@ ROOT_ORDER = [
 NEW_CSS = """
 /* ---- theme variables ---- */
 :root{
-  --bg:var(--bg); --panel:var(--panel); --hover:var(--hover); --active:var(--active);
-  --wash:var(--wash); --wash2:var(--wash2);
-  --border:var(--border); --border2:var(--border2);
-  --text:var(--text); --text2:var(--text2); --muted:var(--muted); --faint:var(--faint);
-  --accent:var(--accent); --accent-hi:var(--accent-hi); --on-accent:#ffffff;
-  --ghost:var(--ghost);
-  --amber:var(--amber); --amber-bd:var(--amber-bd); --amber-bg:var(--amber-bg); --amber-bg2:var(--amber-bg2);
-  --amber-hi:var(--amber-hi); --amber-tx:var(--amber-tx); --amber-tx2:var(--amber-tx2);
-  --grn-bg:var(--grn-bg); --grn-bd:var(--grn-bd); --grn-tx:var(--grn-tx); --grn-solid:var(--grn-solid);
-  --danger:var(--danger);
-  --shadow:var(--shadow); --shadow-soft:var(--shadow-soft);
-  --scrim:var(--scrim);
+  --bg:#0d1117; --panel:#161b22; --hover:#1c2128; --active:#1f6feb33;
+  --wash:#1f6feb22; --wash2:#1c2b4a;
+  --border:#30363d; --border2:#21262d;
+  --text:#e6edf3; --text2:#c9d1d9; --muted:#8b949e; --faint:#6e7681;
+  --accent:#1f6feb; --accent-hi:#58a6ff; --on-accent:#ffffff;
+  --ghost:rgba(31,111,235,.12);
+  --amber:#f0b429; --amber-bd:#7d5e00; --amber-bg:#3d2e00; --amber-bg2:#4d3a00;
+  --amber-hi:#f0b429; --amber-tx:#f0b429; --amber-tx2:#e8c547;
+  --grn-bg:#0f2c1a; --grn-bd:#1f6f43; --grn-tx:#3fb950; --grn-solid:#3fb950;
+  --danger:#f85149;
+  --shadow:rgba(0,0,0,.5); --shadow-soft:rgba(0,0,0,.3);
+  --scrim:rgba(0,0,0,.6);
 }
 html.light{
   --bg:#ffffff; --panel:#f6f8fa; --hover:#eaeef2; --active:#ddf4ff;
   --wash:#ddf4ff; --wash2:#e8f0fe;
   --border:#d0d7de; --border2:#e5e8eb;
-  --text:#1f2328; --text2:#424a53; --muted:#57606a; --faint:var(--faint);
+  --text:#1f2328; --text2:#424a53; --muted:#57606a; --faint:#6e7781;
   --accent:#0969da; --accent-hi:#0969da; --on-accent:#ffffff;
   --ghost:rgba(9,105,218,.08);
-  --amber:#9a6700; --amber-bd:var(--amber-bd); --amber-bg:#fff8c5; --amber-bg2:#ffef9e;
+  --amber:#9a6700; --amber-bd:#d4a017; --amber-bg:#fff8c5; --amber-bg2:#ffef9e;
   --amber-hi:#9a6700; --amber-tx:#7d5e00; --amber-tx2:#9a6700;
-  --grn-bg:#dafbe1; --grn-bd:var(--grn-bd); --grn-tx:var(--grn-solid); --grn-solid:var(--grn-solid);
+  --grn-bg:#dafbe1; --grn-bd:#4ac26b; --grn-tx:#1a7f37; --grn-solid:#1a7f37;
   --danger:#cf222e;
   --shadow:rgba(31,35,40,.18); --shadow-soft:rgba(31,35,40,.08);
   --scrim:rgba(31,35,40,.5);
