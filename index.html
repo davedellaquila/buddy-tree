@@ -1367,7 +1367,7 @@ function renderBuddy(id){
   if (!arts) arts = '<p class="bp-empty">No artifacts yet — the drill adds the brief and repo here when they exist.</p>';
   let photos = '';
   const seedStrip = (b.photos || []).map(u => '<a href="'+escHtml(u)+'" target="_blank" rel="noopener"><img src="'+escHtml(u)+'" loading="lazy" alt=""></a>').join('');
-  photos = '<div class="bp-sec" data-field="photos"><h3>Photos</h3><div class="prow"><div class="pstrip" id="pstrip">' + seedStrip + '</div>'
+  photos = '<div class="bp-sec" data-field="photos"><h3 id="photos-h3">Photos</h3><div class="prow"><div class="pstrip" id="pstrip">' + seedStrip + '</div>'
     + '<div class="pdrop" id="pdrop">Drop photos here or click to choose<br><span style="font-size:12px">JPEG, PNG, GIF, WebP, HEIC \u2014 all supported</span></div></div>'
     + '<p class="fineprint" id="pstat"></p></div>';
   const linkedPlans = PLANS.filter(p => (p.buddies || []).includes(id));
@@ -2287,6 +2287,8 @@ async function loadPhotos(id){
     } catch (e) {}
   }
   const all = seeds.concat(repo.filter(x => !seeds.some(s => s.src === x.src)));
+  const ph3 = document.getElementById('photos-h3');
+  if (ph3) ph3.textContent = 'Photos (' + all.length + ')';
   strip.innerHTML = all.map(p => {
     const del = p.path ? '<button class="pdel" data-del="' + escHtml(p.path) + '" data-repo="' + escHtml(p.repo || 'buddy-tree') + '" title="Delete photo">✕</button>' : '';
     return '<div class="pwrap"><a href="' + escHtml(p.href) + '" target="_blank" rel="noopener"><img src="' + escHtml(p.src) + '" loading="lazy" alt=""></a>' + del + '</div>';
