@@ -197,23 +197,23 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 .fset-row.dragging{opacity:.5}
 .fset-row .fh{color:var(--muted);cursor:grab;font-size:14px}
 .fset-row .fl{flex:1;font-size:13px}
-/* Professional settings checkboxes */
+/* Circle-check settings toggles (checkmark.circle.fill style) */
 .fset-check{display:flex;align-items:center;gap:12px;margin-top:8px;padding:11px 12px;font-size:13.5px;
   cursor:pointer;border:1px solid var(--border2);border-radius:10px;background:var(--bg);user-select:none;-webkit-user-select:none}
 .fset-check:hover{border-color:var(--border);background:var(--hover)}
 .fset-check:has(input:checked){border-color:color-mix(in srgb, var(--accent) 45%, var(--border));background:var(--wash)}
 #field-settings input[type=checkbox]{
-  -webkit-appearance:none;appearance:none;width:20px;height:20px;margin:0;flex:0 0 20px;
-  border:1.5px solid var(--border);border-radius:6px;background:var(--panel);cursor:pointer;
-  position:relative;transition:background .15s ease,border-color .15s ease,box-shadow .15s ease}
-#field-settings input[type=checkbox]:hover{border-color:var(--accent)}
+  -webkit-appearance:none;appearance:none;width:28px;height:28px;margin:0;flex:0 0 28px;
+  border:2px solid var(--border);border-radius:50%;background:var(--panel);cursor:pointer;
+  position:relative;transition:background .15s ease,border-color .15s ease,box-shadow .15s ease,transform .12s ease}
+#field-settings input[type=checkbox]:hover{border-color:var(--accent);background:var(--ghost)}
 #field-settings input[type=checkbox]:checked{background:var(--accent);border-color:var(--accent)}
 #field-settings input[type=checkbox]:checked::after{
-  content:'';position:absolute;left:6px;top:2px;width:5px;height:10px;
-  border:solid var(--on-accent);border-width:0 2px 2px 0;transform:rotate(45deg)}
+  content:'';position:absolute;left:9px;top:4px;width:6px;height:12px;
+  border:solid var(--on-accent);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
 #field-settings input[type=checkbox]:focus-visible{outline:none;box-shadow:0 0 0 3px var(--ghost)}
-#field-settings input[type=checkbox]:active{transform:scale(.96)}
-.fset-row input[type=checkbox]{margin-left:4px}
+#field-settings input[type=checkbox]:active{transform:scale(.92)}
+.fset-row input[type=checkbox]{margin-left:2px}
 .bp-close-x{position:absolute;top:10px;right:10px;z-index:10;width:36px;height:36px;
   background:none;border:none;border-radius:8px;color:var(--muted);font-size:24px;
   cursor:pointer;display:flex;align-items:center;justify-content:center}
