@@ -203,8 +203,9 @@ body{background:var(--bg);color:var(--text)}
 body{padding:0}
 .app{display:flex;min-height:100vh;align-items:stretch}
 #sidebar{width:308px;flex:0 0 308px;background:var(--bg);border-right:1px solid var(--border2);
-  padding:0 14px 32px;position:sticky;top:0;height:100vh;overflow-y:auto;overflow-x:hidden;overflow-wrap:break-word}
-#main{flex:1;min-width:0;padding:36px 32px 80px}
+  padding:0 14px 32px;position:sticky;top:0;height:100vh;overflow-y:auto;overflow-x:hidden;overflow-wrap:break-word;
+  z-index:40}
+#main{flex:1;min-width:0;padding:36px 32px 80px;position:relative;z-index:1}
 .brand{padding:22px 8px 14px;background:var(--bg)}
 .sb-sticky-head{position:sticky;top:0;z-index:5;background:var(--bg);padding-bottom:4px;border-bottom:1px solid var(--border)}
 .brand .eyebrow{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
@@ -489,14 +490,16 @@ body.standalone .sa-bar{display:flex}
   /* Keep a real left sidebar — do not stack above main (iPad portrait is ~744–834px). */
   .app{display:flex;flex-direction:row;align-items:stretch}
   #sidebar{width:250px;flex:0 0 250px;position:sticky;top:0;height:100vh;height:100dvh;
-    max-height:none;border-right:1px solid var(--border2);border-bottom:0;overflow-y:auto;overflow-x:hidden}
-  #main{flex:1;min-width:0;padding:28px 22px 64px}
+    max-height:none;border-right:1px solid var(--border2);border-bottom:0;overflow-y:auto;overflow-x:hidden;
+    z-index:40;background:var(--bg)}
+  #main{flex:1;min-width:0;padding:28px 22px 64px;position:relative;z-index:1}
   #main.homepage-mode{padding:0}
-  #view-nav{display:flex;gap:4px;background:var(--panel);border:1px solid var(--border);
-    border-radius:12px;padding:4px}
-  #view-nav .navbtn{flex:1}
+  /* Vertical view list (same as desktop) — not a horizontal pill strip */
+  #view-nav{display:flex;flex-direction:column;gap:2px;background:transparent;border:none;
+    border-radius:0;padding:0}
+  #view-nav .navbtn{flex:none;width:100%}
   .node{width:172px}
-  #view-buddy.panel{position:fixed;top:0;right:0;bottom:0;width:min(380px,92vw);z-index:60;
+  #view-buddy.panel{position:fixed;top:0;right:0;bottom:0;width:min(380px,calc(100vw - 250px));z-index:30;
     background:var(--bg);border-left:1px solid var(--border);overflow-y:auto;overflow-x:hidden;
     padding:20px 18px 48px;box-shadow:-8px 0 32px var(--shadow)}
 }
@@ -2999,7 +3002,7 @@ function initGear(){
 // has a newer build than the one currently loaded (helps Safari web apps
 // and other containers without a hard-refresh shortcut).
 function initVersionCheck(){
-  const myBuild = '20261010.1019';
+  const myBuild = '20261010.1024';
   async function check(){
     try {
       const r = await fetch('version.txt?_=' + Date.now(), {cache: 'no-store'});
