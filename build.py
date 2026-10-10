@@ -303,6 +303,15 @@ body.standalone .sa-bar{display:flex}
 #main .view.active{display:block}
 #bp-close{display:none}
 #view-buddy.panel #bp-close,#view-buddy.sheet #bp-close{display:inline-block}
+/* ---------- buddy homepage embed (Project view) ---------- */
+#homepage-wrap{display:flex;flex-direction:column;height:calc(100vh - 116px);min-height:480px}
+#homepage-bar{display:flex;align-items:center;gap:10px;padding:2px 2px 10px;color:var(--muted);font-size:13px}
+#homepage-title{font-weight:600;color:var(--ink)}
+#homepage-meta{font-size:12px}
+#homepage-src{margin-left:auto;font-size:13px;color:var(--accent);text-decoration:none;white-space:nowrap}
+#homepage-src:hover{text-decoration:underline}
+#homepage-frame{flex:1;width:100%;min-height:0;border:1px solid var(--border);border-radius:12px;background:#fff}
+@media (max-width:760px){#homepage-wrap{height:calc(100vh - 88px)}}
 
 .pstrip img{height:150px;border-radius:10px;border:1px solid var(--border);display:block}
 .pstrip img:hover{border-color:var(--accent)}
@@ -524,7 +533,8 @@ function selectProject(id){
 function openBuddy(id){
   if (!byId[id]) return;
   S.projectId = id; save();
-  show('buddy:' + id);
+  if (S.sel === 'view:project') show('view:project');
+  else show('buddy:' + id);
 }
 function shortVal(v){
   if (v == null || v === '') return '(empty)';
@@ -934,7 +944,53 @@ function initPanelResize(){
     save(); sx = null;
   });
 }
+function hideHomepage(){
+  const wrap = document.getElementById('homepage-wrap');
+  if (wrap) wrap.style.display = 'none';
+  const home = document.getElementById('buddy-home');
+  if (home) home.style.display = '';
+}
+function renderHomepage(b){
+  hideHomepage();
+  const vb = document.getElementById('view-buddy');
+  const home = document.getElementById('buddy-home');
+  if (home) home.style.display = 'none';
+  let wrap = document.getElementById('homepage-wrap');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = 'homepage-wrap';
+    vb.appendChild(wrap);
+  }
+  wrap.style.display = 'flex';
+  wrap.innerHTML = '';
+  const bar = document.createElement('div');
+  bar.id = 'homepage-bar';
+  const title = document.createElement('span');
+  title.id = 'homepage-title';
+  title.textContent = (b.icon ? b.icon + ' ' : '') + b.name;
+  bar.appendChild(title);
+  const meta = document.createElement('span');
+  meta.id = 'homepage-meta';
+  meta.textContent = 'homepage' + (b.homepageSynced ? ' · mirrored ' + b.homepageSynced : '');
+  bar.appendChild(meta);
+  if (b.homepageSource) {
+    const a = document.createElement('a');
+    a.id = 'homepage-src';
+    a.href = b.homepageSource;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.textContent = 'Open on Muse ↗';
+    bar.appendChild(a);
+  }
+  const frame = document.createElement('iframe');
+  frame.id = 'homepage-frame';
+  frame.src = b.homepage;
+  frame.title = b.name + ' homepage';
+  wrap.appendChild(bar);
+  wrap.appendChild(frame);
+}
 function renderBuddy(id){
+  hideHomepage();
   const b = byId[id]; if(!b) return;
   const items = (b.attention || []).slice().sort((x,y) => (S.seen[x.id]?1:0) - (S.seen[y.id]?1:0));
   let arts = '';
@@ -1417,6 +1473,7 @@ let dragId = null;
   });
 })();
 function renderPlan(id){
+  hideHomepage();
   const p = planById[id]; if(!p) return;
   let docs = '';
   (p.docs || []).forEach(d => { docs += artRow(ICON_LINK, d.label, 'Related document', d.url); });
@@ -1482,7 +1539,8 @@ function show(sel, push){
     if (sel === 'view:project') {
       vb.classList.add('active');
       vb.style.width = '';
-      renderBuddy(projectId());
+      const pb = byId[projectId()] || {};
+      if (pb.homepage) renderHomepage(pb); else renderBuddy(projectId());
     } else if (sel.startsWith('view:')) {
       const ev = document.getElementById('view-' + sel.slice(5));
       if (ev) ev.classList.add('active');
