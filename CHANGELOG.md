@@ -5,6 +5,13 @@ All notable changes to the Buddies dashboard and buddy system. Newest first.
 
 ## 2026-10-09
 
+### Fixed
+- **Duplicate sidebar rows** — the nav's top-level filter included Project
+  Buddy's direct children *and* the recursive render nested them under
+  Project Buddy, so every direct child (and its subtree) appeared twice
+  (e.g. searching "nan" showed Nancy and Finance twice). Top level now only
+  lists parentless buddies; children render once, nested.
+
 ### Added
 - **Per-dump actions** — every ingest dump tile now has edit (✏️) and
   delete (🗑️) buttons in its upper-right corner (trash on the far right,
