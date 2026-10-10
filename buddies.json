@@ -69,7 +69,8 @@
    "statusClass": "st-brief",
    "tagline": "Trip planning, itineraries, logistics",
    "icon": "✈️",
-   "photos": []
+   "photos": [],
+   "homepage": "travel-buddy/"
   },
   {
    "attention": [
@@ -205,7 +206,8 @@
    "statusClass": "st-brief",
    "tagline": "Sundance Optima 880 — treatments & chemistry",
    "icon": "♨️",
-   "photos": []
+   "photos": [],
+   "homepage": "hot-tub-buddy/"
   },
   {
    "attention": [

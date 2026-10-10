@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travel Buddy ✈️</title>
+<style>
+  :root {
+    --bg: #0b1020;
+    --panel: #141b32;
+    --panel2: #1a2340;
+    --border: #2a3560;
+    --text: #e8edf7;
+    --muted: #93a0c4;
+    --sky: #58a6ff;
+    --sunset1: #ff9a5a;
+    --sunset2: #f778ba;
+    --sunset3: #a371f7;
+    --green: #3fb950;
+    --amber: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: radial-gradient(1200px 500px at 50% -10%, #1c2547 0%, var(--bg) 60%) fixed, var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* ---- flight path banner ---- */
+  .sky { margin-bottom: 8px; }
+  .sky svg { width: 100%; height: 110px; display: block; }
+  header { text-align: center; margin-bottom: 40px; }
+  .avatar { font-size: 68px; display: inline-block; animation: float 3.2s ease-in-out infinite; }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+  h1 {
+    font-size: 46px; font-weight: 800; margin: 12px 0 6px;
+    background: linear-gradient(120deg, var(--sunset1), var(--sunset2), var(--sunset3));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .tagline { font-size: 19px; color: var(--muted); font-style: italic; }
+
+  /* ---- boarding pass ---- */
+  .pass {
+    display: flex; background: linear-gradient(135deg, var(--panel2), var(--panel));
+    border: 1px solid var(--border); border-radius: 18px; overflow: hidden;
+    margin: 32px 0; box-shadow: 0 12px 40px rgba(0,0,0,.45);
+  }
+  .pass-main { flex: 1; padding: 24px 28px; }
+  .pass-airline {
+    font-size: 12px; letter-spacing: .22em; color: var(--sunset1);
+    font-weight: 700; margin-bottom: 14px;
+  }
+  .pass-route { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
+  .pass-city { font-size: 30px; font-weight: 800; letter-spacing: .04em; }
+  .pass-city small { display: block; font-size: 12px; font-weight: 400; color: var(--muted); letter-spacing: .08em; }
+  .pass-plane { font-size: 30px; color: var(--sky); }
+  .pass-dots { flex: 1; border-top: 3px dashed var(--border); margin: 0 6px; }
+  .pass-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+  .pass-field span { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+  .pass-field strong { font-size: 16px; }
+  .pass-stub {
+    width: 210px; background: rgba(88,166,255,.07);
+    border-left: 2px dashed var(--border); padding: 24px 20px;
+    display: flex; flex-direction: column; justify-content: center; gap: 10px;
+    position: relative;
+  }
+  .pass-stub::before, .pass-stub::after {
+    content: ''; position: absolute; left: -13px; width: 24px; height: 24px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 50%;
+  }
+  .pass-stub::before { top: -13px; } .pass-stub::after { bottom: -13px; }
+  .barcode {
+    height: 54px; border-radius: 6px;
+    background: repeating-linear-gradient(90deg, var(--text) 0 2px, transparent 2px 5px, var(--text) 5px 6px, transparent 6px 11px, var(--text) 11px 14px, transparent 14px 17px);
+    opacity: .85;
+  }
+  .status-pill {
+    display: inline-block; margin-top: 4px; padding: 5px 14px; border-radius: 999px;
+    background: rgba(210,153,34,.15); border: 1px solid var(--amber);
+    color: var(--amber); font-size: 13px; font-weight: 700; letter-spacing: .06em;
+  }
+  @media (max-width: 640px) { .pass { flex-direction: column; } .pass-stub { width: 100%; border-left: none; border-top: 2px dashed var(--border); } }
+
+  /* ---- cards ---- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 28px 0; }
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    padding: 22px; position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    background: var(--tint, var(--sky));
+  }
+  .card h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin-bottom: 10px; }
+  .card p, .card li { font-size: 15px; }
+  .card ul { list-style: none; padding: 0; }
+  .card li { padding: 7px 0; border-bottom: 1px solid var(--border); }
+  .card li:last-child { border-bottom: none; }
+  .card li::before { content: '✦ '; color: var(--tint, var(--sky)); }
+
+  h2 { font-size: 23px; margin: 40px 0 6px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .section-sub { color: var(--muted); font-size: 14px; margin-bottom: 14px; }
+
+  .attention {
+    background: rgba(210,153,34,.08); border: 1px solid var(--amber); border-radius: 12px;
+    padding: 16px 20px; margin: 12px 0; display: flex; gap: 14px; align-items: flex-start;
+  }
+  .attention .bell { font-size: 22px; }
+  .attention strong { display: block; margin-bottom: 2px; }
+  .attention p { font-size: 14px; color: var(--muted); }
+  .attention .date { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+  .links { display: flex; flex-wrap: wrap; gap: 12px; margin: 20px 0; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 22px; border-radius: 999px; font-weight: 700; font-size: 15px;
+    text-decoration: none; color: #fff;
+    background: linear-gradient(120deg, var(--sunset1), var(--sunset2));
+    box-shadow: 0 6px 20px rgba(247,120,186,.35);
+    transition: transform .15s ease;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.ghost {
+    background: transparent; border: 1px solid var(--border); color: var(--text);
+    box-shadow: none;
+  }
+  .btn.ghost:hover { border-color: var(--sky); }
+
+  footer {
+    text-align: center; margin-top: 60px; padding-top: 24px;
+    border-top: 1px solid var(--border); color: var(--muted); font-size: 14px;
+  }
+  footer code { font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="sky">
+    <svg viewBox="0 0 800 110" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <path id="flightpath" d="M 10 95 Q 180 15 360 60 T 790 30" fill="none"
+            stroke="#58a6ff" stroke-width="2" stroke-dasharray="9 9" opacity="0.55"/>
+      <circle cx="10" cy="95" r="5" fill="#3fb950"/>
+      <circle cx="790" cy="30" r="5" fill="#f778ba"/>
+      <g font-size="26">
+        <text x="-14" y="8">✈️</text>
+        <animateMotion dur="9s" repeatCount="indefinite" rotate="auto">
+          <mpath href="#flightpath"/>
+        </animateMotion>
+      </g>
+    </svg>
+  </div>
+
+  <header>
+    <div class="avatar">✈️</div>
+    <h1>Travel Buddy</h1>
+    <p class="tagline">Trip planning, itineraries, logistics — cleared for takeoff, awaiting flight plan.</p>
+  </header>
+
+  <div class="pass">
+    <div class="pass-main">
+      <div class="pass-airline">✈️ TRAVEL BUDDY AIRWAYS &nbsp;·&nbsp; BOARDING PASS</div>
+      <div class="pass-route">
+        <div class="pass-city">IDEA<small>NAME-ONLY</small></div>
+        <div class="pass-dots"></div>
+        <div class="pass-plane">✈</div>
+        <div class="pass-dots"></div>
+        <div class="pass-city" style="text-align:right">REAL<small>PRODUCT</small></div>
+      </div>
+      <div class="pass-fields">
+        <div class="pass-field"><span>Flight</span><strong>TB-001</strong></div>
+        <div class="pass-field"><span>Seat</span><strong>Brief Review</strong></div>
+        <div class="pass-field"><span>Gate</span><strong>Dave</strong></div>
+        <div class="pass-field"><span>Boarding</span><strong>At review</strong></div>
+      </div>
+    </div>
+    <div class="pass-stub">
+      <div class="barcode"></div>
+      <div><span class="status-pill">⏳ AWAITING DIRECTION</span></div>
+      <p style="font-size:13px;color:var(--muted)">Dave corrects the course when he reviews the brief.</p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card" style="--tint: #58a6ff">
+      <h3>The working interpretation</h3>
+      <p>Built from the name alone: a buddy for <strong>trip planning, itineraries, and logistics</strong>. Dave hasn't set the direction yet — this is the placeholder flight plan until he does.</p>
+    </div>
+    <div class="card" style="--tint: #f778ba">
+      <h3>Open questions</h3>
+      <ul>
+        <li>What kind of traveler is Dave, really?</li>
+        <li>Road trips, flights, cabin weekends — or all three?</li>
+        <li>Full itineraries or loose logistics?</li>
+        <li>How close does it sit to the events calendar?</li>
+      </ul>
+    </div>
+    <div class="card" style="--tint: #3fb950">
+      <h3>Someday I'll track</h3>
+      <ul>
+        <li>Trips &amp; day-by-day itineraries</li>
+        <li>Bookings &amp; confirmations in one place</li>
+        <li>Packing lists that learn</li>
+        <li>Travel docs, ready offline</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>🔔 Needs your attention</h2>
+  <p class="section-sub">Straight from the dashboard's attention feed.</p>
+  <div class="attention">
+    <span class="bell">🔔</span>
+    <div>
+      <strong>Product brief ready for review</strong>
+      <p>Looks good, edits, or defer? Note: the brief is a working interpretation from the name alone — trip planning, itineraries, logistics. Dave corrects the direction at review, then comes the PRD decision.</p>
+      <div class="date">Opened 2026-10-09</div>
+    </div>
+  </div>
+
+  <h2>🔗 Links</h2>
+  <div class="links">
+    <a class="btn" href="https://docs.google.com/document/d/1VWXXml-y3uL-mlps-jmDmDYJcLSG1gY_F_ehdRaDRJs/edit" target="_blank" rel="noopener">📄 Product Brief</a>
+    <a class="btn ghost" href="https://github.com/davedellaquila/travel-buddy" target="_blank" rel="noopener">💻 GitHub repo</a>
+  </div>
+
+  <footer>
+    <p>Designed by Travel Buddy, for Dave. ✈️</p>
+    <p style="margin-top: 8px;">This page lives at <code>travel-buddy/</code> in the buddy-system repo.</p>
+  </footer>
+</div>
+</body>
+</html>
