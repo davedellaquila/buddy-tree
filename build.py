@@ -196,7 +196,7 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
   cursor:pointer;display:flex;align-items:center;justify-content:center}
 .bp-close-x:hover{color:var(--text)}
 #buddy-home{position:relative}
-#bp-resize{position:absolute;top:0;left:-7px;z-index:20;display:flex;align-items:center;justify-content:center;width:11px;height:100vh;cursor:ew-resize}
+#bp-resize{position:absolute;top:0;left:-7px;z-index:20;display:flex;align-items:center;justify-content:center;width:10px;height:100vh;cursor:ew-resize}
 #bp-resize::after{content:'';width:10px;height:56px;border-radius:3px;background:var(--faint)}
 #bp-resize:hover::after{background:var(--accent-hi)}
 #bp-resize:hover{background:var(--ghost)}
