@@ -1381,6 +1381,10 @@ function renderBuddy(id){
       const after = getHomepage(b);
       if (before !== after) logChange('homepage', id, 'Homepage URL \u2192 ' + (after || '(cleared)'), before || null, after || null);
       save();
+      // If the Project Homepage view is showing this buddy, reload it with the new URL
+      if (S.sel === 'view:project' && S.projectId === id) {
+        renderProjectView();
+      }
     });
     // Prevent the global click handler from re-opening the buddy when clicking the input
     hpu.addEventListener('click', e => e.stopPropagation());
