@@ -1470,6 +1470,10 @@ function attachPan(el){
     if (!pan || (pid !== undefined && pid !== pan.id)) return;
     const dx = x - pan.x, dy = y - pan.y;
     if (!pan.moved && Math.abs(dx) + Math.abs(dy) < 5) return;
+    if (!pan.moved) {
+      // Dragging started — capture pointer so pan continues outside the element
+      try { if (pid !== undefined && pid !== 'mouse') el.setPointerCapture(pid); } catch (err) {}
+    }
     pan.moved = true;
     el.classList.add('panning');
     el.scrollLeft = pan.sl - dx;
@@ -1489,7 +1493,8 @@ function attachPan(el){
     if (e.button !== 0) return;
     if (e.target.closest && (e.target.closest('.grip') || e.target.closest('input,textarea,button'))) return;
     startPan(e.clientX, e.clientY, e.pointerId);
-    try { el.setPointerCapture(e.pointerId); } catch (err) {}
+    // Don't set pointer capture here — it interferes with click events on tree nodes.
+    // Capture is set in movePan once dragging actually starts.
   });
   el.addEventListener('pointermove', e => { movePan(e.clientX, e.clientY, e.pointerId); e.preventDefault(); });
   el.addEventListener('pointerup', e => endPan(e.pointerId));
