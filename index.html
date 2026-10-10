@@ -585,8 +585,11 @@ html.light #menu-btn .menu-btn-dot{box-shadow:0 0 0 2px rgba(255,255,255,.85)}
 /* ---------- Project view: stat tiles + buddy homepage embed ---------- */
 #project-tiles{display:flex;gap:14px;margin:2px auto 20px;max-width:860px;flex-wrap:wrap}
 #project-status-tiles{display:flex;gap:14px;margin:2px auto 20px;max-width:860px;flex-wrap:wrap}
-#project-status-tiles .ptile{flex:1 1 180px;max-width:calc(25% - 11px)}
 .ptile{flex:1 1 170px;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 18px 12px;position:relative;overflow:hidden;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
+/* Desktop only — never leave 25% max-width on iPhone (crushes status tiles) */
+@media (min-width:640px){
+  #project-status-tiles .ptile{flex:1 1 180px;max-width:calc(25% - 11px)}
+}
 .ptile:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.12)}
 .ptile::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--tint)}
 /* ---- Business Plans cards ---- */
@@ -712,18 +715,36 @@ html.light #menu-btn .menu-btn-dot{box-shadow:0 0 0 2px rgba(255,255,255,.85)}
   .plan-card-link{font-size:15px;margin-top:6px}
   .proj-row .pname{font-size:16px}
   .proj-row .pdesc{font-size:15.5px;line-height:1.4}
-  /* Manifest / project rows: title + status on first row; description full-width below */
+  /* Project / Manifest / SME rows: card stack — title+status, then full-width description */
   .proj-row{
-    display:flex;flex-wrap:wrap;align-items:flex-start;gap:6px 10px;
+    display:flex !important;flex-direction:column !important;flex-wrap:nowrap !important;
+    align-items:stretch !important;gap:6px;
     background:var(--panel);border:1px solid var(--border);border-bottom:1px solid var(--border);
     border-radius:12px;margin:0 0 8px;padding:12px 14px}
   .proj-row .dot{display:none}
-  .proj-row .parrow{order:0;margin-top:2px;flex:0 0 auto}
-  .proj-row .pname{order:1;flex:1 1 auto;min-width:0;white-space:normal;line-height:1.3}
-  .proj-row .status{order:2;flex:0 0 auto;margin-left:auto}
-  .proj-row .pdesc{order:3;flex:1 1 100%;width:100%;max-width:none;font-size:15.5px;line-height:1.45}
-  .proj-row .proj-info{order:4;flex:1 1 100%;padding:2px 0 !important}
+  .proj-row-head{display:flex;align-items:center;gap:8px;width:100%;min-width:0}
+  .proj-row-head .parrow{flex:0 0 auto;margin-top:0}
+  .proj-row-head .pname{flex:1 1 auto;min-width:0;white-space:normal;line-height:1.3}
+  .proj-row-head .status{flex:0 0 auto;margin-left:auto}
+  .proj-row-head .proj-info{flex:0 0 auto;padding:4px !important;opacity:.75}
+  .proj-row > .pdesc,.proj-row .pdesc{
+    display:block;order:unset;flex:none !important;width:100% !important;max-width:none !important;
+    font-size:15.5px;line-height:1.45}
+  /* Static rows without .proj-row-head (Manifest): CSS grid stack */
+  .proj-row:not(:has(.proj-row-head)){
+    display:grid !important;grid-template-columns:1fr auto;grid-template-areas:"title status" "desc desc";
+    gap:6px 10px;align-items:start}
+  .proj-row:not(:has(.proj-row-head)) .pname{grid-area:title;white-space:normal;line-height:1.3;min-width:0}
+  .proj-row:not(:has(.proj-row-head)) .status{grid-area:status;justify-self:end}
+  .proj-row:not(:has(.proj-row-head)) .pdesc{grid-area:desc}
+  .proj-row:not(:has(.proj-row-head)) .parrow{display:none}
   .proj-row.d0,.proj-row.d1,.proj-row.d2,.proj-row.d3{padding-left:14px}
+  /* Re-assert 2-col tiles AFTER desktop #project-status-tiles rules (cascade safety) */
+  #project-tiles,#changelog-tiles,#plans-tiles,#manifest-tiles,#project-status-tiles{
+    display:grid !important;grid-template-columns:1fr 1fr !important;gap:6px !important;
+    max-width:none !important;width:100% !important;margin:0 0 10px !important;box-sizing:border-box}
+  #project-tiles .ptile,#changelog-tiles .ptile,#plans-tiles .ptile,#manifest-tiles .ptile,#project-status-tiles .ptile{
+    flex:none !important;max-width:none !important;min-width:0 !important;width:auto !important}
 }
 /* ---- Buddy detail: iPhone readability & thumb targets (after base .bp-* rules) ---- */
 @media (max-width:639px){
@@ -1698,7 +1719,7 @@ function initPanelResize(){
   });
 }
 function tileHtml(label, num, tint, sub, fkey, sel, tip){
-  return '<div class="ptile' + (sel ? ' sel' : '') + '"' + (fkey ? ' data-tile="' + fkey + '"' : '') + (tip ? ' title="' + escHtml(tip) + '"' : '') + ' style="--tint:' + tint + ';flex:1">'
+  return '<div class="ptile' + (sel ? ' sel' : '') + '"' + (fkey ? ' data-tile="' + fkey + '"' : '') + (tip ? ' title="' + escHtml(tip) + '"' : '') + ' style="--tint:' + tint + '">'
     + '<div class="ptile-label">' + escHtml(label) + '</div>'
     + '<div class="ptile-num">' + escHtml(String(num)) + '</div>'
     + '<div class="ptile-sub">' + escHtml(sub) + '</div></div>';
@@ -2195,12 +2216,14 @@ function renderProjects(){
     const hasKids = kids.length > 0;
     const collapsed = (projFilter || statusFilter) ? false : !!S.projCollapsed[id];
     s += '<div class="proj-row d' + Math.min(depth, 3) + '" data-buddy="' + b.id + '">'
+      + '<div class="proj-row-head">'
       + (hasKids ? '<span class="parrow ' + (collapsed ? '' : 'expanded') + '" data-proj-toggle="' + b.id + '">›</span>' : '')
-      + (depth ? '<span class="dot">└</span>' : '')
       + '<span class="pname">' + iconName(b) + '</span>'
-      + '<span class="pdesc">' + escHtml(b.tagline || '') + '</span>'
       + '<span class="status ' + b.statusClass + '">' + escHtml(b.status) + '</span>'
-      + '<button class="proj-info" data-proj-info="' + b.id + '" title="Open ' + escHtml(dispName(b)) + ' details (right panel)" style="background:none;border:none;cursor:pointer;font-size:16px;padding:4px 8px;opacity:0.6" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">ⓘ</button></div>';
+      + '<button class="proj-info" data-proj-info="' + b.id + '" title="Open ' + escHtml(dispName(b)) + ' details (right panel)" aria-label="Open details" style="background:none;border:none;cursor:pointer;font-size:16px;padding:4px 8px;opacity:0.75">ⓘ</button>'
+      + '</div>'
+      + '<span class="pdesc">' + escHtml(b.tagline || '') + '</span>'
+      + '</div>';
     if (!collapsed) kids.forEach(c => walk(c.id, depth + 1));
   })('project-buddy', 0);
   s += '</div></section>';
