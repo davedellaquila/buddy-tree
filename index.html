@@ -226,6 +226,7 @@ body{padding:0}
 .brow{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:0;
   color:var(--text);font:inherit;font-size:13.5px;padding:6px 10px 6px 8px;border-radius:8px;cursor:pointer}
 .brow:hover{background:var(--hover)}
+.brow:hover .binfo{opacity:0.7 !important}
 .brow.sel{background:var(--active);box-shadow:inset 2px 0 0 var(--accent)}
 .bdot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:0 0 8px;visibility:hidden}
 .brow.has-unseen .bdot{visibility:visible}
@@ -935,30 +936,38 @@ function selectProject(id){
   S.projectId = id; save();
   show('view:project');
 }
-function openBuddy(id){
+function selectBuddy(id){
   if (!byId[id]) return;
   const b = byId[id];
-  // Project Homepage view: clicking a buddy loads its homepage in the main view
-  // (if it has one) AND opens the right-side detail panel.
-  // In Project Homepage view: every buddy has a homepage (custom URL or auto-generated)
+  // Select the buddy and update the main view, WITHOUT opening the right-side panel.
   if (S.view === 'project') {
     S.projectId = id; save();
     renderProjectView();
     renderNav();
-    // Fall through to open the right-side panel below
+  } else {
+    const inView = (S.sel || '').startsWith('view:');
+    S.projectId = id; save();
+    if (inView) {
+      // Update selection highlight without opening the panel
+      renderNav();
+    } else {
+      show('buddy:' + id);
+    }
   }
+}
+function openBuddy(id){
+  if (!byId[id]) return;
+  selectBuddy(id);
+  // Now open the right-side detail panel
   const inView = (S.sel || '').startsWith('view:');
-  S.projectId = id; save();
-  if (inView) {
-    // Open panel WITHOUT changing S.sel — view and buddy selections stay independent
+  const b = byId[id];
+  if (S.view === 'project' || inView) {
     const vb = document.getElementById('view-buddy');
     vb.classList.add('active');
     vb.classList.toggle('panel', window.innerWidth >= 640);
     vb.classList.toggle('sheet', window.innerWidth < 640);
     renderBuddy(id);
     renderNav();
-  } else {
-    show('buddy:' + id);
   }
 }
 function shortVal(v){
@@ -1063,7 +1072,8 @@ function renderNav(){
       + ' draggable="'+(id==='project-buddy'?'false':'true')+'"'
       + ' style="padding-left:'+(8+depth*16)+'px" title="'+escHtml(b.tagline||'')+'">'
       + '<span class="bdot"></span><span class="bicon">'+escHtml(b.icon||'')+'</span><span class="bname">'+escHtml(dispName(b))+'</span>'
-      + '<span class="bkind">'+kind+'</span></button>';
+      + '<span class="bkind">'+kind+'</span>'
+      + '<span class="binfo" data-buddy-info="'+id+'" title="Open '+escHtml(dispName(b))+' details" style="margin-left:auto;padding:2px 6px;opacity:0;transition:opacity 0.15s;cursor:pointer" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">ⓘ</span></button>';
     (kidsOf[id] || []).forEach(c => row(c.id, depth+1));
   }
   ROOT_ORDER.filter(id => { const b = byId[id]; const p = b ? effParent(b) : null; return p === null; })
@@ -1585,7 +1595,7 @@ function renderBuddy(id){
     + '<div class="bp-sec" data-field="shared"><h3>Shared notes<span class="info-tip" data-tip="Anybody with repo access can see this note. Saved to the buddy’s repo (docs/notes.md).">ⓘ</span></h3>'
     + '<textarea class="notes" id="bp-shared-notes" placeholder="Anybody with repo access can see this note."></textarea>'
     + '<p class="fineprint" id="shared-status"></p></div>'
-    + '<div class="bp-build">Build 20261010.0324</div>'
+    + '<div class="bp-build">Build 20261009.2027</div>'
     + '</div>';
   const nm = document.getElementById('bp-name');
   nm.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); } });
@@ -2108,7 +2118,7 @@ function renderPlan(id){
     + '<p class="fineprint">Saved on this device. (For your eyes only)</p></div>'
     + '<div class="bp-sec"><h3>Shared notes<span class="info-tip" data-tip="Visible to everyone with access to this project.">\u24d8</span></h3><textarea class="notes" id="bp-shared" placeholder="Shared notes\u2026 (visible to everyone with access)">'+escHtml((S.planShared||{})[id]||'')+'</textarea>'
     + '<p class="fineprint">Shared — visible to everyone with access.</p></div>'
-    + '<div class="bp-build">Build 20261010.0324</div>'
+    + '<div class="bp-build">Build 20261009.2027</div>'
     + '</div>';
   const nt = document.getElementById('bp-notes');
   let t = null;
@@ -2801,7 +2811,7 @@ function initGear(){
 // has a newer build than the one currently loaded (helps Safari web apps
 // and other containers without a hard-refresh shortcut).
 function initVersionCheck(){
-  const myBuild = '20261010.0324';
+  const myBuild = '20261009.2027';
   async function check(){
     try {
       const r = await fetch('version.txt?_=' + Date.now(), {cache: 'no-store'});
@@ -2959,6 +2969,11 @@ document.addEventListener('click', e => {
     manifestFilter = manifestFilter === manTile.dataset.tile ? null : manTile.dataset.tile;
     applyManifestFilter(); return;
   }
+  const buddyInfo = e.target.closest('[data-buddy-info]');
+  if (buddyInfo) {
+    e.stopPropagation(); e.preventDefault();
+    openBuddy(buddyInfo.dataset.buddyInfo); return;
+  }
   const projInfo = e.target.closest('[data-proj-info]');
   if (projInfo) {
     e.stopPropagation();
@@ -2976,11 +2991,17 @@ document.addEventListener('click', e => {
     }
     // Open the detail panel only if the setting is on (default: off — use the ⓘ icon instead)
     if (S.autoOpenPanel) openBuddy(projRow.dataset.buddy);
+    else selectBuddy(projRow.dataset.buddy);
     return;
   }
   const bb = e.target.closest('[data-buddy]');
   // Don't re-open the buddy when clicking an editable field (e.g. the name)
-  if (bb && !e.target.closest('[contenteditable="true"]')) { openBuddy(bb.dataset.buddy); return; }
+  // Clicking a buddy selects it; the panel only opens via the ⓘ icon or when autoOpenPanel is on.
+  if (bb && !e.target.closest('[contenteditable="true"]')) {
+    if (S.autoOpenPanel) openBuddy(bb.dataset.buddy);
+    else selectBuddy(bb.dataset.buddy);
+    return;
+  }
   const sb = e.target.closest('[data-seen]');
   if (sb) { S.seen[sb.dataset.seen] = Date.now(); save(); renderBuddy(S.sel.slice(6)); renderNav(); return; }
   const sa = e.target.closest('[data-seen-all]');
