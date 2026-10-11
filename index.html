@@ -3036,6 +3036,54 @@ function setSidebarOpen(open){
     if (sc) sc.classList.remove('show');
   }
 }
+/* iPhone: swipe right from a thin left-edge zone to open the drawer
+   (same as #menu-btn → setSidebarOpen(true)). Edge-only so vertical
+   scroll and iOS back-swipe elsewhere stay usable. */
+function initEdgeSwipeOpen(){
+  const EDGE_PX = 20;      // start must be within this of the left edge
+  const MIN_DX = 56;       // minimum rightward travel to open
+  const DOMINATE = 1.25;   // |dx| must exceed |dy| by this factor
+  let track = null;        // {id, x0, y0} or null
+
+  function onStart(e){
+    if (!isDrawerNav() || isSidebarOpen()) { track = null; return; }
+    if (document.body.classList.contains('standalone')) { track = null; return; }
+    const t = e.changedTouches && e.changedTouches[0];
+    if (!t || t.clientX > EDGE_PX) { track = null; return; }
+    track = { id: t.identifier, x0: t.clientX, y0: t.clientY };
+  }
+  function touchById(list, id){
+    if (!list) return null;
+    for (let i = 0; i < list.length; i++) if (list[i].identifier === id) return list[i];
+    return null;
+  }
+  function onMove(e){
+    if (!track) return;
+    const t = touchById(e.touches, track.id) || touchById(e.changedTouches, track.id);
+    if (!t) return;
+    const dx = t.clientX - track.x0;
+    const dy = t.clientY - track.y0;
+    // Clearly vertical → abandon so page scroll wins
+    if (Math.abs(dy) > 28 && Math.abs(dy) > Math.abs(dx)) track = null;
+  }
+  function onEnd(e){
+    if (!track) return;
+    const t = touchById(e.changedTouches, track.id);
+    const x0 = track.x0, y0 = track.y0;
+    track = null;
+    if (!t || !isDrawerNav() || isSidebarOpen()) return;
+    if (document.body.classList.contains('standalone')) return;
+    const dx = t.clientX - x0;
+    const dy = t.clientY - y0;
+    if (dx >= MIN_DX && Math.abs(dx) > Math.abs(dy) * DOMINATE) setSidebarOpen(true);
+  }
+  function onCancel(){ track = null; }
+
+  document.addEventListener('touchstart', onStart, { passive: true, capture: true });
+  document.addEventListener('touchmove', onMove, { passive: true, capture: true });
+  document.addEventListener('touchend', onEnd, { passive: true, capture: true });
+  document.addEventListener('touchcancel', onCancel, { passive: true, capture: true });
+}
 // Checks for a newer deployed version; shows an update banner if the server
 // has a newer build than the one currently loaded (helps Safari web apps
 // and other containers without a hard-refresh shortcut).
@@ -3299,6 +3347,7 @@ initSearch();
 initGear();
 initVersionCheck();
 initPlansToggle();
+initEdgeSwipeOpen();
 
 </script>
 </body>
