@@ -207,9 +207,15 @@ body{padding:0}
   z-index:40}
 #main{flex:1;min-width:0;padding:36px 32px 80px;position:relative;z-index:1}
 .brand{padding:22px 8px 14px;background:var(--bg)}
-/* Search pins at top of #sidebar scrollport; Views/brand scroll away above; Buddies scroll under */
+/* Brand chrome (eyebrow/title/subtitle + gear/close) pins at top; Views scroll under */
+.sb-brand-sticky{
+  position:sticky;top:0;z-index:7;background:var(--bg);
+  margin:0 -14px;padding:0 14px;
+  border-bottom:1px solid var(--border)}
+.sb-brand-sticky #sb-tools{position:absolute;top:8px;right:8px;z-index:10}
+/* Search stacks under brand sticky block; --sb-brand-h set from measured brand height */
 .sb-search-sticky{
-  position:sticky;top:0;z-index:6;background:var(--bg);
+  position:sticky;top:var(--sb-brand-h,96px);z-index:6;background:var(--bg);
   margin:0 -14px;padding:10px 14px 10px;
   border-bottom:1px solid var(--border);
   box-shadow:0 8px 14px -10px rgba(0,0,0,.55)}
@@ -656,9 +662,12 @@ body.standalone .sa-bar{display:flex}
 <div class="app">
 <button id="menu-btn" aria-label="Open menu">☰</button>
 <div id="sb-scrim"></div>
-<aside id="sidebar"><div id="sb-tools"><button id="sb-gear" title="Settings (⌘,)" aria-label="Settings"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button id="sb-close" title="Close sidebar" aria-label="Close sidebar"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><path class="xmark-x" d="M8.8 8.8l6.4 6.4m0-6.4l-6.4 6.4" fill="none" stroke-width="2.25" stroke-linecap="round"/></svg></button></div>
+<aside id="sidebar">
 <div id="sb-resize" title="Drag left or right to resize the sidebar. Double-click to reset to default width."></div>
-  <div class="brand"><div class="eyebrow">Project Buddy &middot; macro view</div><h1 id="brand-name" title="Click to rename">Buddies</h1><div class="bcount">54 buddies &middot; one family</div></div>
+  <div class="sb-brand-sticky">
+    <div id="sb-tools"><button id="sb-gear" title="Settings (⌘,)" aria-label="Settings"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button id="sb-close" title="Close sidebar" aria-label="Close sidebar"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><path class="xmark-x" d="M8.8 8.8l6.4 6.4m0-6.4l-6.4 6.4" fill="none" stroke-width="2.25" stroke-linecap="round"/></svg></button></div>
+    <div class="brand"><div class="eyebrow">Project Buddy &middot; macro view</div><h1 id="brand-name" title="Click to rename">Buddies</h1><div class="bcount">54 buddies &middot; one family</div></div>
+  </div>
   <div class="nav-sec"><h3>Views</h3><div id="view-nav"></div></div>
   <div class="sb-search-sticky">
     <input type="search" id="buddy-search" placeholder="Search buddies…" aria-label="Search buddies"
@@ -3046,6 +3055,22 @@ function setSidebarOpen(open){
     if (sc) sc.classList.remove('show');
   }
 }
+/* Keep --sb-brand-h in sync so .sb-search-sticky stacks under the brand chrome. */
+function syncSbBrandStickyHeight(){
+  const sb = document.getElementById('sidebar');
+  const brand = document.querySelector('.sb-brand-sticky');
+  if (!sb || !brand) return;
+  const h = Math.ceil(brand.getBoundingClientRect().height);
+  if (h > 0) sb.style.setProperty('--sb-brand-h', h + 'px');
+}
+function initSbBrandSticky(){
+  syncSbBrandStickyHeight();
+  const brand = document.querySelector('.sb-brand-sticky');
+  if (brand && typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(() => syncSbBrandStickyHeight()).observe(brand);
+  }
+  window.addEventListener('resize', syncSbBrandStickyHeight);
+}
 /* iPhone: swipe right from a thin left-edge zone to open the drawer
    (same as #menu-btn → setSidebarOpen(true)). Edge-only so vertical
    scroll and iOS back-swipe elsewhere stay usable. */
@@ -3357,6 +3382,7 @@ initSearch();
 initGear();
 initVersionCheck();
 initPlansToggle();
+initSbBrandSticky();
 initEdgeSwipeOpen();
 
 </script>
