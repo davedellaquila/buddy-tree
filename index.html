@@ -327,6 +327,18 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
   border-radius:8px;padding:8px 10px;font-size:13px;margin-bottom:10px}
 #token-pop .saved-check{display:none;color:var(--grn-tx);font-size:14px;font-weight:600;margin-top:8px}
 #token-pop .saved-check.show{display:block}
+/* Reopen right detail panel when closed (Muse-ish fixed chrome) */
+#panel-open{position:fixed;top:12px;right:12px;z-index:85;width:44px;height:44px;border-radius:12px;
+  background:var(--panel);border:1px solid var(--border);color:var(--muted);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;padding:0;
+  box-shadow:0 2px 14px var(--shadow);-webkit-tap-highlight-color:transparent;transition:border-color .15s,color .15s,transform .15s}
+#panel-open:hover{color:var(--accent);border-color:var(--accent);transform:scale(1.05)}
+#panel-open:active{transform:scale(.96)}
+#panel-open svg{display:block}
+body:has(#view-buddy.active) #panel-open,
+body.standalone #panel-open{display:none}
+/* When token pill is present, sit just to its left */
+body:has(#token-pill) #panel-open{right:148px}
 .ctog{display:none;width:18px;height:18px;flex:0 0 18px;align-items:center;justify-content:center;
   background:none;border:none;color:var(--muted);cursor:pointer;font-size:10px;padding:0;margin-right:2px}
 .brow:hover .ctog.has-kids{display:inline-flex}
@@ -337,7 +349,12 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
 #field-settings.show{display:flex;flex-direction:column}
 #field-settings .fset-head{padding:20px 20px 0;cursor:move;user-select:none;-webkit-user-select:none;flex:0 0 auto}
 #field-settings .fset-head h3{margin:0 0 12px;font-size:14px}
-#field-settings .fset-body{padding:0 20px;overflow-y:auto;flex:1 1 auto;min-height:0}
+#field-settings .fset-body{padding:0 20px 16px;overflow-y:auto;flex:1 1 auto;min-height:0}
+#field-settings .fset-sec{margin:0}
+#field-settings .fset-sec-h{position:sticky;top:0;z-index:3;margin:0;padding:12px 0 8px;font-size:13px;
+  letter-spacing:.02em;background:var(--panel);border-bottom:1px solid var(--border);color:var(--text)}
+#field-settings .fset-sec + .fset-sec .fset-sec-h{margin-top:8px}
+#field-settings .fset-sec .fineprint{margin:10px 0 12px}
 #field-settings .fset-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:space-between;align-items:center;background:var(--panel);flex:0 0 auto}
 #field-settings .fset-resize{position:absolute;right:3px;bottom:3px;width:14px;height:14px;cursor:nwse-resize;opacity:.55;
   background:linear-gradient(135deg,transparent 55%,var(--muted) 55%);border-radius:0 0 8px 0}
@@ -348,11 +365,15 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
   box-shadow:0 2px 8px rgba(0,0,0,.08);transition:all .15s ease}
 #field-settings .fset-close-x:hover{color:#fff;background:linear-gradient(135deg,#e0533d,#c23e2a);border-color:#c23e2a;box-shadow:0 2px 12px rgba(224,83,61,.3);transform:scale(1.05)}
 .fset-row{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--border2);border-radius:8px;margin-bottom:6px;background:var(--bg);cursor:grab}
-.fset-row.drag-over{border-color:var(--accent);background:var(--wash2)}
-.fset-row .fh{touch-action:none;cursor:grab;padding:4px 8px;font-size:18px;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center}
-.fset-row.dragging{opacity:.5}
-.fset-row .fh{color:var(--muted);cursor:grab;font-size:14px}
+.fset-row .fh{touch-action:none;cursor:grab;padding:4px 8px;font-size:18px;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
 .fset-row .fl{flex:1;font-size:13px}
+/* Settings list DnD feedback: dim source, dashed insert line, elevated ghost */
+.fset-row.dragging{opacity:.32;border-style:dashed;background:var(--wash)}
+.fset-insert{height:0;margin:-1px 2px 5px;border:0;border-top:2px dashed var(--accent);
+  box-shadow:0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);pointer-events:none}
+#fset-ghost{position:fixed;z-index:4000;pointer-events:none;margin:0;opacity:.95;
+  box-shadow:0 12px 32px rgba(0,0,0,.55);border-color:var(--accent);transform:scale(1.03);
+  background:var(--panel)}
 /* Circle-check settings toggles (checkmark.circle.fill style) */
 .fset-check{display:flex;align-items:center;gap:12px;margin-top:8px;padding:11px 12px;font-size:13.5px;
   cursor:pointer;border:1px solid var(--border2);border-radius:10px;background:var(--bg);user-select:none;-webkit-user-select:none}
@@ -661,6 +682,9 @@ body.standalone .sa-bar{display:flex}
 <body>
 <div class="app">
 <button id="menu-btn" aria-label="Open menu">☰</button>
+<button type="button" id="panel-open" title="Open buddy details" aria-label="Open buddy details">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><circle cx="12" cy="8" r="1.1" fill="currentColor" stroke="none"/></svg>
+</button>
 <div id="sb-scrim"></div>
 <aside id="sidebar">
 <div id="sb-resize" title="Drag left or right to resize the sidebar. Double-click to reset to default width."></div>
@@ -1382,9 +1406,11 @@ function openFieldSettings(){
     m = document.createElement('div'); m.id = 'field-settings';
     m.innerHTML = '<button class="fset-close-x" id="fset-x" title="Close">✕</button>'
       + '<div class="fset-head" id="fset-drag"><h3>Settings</h3></div>'
-      + '<div class="fset-body"><div id="fset-settings"></div>'
-      + '<h3 style="margin-top:18px">Buddy fields</h3><p class="fineprint" style="margin-bottom:12px">Drag to reorder. Uncheck to hide.</p><div id="fset-list"></div>'
-      + '<h3 style="margin-top:18px">Main views</h3><p class="fineprint" style="margin-bottom:12px">Drag to reorder. Number keys 1–9 follow this order.</p><div id="vset-list"></div></div>'
+      + '<div class="fset-body">'
+      + '<section class="fset-sec"><h3 class="fset-sec-h">Preferences</h3><div id="fset-settings"></div></section>'
+      + '<section class="fset-sec"><h3 class="fset-sec-h">Buddy fields</h3><p class="fineprint">Drag to reorder. Uncheck to hide.</p><div id="fset-list"></div></section>'
+      + '<section class="fset-sec"><h3 class="fset-sec-h">Main views</h3><p class="fineprint">Drag to reorder. Number keys 1–9 follow this order.</p><div id="vset-list"></div></section>'
+      + '</div>'
       + '<div class="fset-footer">'
       + '<div style="display:flex;gap:8px"><button class="linkbtn" id="fset-reset" title="Restore all settings to factory defaults">Reset to Factory Defaults</button>'
       + '<button class="linkbtn" id="fset-update" title="Save current settings as the new factory defaults">Update Factory Defaults</button></div>'
@@ -1415,71 +1441,122 @@ function openFieldSettings(){
       + '<span class="fh">☰</span><span class="fl">' + def.label + '</span>'
       + '<input type="checkbox" ' + (vis ? 'checked' : '') + ' data-vis="' + fid + '" title="Show/hide"></div>';
   }).join('');
-  // Drag reorder
-  let dragEl = null;
-  list.querySelectorAll('.fset-row').forEach(row => {
-    row.addEventListener('dragstart', e => { dragEl = row; row.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
-    row.addEventListener('dragend', () => row.classList.remove('dragging'));
-    row.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
-    row.addEventListener('drop', e => {
-      e.preventDefault();
-      if (!dragEl || dragEl === row) return;
-      const ids = Array.from(list.querySelectorAll('.fset-row')).map(r => r.dataset.fid);
-      const from = ids.indexOf(dragEl.dataset.fid), to = ids.indexOf(row.dataset.fid);
-      const order = getFieldOrder();
-      const [moved] = order.splice(from, 1);
-      order.splice(to, 0, moved);
-      S.fieldOrder = order; save();
-      openFieldSettings();
-      const vb2 = document.getElementById('view-buddy');
-      if (vb2 && vb2.classList.contains('active') && S.projectId && byId[S.projectId]) {
-        renderBuddy(S.projectId);
-      }
-    });
-  });
-  // Touch drag support for iPad (HTML5 DnD doesn't work on touch)
-  function addTouchDrag(listEl, getId, onReorder) {
-    let tDragEl = null, tTarget = null;
+  function clearFsetDnD(listEl){
+    if (listEl) {
+      listEl.querySelectorAll('.fset-row').forEach(r => r.classList.remove('dragging'));
+      listEl.querySelectorAll('.fset-insert').forEach(n => n.remove());
+    }
+    const g = document.getElementById('fset-ghost');
+    if (g) g.remove();
+  }
+  function moveFsetGhost(row, clientX, clientY){
+    let g = document.getElementById('fset-ghost');
+    if (!g) {
+      g = row.cloneNode(true);
+      g.id = 'fset-ghost';
+      g.classList.remove('dragging');
+      g.querySelectorAll('input').forEach(i => { i.disabled = true; });
+      g.style.width = row.getBoundingClientRect().width + 'px';
+      document.body.appendChild(g);
+    }
+    g.style.left = Math.max(8, clientX - 28) + 'px';
+    g.style.top = Math.max(8, clientY - 22) + 'px';
+  }
+  function placeFsetInsert(listEl, clientY, dragEl){
+    listEl.querySelectorAll('.fset-insert').forEach(n => n.remove());
+    const rows = [...listEl.querySelectorAll('.fset-row')].filter(r => r !== dragEl);
+    let before = null;
+    for (const r of rows) {
+      const rect = r.getBoundingClientRect();
+      if (clientY < rect.top + rect.height / 2) { before = r; break; }
+    }
+    const marker = document.createElement('div');
+    marker.className = 'fset-insert';
+    if (before) listEl.insertBefore(marker, before);
+    else listEl.appendChild(marker);
+    return before;
+  }
+  function insertBeforeFromMarker(listEl, dragEl){
+    const insert = listEl.querySelector('.fset-insert');
+    let before = insert ? insert.nextElementSibling : null;
+    while (before && (before === dragEl || !before.classList || !before.classList.contains('fset-row'))) {
+      before = before.nextElementSibling;
+    }
+    return before;
+  }
+  function reorderBefore(order, fromId, beforeId){
+    const from = order.indexOf(fromId);
+    if (from < 0) return order;
+    const next = order.slice();
+    const [moved] = next.splice(from, 1);
+    if (!beforeId) next.push(moved);
+    else {
+      const to = next.indexOf(beforeId);
+      if (to < 0) next.push(moved);
+      else next.splice(to, 0, moved);
+    }
+    return next;
+  }
+  // HTML5 + touch reorder with ghost preview and dashed insert line
+  function bindFsetListDnD(listEl, getId, applyOrder){
+    let dragEl = null;
+    const finish = () => {
+      if (!dragEl) return;
+      const before = insertBeforeFromMarker(listEl, dragEl);
+      const fromId = getId(dragEl);
+      const beforeId = before ? getId(before) : null;
+      clearFsetDnD(listEl);
+      if (fromId && beforeId !== fromId) applyOrder(fromId, beforeId);
+      dragEl = null;
+    };
     listEl.querySelectorAll('.fset-row').forEach(row => {
+      row.addEventListener('dragstart', e => {
+        dragEl = row;
+        row.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        try { e.dataTransfer.setData('text/plain', getId(row)); } catch (err) {}
+        const ghost = row.cloneNode(true);
+        ghost.style.cssText = 'position:absolute;top:-9999px;left:0;width:' + row.offsetWidth + 'px;opacity:.95;box-shadow:0 12px 32px rgba(0,0,0,.55);border-color:var(--accent);background:var(--panel)';
+        document.body.appendChild(ghost);
+        try { e.dataTransfer.setDragImage(ghost, 28, 22); } catch (err) {}
+        setTimeout(() => ghost.remove(), 0);
+      });
+      row.addEventListener('dragend', () => { clearFsetDnD(listEl); dragEl = null; });
+      row.addEventListener('dragover', e => {
+        e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+        if (dragEl) placeFsetInsert(listEl, e.clientY, dragEl);
+      });
+      row.addEventListener('drop', e => { e.preventDefault(); finish(); });
       const handle = row.querySelector('.fh');
       if (!handle) return;
       handle.style.touchAction = 'none';
       handle.addEventListener('touchstart', e => {
-        tDragEl = row; row.classList.add('dragging');
+        const t = e.touches[0];
+        dragEl = row;
+        row.classList.add('dragging');
+        moveFsetGhost(row, t.clientX, t.clientY);
+        placeFsetInsert(listEl, t.clientY, dragEl);
         e.preventDefault();
       }, {passive: false});
       handle.addEventListener('touchmove', e => {
-        if (!tDragEl) return;
+        if (!dragEl) return;
         e.preventDefault();
         const t = e.touches[0];
-        const el = document.elementFromPoint(t.clientX, t.clientY);
-        const targetRow = el ? el.closest('.fset-row') : null;
-        listEl.querySelectorAll('.fset-row').forEach(r => r.classList.remove('drag-over'));
-        if (targetRow && targetRow !== tDragEl) {
-          targetRow.classList.add('drag-over');
-          tTarget = targetRow;
-        } else {
-          tTarget = null;
-        }
+        moveFsetGhost(dragEl, t.clientX, t.clientY);
+        placeFsetInsert(listEl, t.clientY, dragEl);
       }, {passive: false});
-      handle.addEventListener('touchend', e => {
-        if (!tDragEl) return;
-        row.classList.remove('dragging');
-        listEl.querySelectorAll('.fset-row').forEach(r => r.classList.remove('drag-over'));
-        if (tTarget && tTarget !== tDragEl) {
-          onReorder(getId(tDragEl), getId(tTarget));
-        }
-        tDragEl = null; tTarget = null;
-      });
+      handle.addEventListener('touchend', () => finish());
+      handle.addEventListener('touchcancel', () => { clearFsetDnD(listEl); dragEl = null; });
     });
+    listEl.addEventListener('dragover', e => {
+      e.preventDefault();
+      if (dragEl) placeFsetInsert(listEl, e.clientY, dragEl);
+    });
+    listEl.addEventListener('drop', e => { e.preventDefault(); finish(); });
   }
-  addTouchDrag(list, r => r.dataset.fid, (fromId, toId) => {
-    const ids = Array.from(list.querySelectorAll('.fset-row')).map(r => r.dataset.fid);
-    const from = ids.indexOf(fromId), to = ids.indexOf(toId);
-    const order = getFieldOrder();
-    const [moved] = order.splice(from, 1);
-    order.splice(to, 0, moved);
-    S.fieldOrder = order; save();
+  bindFsetListDnD(list, r => r.dataset.fid, (fromId, beforeId) => {
+    S.fieldOrder = reorderBefore(getFieldOrder(), fromId, beforeId);
+    save();
     openFieldSettings();
     const vb2 = document.getElementById('view-buddy');
     if (vb2 && vb2.classList.contains('active') && S.projectId && byId[S.projectId]) {
@@ -1491,7 +1568,6 @@ function openFieldSettings(){
       if (!S.fieldHidden) S.fieldHidden = {};
       S.fieldHidden[cb.dataset.vis] = !cb.checked;
       save();
-      // Re-render the panel immediately if it's open (use S.projectId, not S.sel)
       const vb = document.getElementById('view-buddy');
       if (vb && vb.classList.contains('active') && S.projectId && byId[S.projectId]) {
         renderBuddy(S.projectId);
@@ -1506,33 +1582,11 @@ function openFieldSettings(){
       return '<div class="fset-row" draggable="true" data-vid="' + vid + '">'
         + '<span class="fh">☰</span><span class="fl">' + def[1] + '</span></div>';
     }).join('');
-    let vdragEl = null;
-    vlist.querySelectorAll('.fset-row').forEach(row => {
-      row.addEventListener('dragstart', e => { vdragEl = row; row.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
-      row.addEventListener('dragend', () => row.classList.remove('dragging'));
-      row.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
-      row.addEventListener('drop', e => {
-        e.preventDefault();
-        if (!vdragEl || vdragEl === row) return;
-        const ids = Array.from(vlist.querySelectorAll('.fset-row')).map(r => r.dataset.vid);
-        const from = ids.indexOf(vdragEl.dataset.vid), to = ids.indexOf(row.dataset.vid);
-        const order = getViewOrder();
-        const moved = order.splice(from, 1)[0];
-        order.splice(to, 0, moved);
-        S.viewOrder = order; save();
-        renderNav();
-        openFieldSettings();
-      });
-    addTouchDrag(vlist, r => r.dataset.vid, (fromId, toId) => {
-      const ids = Array.from(vlist.querySelectorAll('.fset-row')).map(r => r.dataset.vid);
-      const from = ids.indexOf(fromId), to = ids.indexOf(toId);
-      const order = getViewOrder();
-      const moved = order.splice(from, 1)[0];
-      order.splice(to, 0, moved);
-      S.viewOrder = order; save();
+    bindFsetListDnD(vlist, r => r.dataset.vid, (fromId, beforeId) => {
+      S.viewOrder = reorderBefore(getViewOrder(), fromId, beforeId);
+      save();
       renderNav();
       openFieldSettings();
-    });
     });
   }
   m.classList.add('show');
@@ -3222,6 +3276,11 @@ async function loadSharedNotes(id){
 document.addEventListener('click', e => {
   if (e.target.closest && e.target.closest('#bp-icon')) { const m = S.sel.match(/^buddy:(.+)$/); if (m) openAvatarPicker(m[1], e.target.closest('#bp-icon')); return; }
   if (e.target.closest && (e.target.closest('#bp-close') || e.target.closest('#bp-close-x'))) { closeDetail(); return; }
+  if (e.target.closest && e.target.closest('#panel-open')) {
+    const id = (S.projectId && byId[S.projectId]) ? S.projectId : 'project-buddy';
+    openBuddy(id);
+    return;
+  }
   if (e.target.closest && e.target.closest('#sb-close')) { setSidebarOpen(false); return; }
   if (e.target.closest && e.target.closest('#menu-btn')) { setSidebarOpen(!isSidebarOpen()); return; }
   if (e.target.closest && e.target.closest('#sb-scrim')) { setSidebarOpen(false); return; }
