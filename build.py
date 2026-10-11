@@ -981,21 +981,25 @@ function applySectionCollapse(bid){
 function applyFieldOrder(){
   const home = document.getElementById('buddy-home');
   if (!home) return;
+  // Keep sections inside .bp-wrap (before .bp-build) so .bp-sticky-head can stick
+  const wrap = home.querySelector('.bp-wrap') || home;
+  const build = wrap.querySelector('.bp-build');
   const order = getFieldOrder();
   const sections = {};
   home.querySelectorAll('.bp-sec[data-field]').forEach(el => { sections[el.dataset.field] = el; });
   // Remove all and re-append in order
   Object.values(sections).forEach(el => el.remove());
+  const place = el => { if (build) wrap.insertBefore(el, build); else wrap.appendChild(el); };
   order.forEach(fid => {
     const el = sections[fid];
     if (!el) return;
     if (S.fieldHidden && S.fieldHidden[fid]) el.style.display = 'none';
     else el.style.display = '';
-    home.appendChild(el);
+    place(el);
   });
   // Append any sections not in order (safety)
   Object.entries(sections).forEach(([fid, el]) => {
-    if (!order.includes(fid) && !el.parentNode) home.appendChild(el);
+    if (!order.includes(fid) && !el.parentNode) place(el);
   });
 }
 function isFieldVisible(fid){
