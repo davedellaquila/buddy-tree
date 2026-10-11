@@ -131,11 +131,11 @@ body{padding:0}
 #zoombar .zv{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
 #zoomfit{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:14px;width:30px;height:26px;cursor:pointer}
 #zoomfit:hover{color:var(--text);border-color:var(--muted)}
-#sb-resize{position:absolute;top:0;right:-7px;z-index:20;display:flex;align-items:center;justify-content:center;width:10px;height:100vh;cursor:ew-resize}
+#sb-resize{position:absolute;top:0;right:0;z-index:60;display:flex;align-items:center;justify-content:center;width:10px;height:100vh;cursor:ew-resize}
 #sb-resize::after{content:'';width:7px;height:56px;border-radius:3px;background:var(--faint)}
 #sb-resize:hover::after{background:var(--accent-hi)}
 #sb-resize:hover{background:var(--ghost)}
-@media (max-width:639px){#sb-resize{display:none}}
+/* (mobile: the drawer handle is restyled, not hidden, in the max-width:639px block below) */
 .bp-topnav{display:flex;gap:4px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
 .bp-topnav .sep{color:var(--faint);margin:0 2px}
 #journal-bar{display:none;margin:0 0 12px;background:var(--wash);border:1px solid var(--accent);border-radius:10px;padding:9px 13px;font-size:13px}
@@ -233,7 +233,7 @@ textarea[disabled]{opacity:.5;cursor:not-allowed}
   cursor:pointer;display:flex;align-items:center;justify-content:center}
 .bp-close-x:hover{color:var(--text)}
 #buddy-home{position:relative}
-#bp-resize{position:absolute;top:0;left:-7px;z-index:20;display:flex;align-items:center;justify-content:center;width:10px;height:100vh;cursor:ew-resize}
+#bp-resize{position:absolute;top:0;left:0;z-index:60;display:flex;align-items:center;justify-content:center;width:10px;height:100vh;cursor:ew-resize}
 #bp-resize::after{content:'';width:10px;height:56px;border-radius:3px;background:var(--faint)}
 #bp-resize:hover::after{background:var(--accent-hi)}
 #bp-resize:hover{background:var(--ghost)}
@@ -331,13 +331,21 @@ body.standalone .sa-bar{display:flex}
   #sidebar{position:fixed;left:0;top:0;bottom:0;z-index:95;height:100vh;height:100dvh;
     transform:translateX(-105%);transition:transform .28s cubic-bezier(.32,.72,.35,1);width:min(85vw,340px);flex:none}
   #sidebar.open{transform:none;box-shadow:12px 0 40px rgba(0,0,0,.35)}
-  #sb-resize{display:none}
+  /* Sidebar resize handle: visible + touch-friendly on phones (was display:none).
+     NB: must sit INSIDE the sidebar (right:0) — the sidebar clips overflow, so any
+     overhang past its edge is dead for hit-testing. */
+  #sb-resize{display:flex;right:0;width:28px;touch-action:none;-webkit-tap-highlight-color:transparent}
+  #sb-resize::after{width:7px}
+  html,body{overflow-x:clip}
   #sb-scrim{display:none;position:fixed;inset:0;z-index:94;background:rgba(0,0,0,.45);opacity:0;transition:opacity .25s}
   #sb-scrim.show{display:block;opacity:1}
   #main{padding:72px 12px 60px}
   /* Tree keeps the org chart on phones — pan with a finger, zoom with the floating slider */
   .standalones .grid{display:block}
-  #zoombar{display:block;left:auto;right:10px;top:84px}
+  #zoombar{display:block;left:auto;right:10px;top:84px;z-index:30;width:64px;height:272px}
+  #zoomrange{width:200px}
+  /* Chunkier tree nodes for touch */
+  #treezoom .node{padding:15px 14px;min-height:60px}
   /* Bottom sheet panel — taller, grabbable */
   #view-buddy.sheet{position:fixed;left:0;right:0;bottom:0;top:6%;z-index:96;
     background:var(--bg);border-top:1px solid var(--border);border-radius:20px 20px 0 0;
@@ -505,6 +513,10 @@ body.standalone .sa-bar{display:flex}
 .linkbtn{background:none;border:0;color:var(--accent);font:inherit;font-size:12.5px;cursor:pointer;padding:0}
 .linkbtn:hover{text-decoration:underline}
 .node{position:relative;}
+/* Fix: flex-centered org tree overflows to negative x-coords on narrow screens, which widens the
+   layout viewport and pushes position:fixed UI (zoombar) partly off-screen. max-content + auto
+   margins keeps the centered look when it fits, and overflows only rightward (scrollable) when not. */
+.tree{justify-content:flex-start;width:max-content;margin:0 auto}
 /* ---- tree node drag-to-reparent (pointer-based; mouse + touch) ---- */
 #treezoom .node[data-buddy]:not(.root){touch-action:none;cursor:grab}
 #treezoom .node[data-buddy]:not(.root):active{cursor:grabbing}
@@ -517,6 +529,13 @@ body.standalone .sa-bar{display:flex}
   color:#e6edf3;font-size:15px}
 .node-drag-ghost .name{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body.node-dragging,body.node-dragging *{cursor:grabbing !important}
+/* Chunkier drag/drop affordances on touch devices */
+@media (pointer:coarse){
+  .node-drag-ghost{width:240px;font-size:17px;padding:16px 16px 17px}
+  .node-drag-ghost .name{font-size:17px}
+  .node.drop-target{outline-width:3px;outline-offset:5px}
+  #treezoom .node.drop-invalid{outline-offset:5px}
+}
 """
 
 ICON_DOC = ('<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor"'
@@ -1219,8 +1238,10 @@ function applyPanelWidth(){
 }
 function applySbWidth(){
   const sb = document.getElementById('sidebar');
-  if (sb) { const w = S.sbWidth || SB_DEFAULT_W; sb.style.width = w + 'px'; sb.style.flex = '0 0 ' + w + 'px'; document.documentElement.style.setProperty('--sbw', w + 'px'); }
+  if (sb) { const w = sbClampW(S.sbWidth || SB_DEFAULT_W); sb.style.width = w + 'px'; sb.style.flex = '0 0 ' + w + 'px'; document.documentElement.style.setProperty('--sbw', w + 'px'); }
 }
+/* Sidebar width clamp: desktop max 560, but never wider than 92% of the viewport (drawer on phones) */
+function sbClampW(w){ return Math.min(Math.min(560, Math.floor(window.innerWidth * 0.92)), Math.max(200, w)); }
 function initPanelResize(){
   const vb = document.getElementById('view-buddy');
   if (!vb || vb.dataset.rsz) return;
@@ -1892,6 +1913,20 @@ let nodeDragEndAt = 0; // timestamp of last node-drag gesture; used to swallow t
   function treeNodeFrom(el){
     return (el && el.closest) ? el.closest('#treezoom .node[data-buddy]') : null;
   }
+  var TOUCH_SLOP = 16; // px of extra hit area around each node during a touch drag
+  function nodeAt(x, y, touch){
+    if (!touch) return treeNodeFrom(document.elementFromPoint(x, y));
+    // Touch: finger covers the exact point, so test inflated rects and take the smallest match.
+    var nodes = tz.querySelectorAll('.node[data-buddy]'), best = null, bestArea = Infinity;
+    for (var i = 0; i < nodes.length; i++){
+      var r = nodes[i].getBoundingClientRect();
+      if (x >= r.left - TOUCH_SLOP && x <= r.right + TOUCH_SLOP && y >= r.top - TOUCH_SLOP && y <= r.bottom + TOUCH_SLOP){
+        var area = r.width * r.height;
+        if (area < bestArea){ bestArea = area; best = nodes[i]; }
+      }
+    }
+    return best;
+  }
   function clearHl(){
     tz.querySelectorAll('.node.drop-target,.node.drop-invalid').forEach(function(x){ x.classList.remove('drop-target', 'drop-invalid'); });
   }
@@ -1901,7 +1936,7 @@ let nodeDragEndAt = 0; // timestamp of last node-drag gesture; used to swallow t
   function updateTarget(x, y){
     clearHl();
     drag.target = null;
-    const n = treeNodeFrom(document.elementFromPoint(x, y));
+    const n = nodeAt(x, y, drag.touch);
     if (!n) return;
     const tid = n.dataset.buddy;
     if (!tid || tid === drag.id) return; // self: no highlight, no drop
@@ -1933,7 +1968,7 @@ let nodeDragEndAt = 0; // timestamp of last node-drag gesture; used to swallow t
     nmDiv.textContent = label.trim().slice(0, 60);
     ghost.appendChild(nmDiv);
     document.body.appendChild(ghost);
-    drag = { id: id, pid: c.pid, ghost: ghost, target: null };
+    drag = { id: id, pid: c.pid, ghost: ghost, target: null, touch: !!c.touch };
     cand = null;
     if (src) src.classList.add('drag-src');
     document.body.classList.add('node-dragging');
@@ -1947,7 +1982,7 @@ let nodeDragEndAt = 0; // timestamp of last node-drag gesture; used to swallow t
     if (!n) return;
     const id = n.dataset.buddy;
     if (!id || id === 'project-buddy') return; // root can't be reparented
-    cand = { id: id, x0: e.clientX, y0: e.clientY, pid: e.pointerId };
+    cand = { id: id, x0: e.clientX, y0: e.clientY, pid: e.pointerId, touch: e.pointerType === 'touch' };
   });
   window.addEventListener('pointermove', function(e){
     if (drag) {
@@ -2246,10 +2281,11 @@ document.addEventListener('keydown', e => {
   const h = document.getElementById('sb-resize');
   let sx = null, sw = 0;
   h.addEventListener('pointerdown', e => { sx = e.clientX; sw = sb.getBoundingClientRect().width; h.setPointerCapture(e.pointerId); e.preventDefault(); });
-  h.addEventListener('pointermove', e => { if (sx === null) return; const w = Math.min(560, Math.max(220, sw + e.clientX - sx)); sb.style.width = w + 'px'; sb.style.flex = '0 0 ' + w + 'px'; });
+  h.addEventListener('pointermove', e => { if (sx === null) return; const w = sbClampW(sw + e.clientX - sx); sb.style.width = w + 'px'; sb.style.flex = '0 0 ' + w + 'px'; });
   const done = () => { if (sx === null) return; sx = null; S.sbWidth = Math.round(sb.getBoundingClientRect().width); save(); };
   h.addEventListener('pointerup', done);
   h.addEventListener('pointercancel', done);
+  window.addEventListener('resize', () => applySbWidth()); /* re-clamp drawer on rotate/resize */
 })();
 /* ---------- prev/next/back ---------- */
 function goBack(){ const p = navHist.pop(); show(p || 'view:tree', false); }
