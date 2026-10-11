@@ -3,6 +3,29 @@
 All notable changes to the Buddies dashboard and buddy system. Newest first.
 `FEATURES.md` describes the current state; this file describes how it got there.
 
+## 2026-10-10 (Tree tile drag-to-reparent)
+
+### Fixed
+- **Tree node drag-to-reparent** — replaced the ⠿ gripper handles with whole-tile
+  pointer-based dragging: grab any buddy tile on the chart and drop it onto another
+  buddy to reparent it. Works with mouse and touch (iPhone/iPad), where the old
+  HTML5 drag-and-drop grippers could never fire. Tap still opens the buddy detail
+  panel (6px movement threshold separates click from drag); the click after a drag
+  is swallowed. Cycle-safe (invalid targets get a red dashed outline), root can't
+  be dragged, dropping on root makes a buddy top-level. Same localStorage
+  persistence and reset path as sidebar reparenting.
+- **Why the grippers never worked** — the ⠿ handles were never in the DOM: they
+  were only emitted by the JS `renderOrgTree()`, which runs solely after a sidebar
+  reparent creates localStorage overrides; the static tree baked into the page had
+  no handles. Even had they rendered, HTML5 DnD doesn't fire on touch devices.
+- **Background pan now pans the real scroller** — drag-to-pan on the chart
+  background moved nothing: `attachPan` scrolled `#treezoom`, which has no
+  scrollable overflow (the chart scrolls inside its inner `.chart`). It now pans
+  the `.chart` scroller.
+- **Drop-highlight crash** — `initTreeDrop`'s `dragover` handler threw
+  `Cannot read properties of null (reading 'classList')` whenever a sidebar drag
+  hovered blank chart background (`n` was null). Added the missing null guard.
+
 ## 2026-10-10 (Tree view: org chart on phones)
 
 ### Changed

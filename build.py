@@ -504,15 +504,19 @@ body.standalone .sa-bar{display:flex}
 .bp-mini-zoom button:hover{border-color:var(--accent)}
 .linkbtn{background:none;border:0;color:var(--accent);font:inherit;font-size:12.5px;cursor:pointer;padding:0}
 .linkbtn:hover{text-decoration:underline}
-.grip {
-  position: absolute; top: 4px; left: 4px; z-index: 2;
-  cursor: grab; opacity: .45; color: var(--muted); font-size: 16px; line-height: 1;
-  padding: 8px; user-select: none; -webkit-user-select: none;
-}
-.node:hover .grip { opacity: .9; }
-.grip:hover { opacity: 1 !important; color: var(--text); }
-.grip:active { cursor: grabbing; }
 .node{position:relative;}
+/* ---- tree node drag-to-reparent (pointer-based; mouse + touch) ---- */
+#treezoom .node[data-buddy]:not(.root){touch-action:none;cursor:grab}
+#treezoom .node[data-buddy]:not(.root):active{cursor:grabbing}
+#treezoom .node.drag-src{opacity:.35}
+#treezoom .node.drop-invalid{outline:2px dashed #e0533d;outline-offset:3px}
+.node-drag-ghost{position:fixed;left:0;top:0;z-index:9999;pointer-events:none;width:196px;opacity:.94;
+  transform:translate(-50%,-118%) rotate(-2deg);
+  background:#161b22;border:1px solid #58a6ff;border-top:3px solid #58a6ff;
+  border-radius:10px;padding:12px 12px 13px;box-shadow:0 12px 32px rgba(0,0,0,.55);
+  color:#e6edf3;font-size:15px}
+.node-drag-ghost .name{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.node-dragging,body.node-dragging *{cursor:grabbing !important}
 """
 
 ICON_DOC = ('<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor"'
@@ -684,7 +688,7 @@ const VIEW_DEFS = [
   ['changelog','Changelog','🕘'],
 ];
 const VIEW_TIPS = {
-  tree: 'Tree view — visual hierarchy of all buddies. Click a node to open its details. Drag the background to pan, scroll to zoom. Drag a node by its grip handle to reparent it.',
+  tree: 'Tree view — visual hierarchy of all buddies. Click a node to open its details. Drag the background to pan, scroll to zoom. Drag a node onto another node to reparent it.',
   projects: 'Projects list — every buddy in hierarchy order with status. Click a tile to filter by attention status. Click the chevron to expand/collapse sections.',
   plans: 'Business Plans — real-world ventures as cards. Click a status tile to filter. Each card links to its brief and related buddies.',
   manifest: 'New-Project Manifest — the checklist every new buddy gets. Click AUTOMATIC or PLANNED tiles to filter the steps.',
@@ -1634,14 +1638,10 @@ function gridKids(b){
     + '<div class="desc">' + escHtml(c.tagline || '') + '</div><div class="tag">' + nodeTag(c, 2) + '</div>'
     + gridKids(c) + '</div></li>').join('') + '</ul>';
 }
-function gripHtml(b){
-  if (b.id === 'project-buddy') return '';
-  return '<span class="grip" draggable="true" data-buddy="' + b.id + '" title="Drag to move under a different parent">\u283f</span>';
-}
 function orgNode(b, depth){
   const kids = kidsOf[b.id] || [];
   const kc = kids.length ? '<span class="kcount">' + kids.length + '</span>' : '';
-  let s = '<li><div class="node ' + b.kind + '" data-buddy="' + b.id + '">' + gripHtml(b) + '<div class="name">' + iconName(b) + kc + '</div>'
+  let s = '<li><div class="node ' + b.kind + '" data-buddy="' + b.id + '">' + '<div class="name">' + iconName(b) + kc + '</div>'
     + '<div class="desc">' + escHtml(b.tagline || '') + '</div>'
     + '<div class="tag">' + nodeTag(b, depth) + '</div></div>';
   if (kids.length) s += '<ul>' + kids.map(c => orgNode(c, depth + 1)).join('') + '</ul>';
@@ -1661,7 +1661,7 @@ function renderOrgTree(){
     s += '<section class="standalones"><h2>Orphaned buddies</h2>'
       + '<p class="sub">No meaningful parent yet &mdash; drag one onto a buddy in the tree to give it a home, or drop it here to detach.</p>'
       + '<div class="grid">'
-      + rest.map(b => '<div class="node ' + b.kind + '" data-buddy="' + b.id + '">' + gripHtml(b) + '<div class="name">' + iconName(b) + '</div>'
+      + rest.map(b => '<div class="node ' + b.kind + '" data-buddy="' + b.id + '">' + '<div class="name">' + iconName(b) + '</div>'
         + '<div class="desc">' + escHtml(b.tagline || '') + '</div><div class="tag">' + nodeTag(b, 1) + '</div>'
         + gridKids(b) + '</div>').join('')
       + '</div></section>';
@@ -1671,7 +1671,7 @@ function renderOrgTree(){
     s += '<section class="standalones"><h2>Orphaned buddies</h2>'
       + '<p class="sub">No parent yet &mdash; drag one onto a buddy in the tree to give it a home.</p>'
       + '<div class="grid">'
-      + orphans.map(b => '<div class="node ' + b.kind + '" data-buddy="' + b.id + '">' + gripHtml(b) + '<div class="name">' + iconName(b) + '</div>'
+      + orphans.map(b => '<div class="node ' + b.kind + '" data-buddy="' + b.id + '">' + '<div class="name">' + iconName(b) + '</div>'
         + '<div class="desc">' + escHtml(b.tagline || '') + '</div></div>').join('')
       + '</div></section>';
   }
@@ -1810,9 +1810,13 @@ function zoomToFit(){
 function attachPan(el){
   if (!el || el.dataset.panAttached) return;
   el.dataset.panAttached = '1';
+  // The tree chart's scrollable overflow lives in its inner .chart element
+  // (overflow-x:auto), not in #treezoom itself — pan that scroller.
+  function scroller(){ return (el.id === 'treezoom' && el.querySelector('.chart')) || el; }
   let pan = null, swallow = false;
   function startPan(x, y, pid){
-    pan = { x: x, y: y, sl: el.scrollLeft, st: el.scrollTop, moved: false, id: pid };
+    const sc = scroller();
+    pan = { x: x, y: y, sl: sc.scrollLeft, st: sc.scrollTop, moved: false, id: pid };
   }
   function movePan(x, y, pid){
     if (!pan || (pid !== undefined && pid !== pan.id)) return;
@@ -1823,14 +1827,18 @@ function attachPan(el){
       try { if (pid !== undefined && pid !== 'mouse') el.setPointerCapture(pid); } catch (err) {}
     }
     pan.moved = true;
+    const sc = scroller();
+    sc.classList.add('panning');
     el.classList.add('panning');
-    el.scrollLeft = pan.sl - dx;
-    el.scrollTop = pan.st - dy;
+    sc.scrollLeft = pan.sl - dx;
+    sc.scrollTop = pan.st - dy;
   }
   function endPan(pid){
     if (!pan) return;
     if (pid !== undefined && pid !== pan.id) return;
     try { if (el.releasePointerCapture && pan.id !== undefined) el.releasePointerCapture(pan.id); } catch (err) {}
+    const sc = scroller();
+    sc.classList.remove('panning');
     el.classList.remove('panning');
     if (pan.moved) { swallow = true; setTimeout(() => { swallow = false; }, 80); }
     pan = null;
@@ -1839,7 +1847,8 @@ function attachPan(el){
   el.addEventListener('pointerdown', e => {
     if (e.pointerType !== 'mouse') return;
     if (e.button !== 0) return;
-    if (e.target.closest && (e.target.closest('.grip') || e.target.closest('input,textarea,button'))) return;
+    // Presses on tree nodes are reserved for node drag-to-reparent (or click); background pans.
+    if (e.target.closest && (e.target.closest('#treezoom .node[data-buddy]') || e.target.closest('input,textarea,button'))) return;
     startPan(e.clientX, e.clientY, e.pointerId);
     // Don't set pointer capture here — it interferes with click events on tree nodes.
     // Capture is set in movePan once dragging actually starts.
@@ -1851,7 +1860,7 @@ function attachPan(el){
   el.addEventListener('mousedown', e => {
     if (pan) return;
     if (e.button !== 0) return;
-    if (e.target.closest && (e.target.closest('.grip') || e.target.closest('input,textarea,button'))) return;
+    if (e.target.closest && (e.target.closest('#treezoom .node[data-buddy]') || e.target.closest('input,textarea,button'))) return;
     startPan(e.clientX, e.clientY, 'mouse');
     e.preventDefault();
   });
@@ -1867,21 +1876,103 @@ function initPan(){
   attachPan(document.getElementById('view-manifest'));
 }
 initPan();
-(function initGripDrag(){
+/* ---------- tree node drag-to-reparent (pointer events: mouse + touch) ----------
+   Whole-tile drag: press a node and move >6px to drag it; a simple tap still
+   opens the buddy detail panel. Works with mouse and touch (HTML5 DnD never
+   fires on touch, which is why the old gripper handles could not work there).
+   Dragging a node reparents it; dragging empty background pans the chart. */
+let nodeDragEndAt = 0; // timestamp of last node-drag gesture; used to swallow the follow-up click
+(function initNodeDrag(){
   const tz = document.getElementById('treezoom');
-  tz.addEventListener('dragstart', e => {
-    const g = e.target.closest ? e.target.closest('.grip') : null;
-    if (!g) return;
-    const id = g.dataset.buddy;
-    if (!id || id === 'project-buddy') { e.preventDefault(); return; }
-    dragId = id;
-    e.dataTransfer.effectAllowed = 'move';
-    try { e.dataTransfer.setData('text/plain', id); } catch (_e) {}
+  if (!tz) return;
+  const THRESH = 6; // px of movement before a press becomes a drag (less = click)
+  let cand = null;  // {id, x0, y0, pid} — pressed on a node, drag not yet started
+  let drag = null;  // {id, pid, ghost, target} — active drag
+
+  function treeNodeFrom(el){
+    return (el && el.closest) ? el.closest('#treezoom .node[data-buddy]') : null;
+  }
+  function clearHl(){
+    tz.querySelectorAll('.node.drop-target,.node.drop-invalid').forEach(function(x){ x.classList.remove('drop-target', 'drop-invalid'); });
+  }
+  function moveGhost(x, y){
+    if (drag && drag.ghost) { drag.ghost.style.left = x + 'px'; drag.ghost.style.top = y + 'px'; }
+  }
+  function updateTarget(x, y){
+    clearHl();
+    drag.target = null;
+    const n = treeNodeFrom(document.elementFromPoint(x, y));
+    if (!n) return;
+    const tid = n.dataset.buddy;
+    if (!tid || tid === drag.id) return; // self: no highlight, no drop
+    if (tid === 'project-buddy' || !isDesc(tid, drag.id)) {
+      n.classList.add('drop-target'); drag.target = tid; // valid (root included)
+    } else {
+      n.classList.add('drop-invalid'); // dropping here would create a cycle
+    }
+  }
+  function cleanup(){
+    clearHl();
+    tz.querySelectorAll('.node.drag-src').forEach(function(x){ x.classList.remove('drag-src'); });
+    if (drag && drag.ghost && drag.ghost.parentNode) drag.ghost.parentNode.removeChild(drag.ghost);
+    document.body.classList.remove('node-dragging');
+    drag = null; cand = null;
+  }
+  function beginDrag(x, y){
+    const c = cand, id = c.id;
+    const src = tz.querySelector('.node[data-buddy="' + id + '"]');
+    const ghost = document.createElement('div');
+    ghost.className = 'node-drag-ghost';
+    let label = id;
+    if (src) {
+      const nm = src.querySelector('.name');
+      label = (nm ? nm.textContent : src.textContent) || id;
+    }
+    const nmDiv = document.createElement('div');
+    nmDiv.className = 'name';
+    nmDiv.textContent = label.trim().slice(0, 60);
+    ghost.appendChild(nmDiv);
+    document.body.appendChild(ghost);
+    drag = { id: id, pid: c.pid, ghost: ghost, target: null };
+    cand = null;
+    if (src) src.classList.add('drag-src');
+    document.body.classList.add('node-dragging');
+    moveGhost(x, y);
+    updateTarget(x, y);
+  }
+  tz.addEventListener('pointerdown', function(e){
+    if (e.button !== undefined && e.button !== 0) return;
+    if (e.isPrimary === false) return;
+    const n = treeNodeFrom(e.target);
+    if (!n) return;
+    const id = n.dataset.buddy;
+    if (!id || id === 'project-buddy') return; // root can't be reparented
+    cand = { id: id, x0: e.clientX, y0: e.clientY, pid: e.pointerId };
   });
-  tz.addEventListener('dragend', () => {
-    dragId = null;
-    document.querySelectorAll('#treezoom .node.drop-target').forEach(x => x.classList.remove('drop-target'));
-  });
+  window.addEventListener('pointermove', function(e){
+    if (drag) {
+      if (e.pointerId !== drag.pid) return;
+      moveGhost(e.clientX, e.clientY);
+      updateTarget(e.clientX, e.clientY);
+      return;
+    }
+    if (cand && e.pointerId === cand.pid) {
+      const dx = e.clientX - cand.x0, dy = e.clientY - cand.y0;
+      if (dx * dx + dy * dy > THRESH * THRESH) beginDrag(e.clientX, e.clientY);
+    }
+  }, { passive: true });
+  function finish(e, cancelled){
+    if (drag && e.pointerId === drag.pid) {
+      const src = drag.id, tid = drag.target;
+      cleanup();
+      nodeDragEndAt = Date.now(); // swallow the click that follows a drag gesture
+      if (!cancelled && tid) moveBuddy(src, tid);
+      return;
+    }
+    if (cand && e.pointerId === cand.pid) cand = null;
+  }
+  window.addEventListener('pointerup', function(e){ finish(e, false); });
+  window.addEventListener('pointercancel', function(e){ finish(e, true); });
 })();
 (function initTreeDrop(){
   function target(e){
@@ -1895,7 +1986,7 @@ initPan();
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     document.querySelectorAll('.node.drop-target,.proj-row.drop-target').forEach(x => { if (x !== n) x.classList.remove('drop-target'); });
-    n.classList.add('drop-target');
+    if (n) n.classList.add('drop-target');
   });
   document.addEventListener('drop', e => {
     const n = target(e);
@@ -2843,6 +2934,7 @@ async function loadSharedNotes(id){
   });
 }
 document.addEventListener('click', e => {
+  if (nodeDragEndAt && Date.now() - nodeDragEndAt < 400) return; // swallow the click that follows a node-drag gesture
   if (e.target.closest && e.target.closest('#bp-icon')) { const m = S.sel.match(/^buddy:(.+)$/); if (m) openAvatarPicker(m[1], e.target.closest('#bp-icon')); return; }
   if (e.target.closest && (e.target.closest('#bp-close') || e.target.closest('#bp-close-x'))) { closeDetail(); return; }
   if (e.target.closest && e.target.closest('#sb-close')) { setSidebarOpen(false); return; }
@@ -2858,7 +2950,6 @@ document.addEventListener('click', e => {
   }
   if (e.target.closest && e.target.closest('#bp-desktop')) { const m = S.sel.match(/^buddy:(.+)$/); if (m) saveToDesktop(m[1]); return; }
   if (e.target.closest && e.target.closest('#sa-full')) { try { location.hash = '#/' + S.sel; } catch (e) {} document.body.classList.remove('standalone'); return; }
-  if (e.target.closest && e.target.closest('.grip')) { e.preventDefault(); return; }
   const pd = e.target.closest('[data-del]');
   if (pd) {
     e.preventDefault(); e.stopPropagation();
