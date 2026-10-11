@@ -321,19 +321,9 @@ body.standalone .sa-bar{display:flex}
   #sb-scrim{display:none;position:fixed;inset:0;z-index:94;background:rgba(0,0,0,.45);opacity:0;transition:opacity .25s}
   #sb-scrim.show{display:block;opacity:1}
   #main{padding:72px 12px 60px}
-  /* Tree becomes clean vertical cards */
-  .tree,.tree ul{display:block;padding:0;margin:0}
-  .tree ul{padding-top:0}
-  .tree li{display:block;padding:0;text-align:left}
-  .tree li::before,.tree li::after,.tree ul ul::before,.root-stub{display:none}
-  .node{display:flex;align-items:center;gap:12px;width:auto;margin:0 0 8px;padding:14px 16px;
-    border-radius:14px;min-height:56px}
-  .node.root{width:auto}
-  .node .n-icon{font-size:24px;flex:none}
-  .node .n-name{font-size:16px;font-weight:600}
+  /* Tree keeps the org chart on phones — pan with a finger, zoom with the floating slider */
   .standalones .grid{display:block}
-  #treezoom{height:auto;max-height:none;overflow:visible;cursor:default}
-  #zoombar{display:none}
+  #zoombar{display:block;left:auto;right:10px;top:84px}
   /* Bottom sheet panel — taller, grabbable */
   #view-buddy.sheet{position:fixed;left:0;right:0;bottom:0;top:6%;z-index:96;
     background:var(--bg);border-top:1px solid var(--border);border-radius:20px 20px 0 0;

@@ -127,7 +127,9 @@ Build: `build.py` generates `index.html` from `buddies.json` + `plans.json`.
 
 - **Fit button (⛶)** next to the zoom slider — zooms to fit the chart content.
 - **Small (<640px)**: tiles stack as full-width cards; sidebar becomes a
-  drawer (hamburger button); detail opens as a bottom sheet.
+  drawer (hamburger button); detail opens as a bottom sheet; the Tree view
+  keeps the org chart (pan with a finger, floating zoom slider) instead of a
+  card list.
 - **Medium (640–1100px)**: collapsible sidebar; view nav becomes a horizontal
   segmented control; detail opens as a right-docked side sheet (380px).
 - **Large (>1100px)**: tri-pane with persistent detail panel (400px).
