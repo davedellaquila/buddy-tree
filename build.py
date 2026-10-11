@@ -65,7 +65,21 @@ body{padding:0}
   z-index:40}
 #main{flex:1;min-width:0;padding:36px 32px 80px;position:relative;z-index:1}
 .brand{padding:22px 8px 14px;background:var(--bg)}
-.sb-sticky-head{position:sticky;top:0;z-index:5;background:var(--bg);padding-bottom:4px;border-bottom:1px solid var(--border)}
+/* Brand chrome (eyebrow/title/subtitle + gear/close) pins at top; Views scroll under */
+.sb-brand-sticky{
+  position:sticky;top:0;z-index:7;background:var(--bg);
+  margin:0 -14px;padding:0 14px;
+  border-bottom:1px solid var(--border)}
+.sb-brand-sticky #sb-tools{position:absolute;top:8px;right:8px;z-index:10}
+/* Search stacks under brand sticky block; --sb-brand-h set from measured brand height */
+.sb-search-sticky{
+  position:sticky;top:var(--sb-brand-h,96px);z-index:6;background:var(--bg);
+  margin:0 -14px;padding:10px 14px 10px;
+  border-bottom:1px solid var(--border);
+  box-shadow:0 8px 14px -10px rgba(0,0,0,.55)}
+.sb-search-sticky #buddy-search{
+  width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--border);
+  color:var(--text);border-radius:8px;padding:7px 10px;font-size:13px}
 .brand .eyebrow{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
 .brand h1{font-size:22px;margin:4px 0 0}
 #brand-name{outline:none;border-bottom:2px dashed transparent;cursor:text;display:inline-block;min-width:60px}
@@ -351,7 +365,8 @@ body.standalone .sa-bar{display:flex}
   /* Buddy list in sidebar */
   #buddy-nav .brow{min-height:52px;padding:10px 12px;border-radius:12px;font-size:15px}
   /* Search: full width, proper size */
-  #buddy-search{font-size:16px;padding:12px 14px;border-radius:12px;width:100%}
+  .sb-search-sticky{padding:10px 14px 12px}
+  .sb-search-sticky #buddy-search,#buddy-search{font-size:16px;padding:12px 14px;border-radius:12px;width:100%}
   /* Settings gear: ensure reachable */
   #settings-btn{width:48px;height:48px;font-size:20px}
   /* Homepage iframe: fill safely */
@@ -2686,6 +2701,22 @@ function initPlansToggle(){
     save();
   });
 }
+/* Keep --sb-brand-h in sync so .sb-search-sticky stacks under the brand chrome. */
+function syncSbBrandStickyHeight(){
+  const sb = document.getElementById('sidebar');
+  const brand = document.querySelector('.sb-brand-sticky');
+  if (!sb || !brand) return;
+  const h = Math.ceil(brand.getBoundingClientRect().height);
+  if (h > 0) sb.style.setProperty('--sb-brand-h', h + 'px');
+}
+function initSbBrandSticky(){
+  syncSbBrandStickyHeight();
+  const brand = document.querySelector('.sb-brand-sticky');
+  if (brand && typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(() => syncSbBrandStickyHeight()).observe(brand);
+  }
+  window.addEventListener('resize', syncSbBrandStickyHeight);
+}
 function initGear(){
   const g = document.getElementById('sb-gear');
   if (g && !g.dataset.init) { g.dataset.init = '1'; g.addEventListener('click', () => openFieldSettings()); }
@@ -2974,6 +3005,7 @@ initSearch();
 initGear();
 initVersionCheck();
 initPlansToggle();
+initSbBrandSticky();
 """
     js = js.replace("BUDDIES_JSON", buddies_js).replace("ORDER_JSON", order_js).replace("PLANS_JSON", plans_js)
     js = js.replace("ICON_DOC", "'" + ICON_DOC.replace("'", "\\'") + "'")
@@ -2999,14 +3031,18 @@ initPlansToggle();
 <div class="app">
 <button id="menu-btn" aria-label="Open menu">\u2630</button>
 <div id="sb-scrim"></div>
-<aside id="sidebar"><div id="sb-tools"><button id="sb-gear" title="Settings (⌘,)" aria-label="Settings"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button id="sb-close" title="Close sidebar" aria-label="Close sidebar"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><path class="xmark-x" d="M8.8 8.8l6.4 6.4m0-6.4l-6.4 6.4" fill="none" stroke-width="2.25" stroke-linecap="round"/></svg></button></div>
+<aside id="sidebar">
 <div id="sb-resize" title="Drag left or right to resize the sidebar. Double-click to reset to default width."></div>
-  <div class="sb-sticky-head"><div class="brand"><div class="eyebrow">Project Buddy &middot; macro view</div><h1 id="brand-name" title="Click to rename">Buddies</h1><div class="bcount">NBUD buddies &middot; one family</div></div>
-  <div class="nav-sec"><h3>Views</h3><div id="view-nav"></div></div></div>
+  <div class="sb-brand-sticky">
+    <div id="sb-tools"><button id="sb-gear" title="Settings (⌘,)" aria-label="Settings"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><button id="sb-close" title="Close sidebar" aria-label="Close sidebar"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><path class="xmark-x" d="M8.8 8.8l6.4 6.4m0-6.4l-6.4 6.4" fill="none" stroke-width="2.25" stroke-linecap="round"/></svg></button></div>
+    <div class="brand"><div class="eyebrow">Project Buddy &middot; macro view</div><h1 id="brand-name" title="Click to rename">Buddies</h1><div class="bcount">NBUD buddies &middot; one family</div></div>
+  </div>
+  <div class="nav-sec"><h3>Views</h3><div id="view-nav"></div></div>
+  <div class="sb-search-sticky">
+    <input type="search" id="buddy-search" placeholder="Search buddies\u2026" aria-label="Search buddies"
+      title="Search all buddies by name or tagline. Filters the sidebar list as you type. Press / anywhere to jump here. Arrow keys navigate results.">
+  </div>
   <div class="nav-sec">
-  <div style="padding:0 10px 8px"><input type="search" id="buddy-search" placeholder="Search buddies\u2026" aria-label="Search buddies"
-    title="Search all buddies by name or tagline. Filters the sidebar list as you type. Press / anywhere to jump here. Arrow keys navigate results."
-    style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 10px;font-size:13px"></div>
   <h3>Buddies <span id="attn-pill" class="zero">0</span></h3><div id="buddy-nav"></div></div>
   <div class="nav-sec" id="plans-sec"><h3 style="cursor:pointer" id="plans-toggle"><span id="plans-arrow">\u203a</span> Business Plans</h3><div id="plan-nav"></div></div>
 </aside>
