@@ -251,10 +251,11 @@ body:has(#token-pill) #panel-open{right:148px}
 #field-settings input[type=checkbox]:focus-visible{outline:none;box-shadow:0 0 0 3px var(--ghost)}
 #field-settings input[type=checkbox]:active{transform:scale(.92)}
 .fset-row input[type=checkbox]{margin-left:2px}
-.bp-close-x{position:absolute;top:10px;right:10px;z-index:10;width:36px;height:36px;
-  background:none;border:none;border-radius:8px;color:var(--muted);font-size:24px;
-  cursor:pointer;display:flex;align-items:center;justify-content:center}
+.bp-close-x{position:static;flex:0 0 auto;width:32px;height:32px;margin-left:2px;
+  background:none;border:none;border-radius:8px;color:var(--muted);font-size:20px;
+  cursor:pointer;display:none;align-items:center;justify-content:center;padding:0}
 .bp-close-x:hover{color:var(--text)}
+#view-buddy.panel .bp-close-x,#view-buddy.sheet .bp-close-x{display:flex}
 #buddy-home{position:relative}
 #bp-resize{position:absolute;top:0;left:-7px;z-index:20;display:flex;align-items:center;justify-content:center;width:10px;height:100vh;cursor:ew-resize}
 #bp-resize::after{content:'';width:10px;height:56px;border-radius:3px;background:var(--faint)}
@@ -368,12 +369,6 @@ body.standalone .sa-bar{display:flex}
     -webkit-overflow-scrolling:touch}
   #view-buddy.sheet::before{content:'';display:block;width:48px;height:5px;border-radius:3px;
     background:var(--border);margin:4px auto 14px;flex:none}
-  /* Tiles: 2-column grid */
-  #project-tiles,#changelog-tiles,#plans-tiles,#manifest-tiles,#project-status-tiles{display:grid !important;
-    grid-template-columns:1fr 1fr;gap:10px;max-width:none;margin:0 0 18px}
-  #project-tiles .ptile,#changelog-tiles .ptile,#plans-tiles .ptile,#manifest-tiles .ptile{flex:none !important;max-width:none !important}
-  .ptile{padding:14px 12px;border-radius:14px}
-  .ptile-num{font-size:28px}
   /* Plans: single column cards */
   .plan-grid{display:block;max-width:none}
   .plan-card{margin-bottom:12px}
@@ -450,6 +445,34 @@ body.standalone .sa-bar{display:flex}
 .ptile-sub{font-size:13px;color:var(--muted)}
 .ptile[data-tile]{cursor:pointer}
 .ptile.sel{box-shadow:inset 0 0 0 2px var(--tint)}
+/* Phone tiles AFTER base .ptile so cascade wins (beat inline gap/display too) */
+@media (max-width:639px){
+  #project-tiles,#changelog-tiles,#plans-tiles,#manifest-tiles,#project-status-tiles{
+    display:grid !important;grid-template-columns:1fr 1fr !important;
+    gap:6px !important;max-width:none !important;width:100% !important;
+    margin:0 0 12px !important;box-sizing:border-box;flex-wrap:unset !important}
+  #project-tiles .ptile,#changelog-tiles .ptile,#plans-tiles .ptile,#manifest-tiles .ptile,
+  #project-status-tiles .ptile{flex:none !important;max-width:none !important;min-width:0 !important}
+  .ptile{padding:6px 8px 5px !important;border-radius:10px !important}
+  .ptile::before{width:3px}
+  .ptile-label{font-size:9px !important;letter-spacing:.08em;line-height:1.15}
+  .ptile-num{font-size:18px !important;line-height:1.05 !important;margin:1px 0}
+  .ptile-sub{font-size:10px !important;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
+/* Landscape phones are often >639px wide — key off short height instead */
+@media (orientation:landscape) and (max-height:520px){
+  #project-tiles,#changelog-tiles,#plans-tiles,#manifest-tiles,#project-status-tiles{
+    display:grid !important;grid-template-columns:repeat(auto-fit,minmax(96px,1fr)) !important;
+    gap:6px !important;max-width:none !important;width:100% !important;
+    margin:0 0 10px !important;box-sizing:border-box;flex-wrap:unset !important}
+  #project-tiles .ptile,#changelog-tiles .ptile,#plans-tiles .ptile,#manifest-tiles .ptile,
+  #project-status-tiles .ptile{flex:none !important;max-width:none !important;min-width:0 !important}
+  .ptile{padding:5px 7px 4px !important;border-radius:10px !important}
+  .ptile::before{width:3px}
+  .ptile-label{font-size:9px !important;letter-spacing:.08em;line-height:1.15}
+  .ptile-num{font-size:16px !important;line-height:1.05 !important;margin:1px 0}
+  .ptile-sub{font-size:10px !important;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
 #main.homepage-mode{padding:0}
 #main.homepage-mode #view-project.active{min-height:100vh}
 #homepage-wrap{flex:1;display:flex;flex-direction:column;min-height:0;margin:0;position:relative}
@@ -477,7 +500,16 @@ body.standalone .sa-bar{display:flex}
 .bp-crumb .reposlug{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:600}
 .bp-crumb b{color:var(--text);font-weight:600}
 .bp-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.bp-sticky-head{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 0 8px;margin:-12px 0 0;border-bottom:1px solid var(--border)}
+/* Compact sticky identity bar — one row; nav / crumb / tagline scroll away */
+.bp-sticky-head{position:sticky;top:0;z-index:6;background:var(--bg);
+  padding:6px 0;margin:0 0 2px;border-bottom:1px solid var(--border)}
+.bp-sticky-head .bp-top{gap:8px;flex-wrap:nowrap;min-width:0;align-items:center}
+.bp-sticky-head .bp-icon{font-size:20px;line-height:1;flex:0 0 auto}
+.bp-sticky-head .bp-name{font-size:16px;font-weight:700;margin:0;padding:0;min-width:0;
+  flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  border-bottom-width:1px}
+.bp-sticky-head .status{flex:0 1 auto;max-width:36%;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;font-size:11px;padding:2px 8px;line-height:1.25}
 .bp-name{font-size:32px;font-weight:700;margin:0;outline:none;border-bottom:2px dashed transparent;
   padding-bottom:2px;min-width:120px}
 .bp-name:hover{border-bottom-color:var(--border)}
@@ -1463,17 +1495,17 @@ function renderBuddy(id){
     + '<button class="linkbtn" id="ghtok2-save">Save token</button>'
     + '<a href="https://github.com/settings/tokens" target="_blank" rel="noopener" class="linkbtn" style="text-decoration:none" title="Open GitHub token settings in a new tab">Get a token</a></div></div>'
     + '<div class="sa-bar"><span>\U0001f516 Standalone view</span><button class="linkbtn" id="sa-full">Open full dashboard \u2192</button></div>'
-    + '<button class="bp-close-x" id="bp-close-x" title="Close">\u2715</button>'
-    + '<div class="bp-sticky-head">'
     + '<div class="bp-topnav"><button class="linkbtn" data-navbtn="back">\u2190 Back</button>'
     + '<button class="linkbtn" data-navbtn="prev">\u2039 Prev</button><button class="linkbtn" data-navbtn="next">Next \u203a</button>'
     + '<span class="sep">\u00b7</span><button class="linkbtn" data-view="tree">All buddies</button>'
     + '<span class="sep">\u00b7</span><button class="linkbtn" id="bp-close">\u2715 Close</button><span class="sep">\u00b7</span><button class="linkbtn" id="bp-desktop">\U0001f4be Save to desktop</button></div>'
     + '<div class="bp-crumb">'+crumb(id)+'</div>'
-    + '<div class="bp-top"><span class="bp-icon" id="bp-icon" title="Click to change avatar" style="cursor:pointer">'+escHtml(b.icon||'')+'</span><h2 class="bp-name" id="bp-name" contenteditable="true" spellcheck="false" data-buddy="'+id+'">'+escHtml(dispName(b))+'</h2>'
-    + '<span class="status '+b.statusClass+'">'+escHtml(b.status)+'</span></div>'
+    + '<div class="bp-sticky-head"><div class="bp-top">'
+    + '<span class="bp-icon" id="bp-icon" title="Click to change avatar" style="cursor:pointer">'+escHtml(b.icon||'')+'</span>'
+    + '<h2 class="bp-name" id="bp-name" contenteditable="true" spellcheck="false" data-buddy="'+id+'">'+escHtml(dispName(b))+'</h2>'
+    + '<span class="status '+b.statusClass+'">'+escHtml(b.status)+'</span>'
+    + '<button class="bp-close-x" id="bp-close-x" title="Close">\u2715</button></div></div>'
     + '<p class="bp-tagline">'+escHtml(b.tagline||'')+'</p>'
-    + '</div>'
     + '<div class="bp-sec" data-field="ingest"><h3>Ingest<span class="info-tip" data-tip="Brain-dump anything about this buddy \u2014 raw and unfiltered. Each dump lands in the buddy\u2019s repo (docs/ingest.md) as a timestamped entry.">\u24d8</span></h3>'
     + '<textarea class="notes" id="bp-ingest" placeholder="Dump what\u2019s in your head about '+escHtml(dispName(b))+'\u2026"></textarea>'
     + '<div style="margin-top:8px"><span class="fineprint" id="ingest-status"></span></div>'
@@ -2029,9 +2061,9 @@ function renderPlan(id){
   document.getElementById('buddy-home').innerHTML =
     '<div class="bp-wrap">'
     + '<div class="bp-crumb"><button class="linkbtn" data-view="plans">Business Plans</button> <span style="color:var(--faint)">/</span> <b>'+escHtml(p.name)+'</b></div>'
-    + '<div class="bp-top"><span class="bp-icon">'+escHtml(p.icon||'')+'</span>'
-    + '<h2 style="font-size:32px;font-weight:700;margin:0">'+escHtml(p.name)+'</h2>'
-    + '<span class="status '+p.statusClass+'">'+escHtml(p.status)+'</span></div>'
+    + '<div class="bp-sticky-head"><div class="bp-top"><span class="bp-icon">'+escHtml(p.icon||'')+'</span>'
+    + '<h2 class="bp-name">'+escHtml(p.name)+'</h2>'
+    + '<span class="status '+p.statusClass+'">'+escHtml(p.status)+'</span></div></div>'
     + '<div class="bp-sec"><h3>What it is</h3><p class="bp-mission">'+escHtml(p.desc)+'</p></div>'
     + '<div class="bp-sec"><h3>Documents</h3>'+docs+'</div>'
     + '<div class="bp-sec"><h3>Related buddies</h3>'+buds+'</div>'
